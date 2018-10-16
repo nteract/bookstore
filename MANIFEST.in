@@ -1,9 +1,9 @@
-recursive-include depot *.py
-recursive-include depot *.ipynb
-recursive-include depot *.json
-recursive-include depot *.yaml
-recursive-include depot *.keep
-recursive-include depot *.txt
+recursive-include depository *.py
+recursive-include depository *.ipynb
+recursive-include depository *.json
+recursive-include depository *.yaml
+recursive-include depository *.keep
+recursive-include depository *.txt
 
 include setup.py
 include requirements.txt
@@ -15,7 +15,7 @@ include *.md
 include *.toml
 
 include versioneer.py
-include depot/_version.py
+include depository/_version.py
 include .coveragerc
 
 # Documentation

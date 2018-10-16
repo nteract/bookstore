@@ -53,13 +53,13 @@ try:
     if pip_too_old:
         # pip is too old to handle IPython deps gracefully
         pip_message = (
-            'Your pip version is out of date. Depot requires pip >= 9.0.1. \n'
+            'Your pip version is out of date. depository requires pip >= 9.0.1. \n'
             'pip {} detected. Please install pip >= 9.0.1.'.format(pip.__version__)
         )
 except ImportError:
     pip_message = (
         'No pip detected; we were unable to import pip. \n'
-        'To use depot, please install pip >= 9.0.1.'
+        'To use depository, please install pip >= 9.0.1.'
     )
 except Exception:
     pass
@@ -75,7 +75,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='depot',
+    name='depository',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description='Storage Workflows for Notebooks',
@@ -86,16 +86,16 @@ setup(
     keywords='jupyter storage nteract notebook',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/nteract/depot',
-    packages=['depot'],
+    url='https://github.com/nteract/depository',
+    packages=['depository'],
     install_requires=required,
     extras_require=extras_require,
     entry_points={},
     project_urls={
-        'Documentation': 'https://github.com/nteract/depot/#todo',
+        'Documentation': 'https://github.com/nteract/depository/#todo',
         'Funding': 'https://nteract.io',
-        'Source': 'https://github.com/nteract/depot/',
-        'Tracker': 'https://github.com/nteract/depot/issues',
+        'Source': 'https://github.com/nteract/depository/',
+        'Tracker': 'https://github.com/nteract/depository/issues',
     },
     classifiers=[
         'Intended Audience :: Developers',

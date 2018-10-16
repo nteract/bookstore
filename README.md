@@ -1,4 +1,4 @@
-# Depot
+# depository
 
 This repository provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks.
 
@@ -38,29 +38,29 @@ Since most people are on a regular filesystem, we'll start with writing to the `
 ## Configuration
 
 ```python
-from depot import DepotContentsArchiver
+from depository import depositoryContentsArchiver
 
 # jupyter config
 # At ~/.jupyter/jupyter_notebook_config.py for user installs
 # At __ for system installs
 c = get_config()
 
-c.NotebookApp.contents_manager_class = DepotContentsArchiver
+c.NotebookApp.contents_manager_class = depositoryContentsArchiver
 
-c.Depot.workspace_prefix = "/workspace/kylek/notebooks"
-c.Depot.published_prefix = "/published/kylek/notebooks"  
-c.Depot.scheduled_prefix = "/scheduled/kylek/notebooks"  
+c.depository.workspace_prefix = "/workspace/kylek/notebooks"
+c.depository.published_prefix = "/published/kylek/notebooks"  
+c.depository.scheduled_prefix = "/scheduled/kylek/notebooks"  
 
 # Optional, in case you're using a different contents manager
 # This defaults to notebook.services.contents.manager.ContentsManager
-# c.Depot.Archiver.underlying_contents_manager_class = ADifferentContentsManager
+# c.depository.Archiver.underlying_contents_manager_class = ADifferentContentsManager
 
-c.Depot.Backend = "s3"
-c.Depot.S3.bucket = "<bucket-name>"
+c.depository.Backend = "s3"
+c.depository.S3.bucket = "<bucket-name>"
 
-# Note: if Depot is used from an EC2 instance with the right IAM role, you don't
+# Note: if depository is used from an EC2 instance with the right IAM role, you don't
 # have to specify these
-c.Depot.S3.access_key_id = <AWS Access Key ID / IAM Access Key ID>
-c.Depot.S3.secret_access_key = <AWS Secret Access Key / IAM Secret Access Key>
+c.depository.S3.access_key_id = <AWS Access Key ID / IAM Access Key ID>
+c.depository.S3.secret_access_key = <AWS Secret Access Key / IAM Secret Access Key>
 ```
 
