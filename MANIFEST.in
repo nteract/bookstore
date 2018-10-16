@@ -1,0 +1,28 @@
+recursive-include depot *.py
+recursive-include depot *.ipynb
+recursive-include depot *.json
+recursive-include depot *.yaml
+recursive-include depot *.keep
+recursive-include depot *.txt
+
+include setup.py
+include requirements.txt
+include requirements-dev.txt
+include README.rst
+include LICENSE
+include MANIFEST.in
+include *.md
+include *.toml
+
+include versioneer.py
+include depot/_version.py
+include .coveragerc
+
+# Documentation
+graft docs
+# exclude build files
+prune docs/_build
+# exclude sample notebooks for binder
+prune binder/
+# Scripts
+graft scripts
