@@ -1,0 +1,8 @@
+codecov
+coverage
+notebook
+mock
+pytest>=3.3
+pytest-cov
+pytest-mock
+black; python_version >= '3.6'
