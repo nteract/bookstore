@@ -1,0 +1,28 @@
+recursive-include bookstore *.py
+recursive-include bookstore *.ipynb
+recursive-include bookstore *.json
+recursive-include bookstore *.yaml
+recursive-include bookstore *.keep
+recursive-include bookstore *.txt
+
+include setup.py
+include requirements.txt
+include requirements-dev.txt
+include README.rst
+include LICENSE
+include MANIFEST.in
+include *.md
+include *.toml
+
+include versioneer.py
+include bookstore/_version.py
+include .coveragerc
+
+# Documentation
+graft docs
+# exclude build files
+prune docs/_build
+# exclude sample notebooks for binder
+prune binder/
+# Scripts
+graft scripts
