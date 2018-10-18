@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+print("Welcome to the bookstore 📚")
+
+from bookstore import BookstoreContentsArchiver
+
+# jupyter config
+# At ~/.jupyter/jupyter_notebook_config.py for user installs
+# At __ for system installs
+c = get_config()
+
+c.NotebookApp.contents_manager_class = BookstoreContentsArchiver
+
+
