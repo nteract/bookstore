@@ -38,14 +38,14 @@ Since most people are on a regular filesystem, we'll start with writing to the `
 ## Configuration
 
 ```python
-from bookstore import bookstoreContentsArchiver
+from bookstore import BookstoreContentsArchiver
 
 # jupyter config
 # At ~/.jupyter/jupyter_notebook_config.py for user installs
 # At __ for system installs
 c = get_config()
 
-c.NotebookApp.contents_manager_class = bookstoreContentsArchiver
+c.NotebookApp.contents_manager_class = BookstoreContentsArchiver
 
 c.bookstore.workspace_prefix = "/workspace/kylek/notebooks"
 c.bookstore.published_prefix = "/published/kylek/notebooks"  
