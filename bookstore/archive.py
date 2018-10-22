@@ -17,6 +17,11 @@ from traitlets import (
 class BookstoreContentsArchiver(ContentsManager, HasTraits):
     """
     Archives contents via one ContentsManager and passes through to
-    another ContentsManager
+    another ContentsManager.
+
+    Likely route:
+
+    * Write directly to S3 on post_save_hook
+
     """
     pass
