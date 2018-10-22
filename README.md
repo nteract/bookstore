@@ -19,7 +19,6 @@ Include diagram for versioning
 All notebooks are archived to a single versioned S3 bucket with specific prefixes denoting the lifecycle of the notebook:
 
 * `/workspace` - where users edit
-* `/scheduled` - notebooks currently scheduled
 * `/published` - public notebooks (to an organization)
 
 Each notebook path is a namespace that an external service ties into the schedule. We archive off versions, keeping the path intact (until a user changes them). 
@@ -27,7 +26,6 @@ Each notebook path is a namespace that an external service ties into the schedul
 | Prefix |  Intent | 
 |---|---|
 | `/workspace/kylek/notebooks/mine.ipynb`  | Notebook in “draft”  | 
-| `/scheduled/kylek/notebooks/mine.ipynb`  | Current scheduled copy  | 
 | `/published/kylek/notebooks/mine.ipynb`  | Current published copy  | 
 
 
@@ -49,7 +47,6 @@ c.NotebookApp.contents_manager_class = BookstoreContentsArchiver
 
 c.bookstore.workspace_prefix = "/workspace/kylek/notebooks"
 c.bookstore.published_prefix = "/published/kylek/notebooks"  
-c.bookstore.scheduled_prefix = "/scheduled/kylek/notebooks"  
 
 # Optional, in case you're using a different contents manager
 # This defaults to notebook.services.contents.manager.ContentsManager
