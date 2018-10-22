@@ -28,6 +28,8 @@ Each notebook path is a namespace that an external service ties into the schedul
 | `/workspace/kylek/notebooks/mine.ipynb`  | Notebook in “draft”  | 
 | `/published/kylek/notebooks/mine.ipynb`  | Current published copy  | 
 
+Scheduled notebooks will also be referred to by the notebook key, though we'll need to be able to surface version Ids as well. 
+
 
 ## Transitioning to this Storage Plan
 
