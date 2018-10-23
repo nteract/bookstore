@@ -1,5 +1,7 @@
 # bookstore
 
+[![Documentation Status](https://readthedocs.org/projects/bookstore/badge/?version=latest)](https://bookstore.readthedocs.io/en/latest/?badge=latest)
+
 This repository provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks.
 
 ## Automatic Notebook Versioning
