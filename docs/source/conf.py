@@ -15,6 +15,7 @@
 import os
 import sys
 import recommonmark
+from recommonmark.transform import AutoStructify
 
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -26,9 +27,9 @@ copyright = '2018, nteract project'
 author = 'nteract project'
 
 # The short X.Y version
-version = ''
+version = '0.1'
 # The full version, including alpha/beta/rc tags
-release = ''
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -47,6 +48,15 @@ extensions = [
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# allows recommonmark to provide improved toctree with markdown
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'enable_eval_rst': True,
+            'enable_auto_doc_ref': True,
+            }, True)
+    app.add_stylesheet('custom.css')
+    app.add_transform(AutoStructify)
 
 # source parsers
 source_parsers = {'.md': 'recommonmark.parser.CommonMarkParser'}
@@ -81,11 +91,25 @@ pygments_style = None
 #
 html_theme = 'alabaster'
 
+html_logo = '_static/images/nteract_logo_compact_purple.png'
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'show_related': True,
+    'description': 'Notebook storage workflows for the masses.',
+    'github_user': 'nteract',
+    'github_repo': 'bookstore',
+    'github_banner': False,
+    'github_button': False,
+    'show_powered_by': True,
+    'extra_nav_links': {
+        'GitHub Repo': 'http://github.com/nteract/bookstore',
+        'Issue Tracker': 'http://github.com/nteract/bookstore/issues',
+    },
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -100,7 +124,14 @@ html_static_path = ['_static']
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = {
+        '**': [
+        'about.html',
+        'searchbox.html',
+        'navigation.html',
+        'sourcelink.html',
+    ],
+}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
