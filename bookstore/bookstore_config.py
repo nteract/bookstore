@@ -14,6 +14,9 @@ from traitlets import (
 from traitlets.config import LoggingConfigurable
 
 class BookstoreSettings(LoggingConfigurable):
+    """The same settings to be shared across archival, publishing, and scheduling
+    """
+
     workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(config=True)
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
 
@@ -33,5 +36,5 @@ class BookstoreSettings(LoggingConfigurable):
         "us-east-1", help="Region name").tag(
             config=True, env="JPYNB_S3_REGION_NAME")
     s3_bucket = Unicode(
-        "notebooks", help="Bucket name to store notebooks").tag(
+        "bookstore", help="Bucket name to store notebooks").tag(
             config=True, env="JPYNB_S3_BUCKET")

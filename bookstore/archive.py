@@ -28,6 +28,7 @@ class BookstoreContentsArchiver(FileContentsManager):
 
     def __init__(self, *args, **kwargs):
         super(FileContentsManager, self).__init__(*args, **kwargs)
+        # opt ourselves into being part of the Jupyter App that should have Bookstore Settings applied
         self.settings = BookstoreSettings(parent=self)
 
         self.fs = s3fs.S3FileSystem(key=self.settings.s3_access_key_id,
@@ -41,7 +42,8 @@ class BookstoreContentsArchiver(FileContentsManager):
 
     @property
     def delimiter(self):
-        """Normally this is overridable, for now just keeping this consistent"""
+        """It's a slash! Normally this could be configurable. This leaves room for that later,
+        keeping it centralized for now"""
         return "/"
 
     @property
@@ -50,6 +52,7 @@ class BookstoreContentsArchiver(FileContentsManager):
         return self.delimiter.join([self.settings.s3_bucket, self.settings.workspace_prefix])
 
     def s3_path(self, path):
+        """compute the s3 path based on the bucket, prefix, and the path to the notebook"""
         return self.delimiter.join([self.full_prefix, path])
 
     def run_pre_save_hook(self, model, path, **kwargs):
