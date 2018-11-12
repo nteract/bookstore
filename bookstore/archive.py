@@ -39,6 +39,8 @@ class BookstoreContentsArchiver(FileContentsManager):
     def run_pre_save_hook(self, model, path, **kwargs):
         """Override the direct pre_save_hook to implement our own without monkey patching
         """
+        pprint(self.bookstore._trait_values)
+        pprint(self.bookstore.storage_settings._trait_values)
 
         if model['type'] != 'notebook':
             return
