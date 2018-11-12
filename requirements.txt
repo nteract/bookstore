@@ -1,4 +1,5 @@
 future
 futures ; python_version < "3.0"
 ipython >= 5.0
+notebook
 s3contents
