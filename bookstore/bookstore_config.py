@@ -36,3 +36,12 @@ class BookstoreS3Settings(LoggingConfigurable):
 class Bookstore(LoggingConfigurable):
     workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(config=True)
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
+
+    storage_class = Type(BookstoreS3Settings, help="Class for settings").tag(config=True)
+    storage_settings = Instance(klass=LoggingConfigurable,
+                                help="Instance of settings object used in Bookstore",
+                                allow_none=True)
+
+    @default('storage_settings')
+    def _storage_settings_default(self):
+        return self.storage_class(parent=self)
