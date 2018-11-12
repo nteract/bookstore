@@ -47,7 +47,7 @@ class BookstoreContentsArchiver(FileContentsManager):
     @property
     def full_prefix(self):
         """Full prefix: bucket + workspace prefix"""
-        return self.delimiter.join([self.settings.s3_bucket, self.settings.s3_workspace_prefix])
+        return self.delimiter.join([self.settings.s3_bucket, self.settings.workspace_prefix])
 
     def s3_path(self, path):
         return self.delimiter.join([self.full_prefix, path])
@@ -61,13 +61,9 @@ class BookstoreContentsArchiver(FileContentsManager):
         # TODO: store the hash of the notebook to not write on every save
         notebook_contents = json.dumps(model['content'])
 
-        print(self.s3_path(path))
-
-        return
-
-        # Once we're ready, we'll do S3 for real
+        full_path = self.s3_path(path)
 
         # write to S3
-        # TODO: Do it asynchronously
+        # TODO: Write to S3 asynchronously to not block other server operations
         with self.fs.open(full_path, mode='wb') as f:
             f.write(notebook_contents.encode('utf-8'))
