@@ -47,19 +47,16 @@ from bookstore import BookstoreContentsArchiver
 
 c.NotebookApp.contents_manager_class = BookstoreContentsArchiver
 
-c.Bookstore.workspace_prefix = "/workspace/kylek/notebooks"
-c.Bookstore.published_prefix = "/published/kylek/notebooks"
+c.BookstoreSettings.workspace_prefix = "/workspace/kylek/notebooks"
+c.BookstoreSettings.published_prefix = "/published/kylek/notebooks"
 
 # Optional, in case you're using a different contents manager
 # This defaults to notebook.services.contents.manager.ContentsManager
-# c.bookstore.Archiver.underlying_contents_manager_class = ADifferentContentsManager
 
-c.Bookstore.storage_class = BookstoreS3Settings
-
-c.BookstoreS3Settings.bucket = "<bucket-name>"
+c.BookstoreSettings.s3_bucket = "<bucket-name>"
 
 # Note: if bookstore is used from an EC2 instance with the right IAM role, you don't
 # have to specify these
-c.BookstoreS3Settings.access_key_id = <AWS Access Key ID / IAM Access Key ID>
-c.BookstoreS3Settings.secret_access_key = <AWS Secret Access Key / IAM Secret Access Key>
+c.BookstoreSettings.s3_access_key_id = <AWS Access Key ID / IAM Access Key ID>
+c.BookstoreSettings.s3_secret_access_key = <AWS Secret Access Key / IAM Secret Access Key>
 ```

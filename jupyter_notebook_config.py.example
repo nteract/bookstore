@@ -3,8 +3,19 @@
 
 print("Welcome to the bookstore 📚")
 
-from bookstore import BookstoreContentsArchiver
+from bookstore import BookstoreContentsArchiver, BookstoreSettings
 
+# jupyter config
+# At ~/.jupyter/jupyter_notebook_config.py for user installs
+# At __ for system installs
 c = get_config()
 
 c.NotebookApp.contents_manager_class = BookstoreContentsArchiver
+
+c.BookstoreSettings.workspace_prefix = "works"
+
+# If using minio for development
+c.BookstoreSettings.s3_endpoint_url = "http://127.0.0.1:9000"
+c.BookstoreSettings.s3_bucket = "bookstore"
+c.BookstoreSettings.s3_access_key_id = "4MR9ON7H4UNVCT2LQTFX"
+c.BookstoreSettings.s3_secret_access_key = "o8CnAN5G9x87P9aLxSjohoSV0EsCLjksuY6wjK9N"
