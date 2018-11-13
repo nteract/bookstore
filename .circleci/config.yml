@@ -47,6 +47,7 @@ jobs:
             . venv/bin/activate
             # Package up the package
             python setup.py sdist bdist_wheel
+
       - run:
           name: create virtual environment for packaged release
           command: |
@@ -54,6 +55,7 @@ jobs:
             . venv_packaged_integration/bin/activate
             pip install --upgrade pip setuptools wheel
             pip install -U --force-reinstall dist/bookstore*.whl
+
       - run:
           name: integration tests
           command: |
