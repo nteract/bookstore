@@ -4,7 +4,7 @@ from notebook.base.handlers import APIHandler, \
     AuthenticatedFileHandler
 from tornado import web
 
-from .._version import get_versions
+from ._version import get_versions
 version = get_versions()['version']
 
 class BookstoreVersionHandler(APIHandler):
