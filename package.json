@@ -1,0 +1,29 @@
+{
+  "name": "bookstore",
+  "version": "1.0.0",
+  "description": "[![Documentation Status](https://readthedocs.org/projects/bookstore/badge/?version=latest)](https://bookstore.readthedocs.io/en/latest/?badge=latest)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "private": "true",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nteract/bookstore.git"
+  },
+  "author": "Kyle Kelley <rgbkrk@gmail.com>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/nteract/bookstore/issues"
+  },
+  "homepage": "https://github.com/nteract/bookstore#readme",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "minio": "^7.0.1",
+    "rxjs": "^6.3.3",
+    "xmlhttprequest": "^1.8.0"
+  }
+}

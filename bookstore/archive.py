@@ -31,6 +31,8 @@ class BookstoreContentsArchiver(FileContentsManager):
         # opt ourselves into being part of the Jupyter App that should have Bookstore Settings applied
         self.settings = BookstoreSettings(parent=self)
 
+        self.log.info("Archiving notebooks to {}".format(self.full_prefix))
+
         self.fs = s3fs.S3FileSystem(key=self.settings.s3_access_key_id,
                                     secret=self.settings.s3_secret_access_key,
                                     client_kwargs={
