@@ -14,11 +14,10 @@
 #
 import os
 import sys
-import recommonmark
-from recommonmark.transform import AutoStructify
+
+import m2r
 
 sys.path.insert(0, os.path.abspath('.'))
-
 
 # -- Project information -----------------------------------------------------
 
@@ -27,9 +26,9 @@ copyright = '2018, nteract project'
 author = 'nteract project'
 
 # The short X.Y version
-version = '0.1'
+version = '0.2'
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '0.2.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,22 +43,11 @@ release = '0.1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
+    'm2r',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-# allows recommonmark to provide improved toctree with markdown
-def setup(app):
-    app.add_config_value('recommonmark_config', {
-            'enable_eval_rst': True,
-            'enable_auto_doc_ref': True,
-            }, True)
-    app.add_stylesheet('custom.css')
-    app.add_transform(AutoStructify)
-
-# source parsers
-source_parsers = {'.md': 'recommonmark.parser.CommonMarkParser'}
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
