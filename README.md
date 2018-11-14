@@ -47,11 +47,9 @@ from bookstore import BookstoreContentsArchiver
 
 c.NotebookApp.contents_manager_class = BookstoreContentsArchiver
 
+# All Bookstore settings are centralized on one config object so you don't have to configure it for each class
 c.BookstoreSettings.workspace_prefix = "/workspace/kylek/notebooks"
 c.BookstoreSettings.published_prefix = "/published/kylek/notebooks"
-
-# Optional, in case you're using a different contents manager
-# This defaults to notebook.services.contents.manager.ContentsManager
 
 c.BookstoreSettings.s3_bucket = "<bucket-name>"
 
