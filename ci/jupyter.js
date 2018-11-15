@@ -25,6 +25,11 @@ class JupyterServer {
       this.token = await genToken();
     }
 
+    // Kill off any prexisting process before creating a new one
+    if (this.process) {
+      this.process.kill();
+    }
+
     this.process = child_process.spawn(
       "jupyter",
       [
@@ -42,12 +47,12 @@ class JupyterServer {
     ////// Let's use spawn-rx in the future and make some clean rxjs with timeouts
     this.process.stdout.on("data", data => {
       const s = data.toString();
-      console.log(s);
+      process.stdout.write(s);
     });
     this.process.stderr.on("data", data => {
       const s = data.toString();
+      process.stderr.write(s);
 
-      console.error(s);
       if (s.includes("Jupyter Notebook is running at")) {
         this.up = true;
       }
