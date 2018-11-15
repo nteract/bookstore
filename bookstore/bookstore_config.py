@@ -1,5 +1,4 @@
-from traitlets import Any, Bool, Dict, Instance, List, TraitError, Type, Unicode, validate, default
-
+from traitlets import Int, Unicode
 from traitlets.config import LoggingConfigurable
 
 
@@ -7,10 +6,12 @@ class BookstoreSettings(LoggingConfigurable):
     """The same settings to be shared across archival, publishing, and scheduling
     """
 
-    workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(
+    workspace_prefix = Unicode(
+        "workspace", help="Prefix for the live workspace notebooks"
+    ).tag(config=True)
+    published_prefix = Unicode("published", help="Prefix for published notebooks").tag(
         config=True
     )
-    published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
 
     ## S3 Settings for the S3 backed storage (other implementations can add on below)
     # Allowed to not set these as we can pick up IAM roles instead
@@ -30,3 +31,8 @@ class BookstoreSettings(LoggingConfigurable):
     s3_bucket = Unicode("bookstore", help="Bucket name to store notebooks").tag(
         config=True, env="JPYNB_S3_BUCKET"
     )
+
+    max_threads = Int(
+        16,
+        help="Maximum number of threads for the threadpool allocated for S3 read/writes",
+    ).tag(config=True)
