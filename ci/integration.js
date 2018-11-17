@@ -8,9 +8,33 @@ const { JupyterServer } = require("./jupyter");
 
 const { sleep } = require("./sleep");
 
-// Catch all rogue promise rejections to fail CI
+// Keep the jupyter server around to make sure we can destroy on bad exit
+let jupyterServer = null;
+
+function cleanupJupyter() {
+  if (jupyterServer && jupyterServer.process && !jupyterServer.process.killed) {
+    console.log("cleaning up a rogue jupyter server");
+    jupyterServer.process.kill();
+  }
+}
+
+// Clean up on general close
+process.on("exit", cleanupJupyter);
+
+// Clean up on ctrl+c
+process.on("SIGINT", cleanupJupyter);
+
+// Clean up from `kill pid`, e.g. nodemon restart
+process.on("SIGUSR1", cleanupJupyter);
+process.on("SIGUSR2", cleanupJupyter);
+
+// Clean up from uncaught exceptions
+process.on("uncaughtException", cleanupJupyter);
+
+// Catch all rogue promise rejections to ensure we fail CI
 process.on("unhandledRejection", error => {
-  console.log("unhandledRejection", error.message);
+  cleanupJupyter();
+  console.log("unhandledRejection", error);
   console.error(error.stack);
   process.exit(2);
 });
@@ -20,7 +44,7 @@ console.log("running bookstore integration tests");
 const main = async () => {
   const bucketName = "bookstore";
 
-  const jupyterServer = new JupyterServer();
+  jupyterServer = new JupyterServer();
   await jupyterServer.start();
 
   const s3Config = {
@@ -36,8 +60,49 @@ const main = async () => {
   var s3Client = new s3.Client(s3Config);
 
   await s3Client.makeBucket(bucketName);
-
   console.log(`Created bucket ${bucketName}`);
+
+  async function compareNotebooks(filepath, originalNotebook) {
+    /***** Check notebook from S3 *****/
+    const rawNotebook = await s3Client.getObject(
+      bucketName,
+      `ci-workspace/${filepath}`
+    );
+
+    console.log(filepath);
+    console.log(rawNotebook);
+
+    const notebook = JSON.parse(rawNotebook);
+
+    if (!_.isEqual(notebook, originalNotebook)) {
+      console.error("original");
+      console.error(originalNotebook);
+      console.error("from s3");
+      console.error(notebook);
+      throw new Error("Notebook on S3 does not match what we sent");
+    }
+
+    console.log("Notebook on S3 matches what we sent");
+
+    /***** Check notebook from Disk *****/
+    const diskNotebook = await new Promise((resolve, reject) =>
+      fs.readFile(path.join(__dirname, filepath), (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(JSON.parse(data));
+        }
+      })
+    );
+
+    if (!_.isEqual(diskNotebook, originalNotebook)) {
+      console.error("original");
+      console.error(originalNotebook);
+      console.error("from disk");
+      console.error(diskNotebook);
+      throw new Error("Notebook on Disk does not match what we sent");
+    }
+  }
 
   const originalNotebook = {
     cells: [
@@ -72,7 +137,36 @@ const main = async () => {
     nbformat_minor: 2
   };
 
-  jupyterServer.writeNotebook("ci-local-writeout.ipynb", originalNotebook);
+  await jupyterServer.writeNotebook(
+    "ci-local-writeout.ipynb",
+    originalNotebook
+  );
+
+  const basicNotebook = {
+    cells: [],
+    nbformat: 4,
+    nbformat_minor: 2,
+    metadata: {
+      save: 1
+    }
+  };
+
+  for (var ii = 0; ii < 4; ii++) {
+    await jupyterServer.writeNotebook("ci-local-writeout2.ipynb", {
+      cells: [],
+      nbformat: 4,
+      nbformat_minor: 2,
+      metadata: {
+        save: ii
+      }
+    });
+    await jupyterServer.writeNotebook("ci-local-writeout3.ipynb", {
+      cells: [{ cell_type: "markdown", source: "# Hello world", metadata: {} }],
+      nbformat: 4,
+      nbformat_minor: 2,
+      metadata: {}
+    });
+  }
 
   // Wait for minio to have the notebook
   // Future iterations of this script should poll to get the notebook
@@ -80,45 +174,15 @@ const main = async () => {
 
   jupyterServer.shutdown();
 
-  /***** Check notebook from S3 *****/
-  const rawNotebook = await s3Client.getObject(
-    bucketName,
-    "ci-workspace/ci-local-writeout.ipynb"
-  );
-
-  const notebook = JSON.parse(rawNotebook);
-
-  if (!_.isEqual(notebook, originalNotebook)) {
-    console.error("original");
-    console.error(originalNotebook);
-    console.error("from s3");
-    console.error(notebook);
-    throw new Error("Notebook on S3 does not match what we sent");
-  }
-
-  console.log("Notebook on S3 matches what we sent");
-
-  /***** Check notebook from Disk *****/
-  const diskNotebook = await new Promise((resolve, reject) =>
-    fs.readFile(
-      path.join(__dirname, "ci-local-writeout.ipynb"),
-      (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(JSON.parse(data));
-        }
-      }
-    )
-  );
-
-  if (!_.isEqual(diskNotebook, originalNotebook)) {
-    console.error("original");
-    console.error(originalNotebook);
-    console.error("from disk");
-    console.error(diskNotebook);
-    throw new Error("Notebook on Disk does not match what we sent");
-  }
+  await compareNotebooks("ci-local-writeout.ipynb", originalNotebook);
+  await compareNotebooks("ci-local-writeout2.ipynb", {
+    cells: [],
+    nbformat: 4,
+    nbformat_minor: 2,
+    metadata: {
+      save: 3
+    }
+  });
 
   console.log("📚 Bookstore Integration Complete 📚");
 };
