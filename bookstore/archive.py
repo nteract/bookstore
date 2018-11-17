@@ -38,9 +38,7 @@ class BookstoreContentsArchiver(FileContentsManager):
     @property
     def full_prefix(self):
         """Full prefix: bucket + workspace prefix"""
-        return self.delimiter.join(
-            [self.settings.s3_bucket, self.settings.workspace_prefix]
-        )
+        return self.delimiter.join([self.settings.s3_bucket, self.settings.workspace_prefix])
 
     def s3_path(self, path):
         """compute the s3 path based on the bucket, prefix, and the path to the notebook"""
