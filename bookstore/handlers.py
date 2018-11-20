@@ -1,6 +1,7 @@
 import json
+
+from notebook.base.handlers import APIHandler
 from notebook.utils import url_path_join
-from notebook.base.handlers import APIHandler, AuthenticatedFileHandler
 from tornado import web
 
 from ._version import get_versions
@@ -21,6 +22,10 @@ class BookstoreVersionHandler(APIHandler):
 def load_jupyter_server_extension(nb_app):
     web_app = nb_app.web_app
     host_pattern = '.*$'
-    base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
+    base_bookstore_pattern = url_path_join(
+        web_app.settings['base_url'], '/api/bookstore'
+    )
 
-    web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
+    web_app.add_handlers(
+        host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)]
+    )

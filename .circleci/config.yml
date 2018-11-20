@@ -36,6 +36,15 @@ jobs:
             pip install -r requirements.txt
             pip install -r requirements-dev.txt
 
+      - run:
+          name: check types
+          command: |
+            . venv/bin/activate
+            pip install mypy==0.641
+            # NOTE: We can add in stubs for modules we're using
+            # BONUS: Tornado 6 will include types
+            mypy bookstore --ignore-missing-imports
+
       - save_cache:
           paths:
             - ./venv

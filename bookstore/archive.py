@@ -1,9 +1,21 @@
 import json
-import s3fs
+from asyncio import Lock
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, NamedTuple
 
+import s3fs
 from notebook.services.contents.filemanager import FileContentsManager
+from tornado import gen, ioloop
+from tornado.concurrent import run_on_executor
+from tornado.util import TimeoutError
 
 from .bookstore_config import BookstoreSettings
+
+
+class ArchiveRecord(NamedTuple):
+    filepath: str
+    content: str
+    queued_time: float
 
 
 class BookstoreContentsArchiver(FileContentsManager):
@@ -29,6 +41,47 @@ class BookstoreContentsArchiver(FileContentsManager):
             s3_additional_kwargs={},
         )
 
+        self._thread_pool = ThreadPoolExecutor(max_workers=self.settings.max_threads)
+
+        # A lock per path to suppress writing to S3 when currently writing
+        self.path_locks: Dict[str, Lock] = {}
+        # Since locks are not pre-created,
+        self.ability_to_create_path_lock = Lock()
+
+    async def archive(self, record: ArchiveRecord):
+        """Process a storage write, only allowing one write at a time to each path
+        """
+        async with self.ability_to_create_path_lock:
+            lock = self.path_locks.get(record.filepath)
+
+            if lock is None:
+                lock = Lock()
+                self.path_locks[record.filepath] = lock
+
+        # Skip writes when a given path is already locked
+        if lock.locked():
+            self.log.info("Skipping archive of %s", record.filepath)
+            return
+
+        async with lock:
+            try:
+                self.log.info("Processing storage write of %s", record.filepath)
+                full_path = self.s3_path(record.filepath)
+                await self.write_to_s3(full_path, record.content)
+                self.log.info("Done with storage write of %s", record.filepath)
+            except Exception as e:
+                self.log.error(
+                    'Error while archiving file: %s %s',
+                    record.filepath,
+                    e,
+                    exc_info=True,
+                )
+
+    @run_on_executor(executor='_thread_pool')
+    def write_to_s3(self, full_path: str, content: str):
+        with self.fs.open(full_path, mode="wb") as f:
+            f.write(content.encode("utf-8"))
+
     @property
     def delimiter(self):
         """It's a slash! Normally this could be configurable. This leaves room for that later,
@@ -38,7 +91,9 @@ class BookstoreContentsArchiver(FileContentsManager):
     @property
     def full_prefix(self):
         """Full prefix: bucket + workspace prefix"""
-        return self.delimiter.join([self.settings.s3_bucket, self.settings.workspace_prefix])
+        return self.delimiter.join(
+            [self.settings.s3_bucket, self.settings.workspace_prefix]
+        )
 
     def s3_path(self, path):
         """compute the s3 path based on the bucket, prefix, and the path to the notebook"""
@@ -50,12 +105,16 @@ class BookstoreContentsArchiver(FileContentsManager):
         if model["type"] != "notebook":
             return
 
-        # TODO: store the hash of the notebook to not write on every save
-        notebook_contents = json.dumps(model["content"])
+        content = json.dumps(model["content"])
 
-        full_path = self.s3_path(path)
+        loop = ioloop.IOLoop.current()
 
-        # write to S3
-        # TODO: Write to S3 asynchronously to not block other server operations
-        with self.fs.open(full_path, mode="wb") as f:
-            f.write(notebook_contents.encode("utf-8"))
+        # Offload the archival to be scheduled to work on the event loop
+        loop.spawn_callback(
+            self.archive,
+            ArchiveRecord(
+                content=content,
+                filepath=path,
+                queued_time=ioloop.IOLoop.current().time(),
+            ),
+        )
