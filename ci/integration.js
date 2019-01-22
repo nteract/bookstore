@@ -166,11 +166,12 @@ const main = async () => {
       nbformat_minor: 2,
       metadata: {}
     });
+    await sleep(100);
   }
 
   // Wait for minio to have the notebook
   // Future iterations of this script should poll to get the notebook
-  await sleep(1000);
+  await sleep(700);
 
   jupyterServer.shutdown();
 
