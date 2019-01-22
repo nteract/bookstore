@@ -45,11 +45,17 @@ class Client {
     this.minioClient = new Minio.Client(s3Config);
   }
 
-  makeBucket(bucketName) {
-    return makeBucket(this.minioClient, bucketName);
+  async makeBucket(bucketName) {
+    const bucketExists = await this.minioClient.bucketExists(bucketName);
+
+    if (bucketExists) {
+      return;
+    }
+
+    return await makeBucket(this.minioClient, bucketName);
   }
 
-  getObject(bucketName, objectName) {
+  async getObject(bucketName, objectName) {
     return getObject(this.minioClient, bucketName, objectName);
   }
 }
