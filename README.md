@@ -1,14 +1,14 @@
-# bookstore
+# bookstore :books:
 
 [![Documentation Status](https://readthedocs.org/projects/bookstore/badge/?version=latest)](https://bookstore.readthedocs.io/en/latest/?badge=latest)
 
-This repository provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks.
+**bookstore** :books: provides tooling and workflow recommendations for storing :cd: , scheduling :calendar:, and publishing :book: notebooks.
 
 ## Automatic Notebook Versioning
 
-Every save of a notebook creates an immutable copy of the notebook on object storage.
+Every *save* of a notebook creates an *immutable copy* of the notebook on object storage.
 
-To ease implementation, we'll rely on S3 as the object store, using [versioned buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html).
+To simplify implementation, we currently rely on S3 as the object store, using [versioned buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html).
 
 <!--
 
@@ -30,11 +30,20 @@ Each notebook path is a namespace that an external service ties into the schedul
 | `/workspace/kylek/notebooks/mine.ipynb` | Notebook in “draft”    |
 | `/published/kylek/notebooks/mine.ipynb` | Current published copy |
 
-Scheduled notebooks will also be referred to by the notebook key, though we'll need to be able to surface version Ids as well.
+Scheduled notebooks will also be referred to by the notebook key. In addition, we'll need to be able to surface version IDs as well.
 
 ## Transitioning to this Storage Plan
 
 Since most people are on a regular filesystem, we'll start with writing to the `/workspace` prefix as Archival Storage (writing on save using a `post_save_hook` for a Jupyter contents manager).
+
+---
+
+## Installation
+
+**bookstore** requires Python 3.6 or higher.
+
+1. Clone this repo.
+2. At the repo's root, enter in the Terminal: `python3 -m pip install .` (Tip: don't forget the dot at the end of the command)
 
 ## Configuration
 
