@@ -257,7 +257,7 @@ const main = async () => {
     }
   });
   
-  // await comparePublishedNotebooks("ci-published-local-writeout.ipynb", originalNotebook);
+  await comparePublishedNotebooks("ci-published-local-writeout.ipynb", originalNotebook);
   // await comparePublishedNotebooks("ci-published-local-writeout2.ipynb", {
   //   cells: [],
   //   nbformat: 4,
