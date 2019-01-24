@@ -195,16 +195,16 @@ const main = async () => {
     }
   };
 
-  await jupyterServer.writeNotebook(
-    "ci-published-local-writeout.ipynb",
-    originalNotebook
-  );
 
   await jupyterServer.writeNotebook(
     "ci-archived-local-writeout.ipynb",
     originalNotebook
   );
 
+  await jupyterServer.publishNotebook(
+    "ci-published-local-writeout.ipynb",
+    originalNotebook
+  );
 
   for (var ii = 0; ii < 4; ii++) {
     await jupyterServer.writeNotebook("ci-archived-local-writeout2.ipynb", {
@@ -224,7 +224,7 @@ const main = async () => {
     await sleep(100);
   }
   for (var ii = 0; ii < 4; ii++) {
-    await jupyterServer.writeNotebook("ci-published-local-writeout2.ipynb", {
+    await jupyterServer.publishNotebook("ci-published-local-writeout2.ipynb", {
       cells: [],
       nbformat: 4,
       nbformat_minor: 2,
@@ -232,7 +232,7 @@ const main = async () => {
         save: ii
       }
     });
-    await jupyterServer.writeNotebook("ci-published-local-writeout3.ipynb", {
+    await jupyterServer.publishNotebook("ci-published-local-writeout3.ipynb", {
       cells: [{ cell_type: "markdown", source: "# Hello world", metadata: {} }],
       nbformat: 4,
       nbformat_minor: 2,
@@ -245,6 +245,16 @@ const main = async () => {
   // Future iterations of this script should poll to get the notebook
   await sleep(700);
 
+  // await comparePublishedNotebooks("ci-published-local-writeout.ipynb", originalNotebook);
+  // await comparePublishedNotebooks("ci-published-local-writeout2.ipynb", {
+  //   cells: [],
+  //   nbformat: 4,
+  //   nbformat_minor: 2,
+  //   metadata: {
+  //     save: 3
+  //   }
+  // });
+  
   jupyterServer.shutdown();
 
   await compareArchivedNotebooks("ci-archived-local-writeout.ipynb", originalNotebook);
@@ -257,15 +267,6 @@ const main = async () => {
     }
   });
   
-  await comparePublishedNotebooks("ci-published-local-writeout.ipynb", originalNotebook);
-  // await comparePublishedNotebooks("ci-published-local-writeout2.ipynb", {
-  //   cells: [],
-  //   nbformat: 4,
-  //   nbformat_minor: 2,
-  //   metadata: {
-  //     save: 3
-  //   }
-  // });
 
   console.log("📚 Bookstore Integration Complete 📚");
 };
