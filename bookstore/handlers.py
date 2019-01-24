@@ -92,8 +92,12 @@ class BookstorePublishHandler(APIHandler):
         # Until we're ready
         # self.set_status(501)
         self.set_status(201)
-        self.log.info(json.dumps({"s3path": full_s3_path, "versionID": obj['VersionId']}))
-        self.finish(json.dumps({"s3path": full_s3_path, "versionID": obj['VersionId']}))
+        resp_content = {
+            "s3path": full_s3_path,
+            # "versionID": obj['VersionId'],
+        }
+        resp_str =  json.dumps(resp_content)
+        self.finish(resp_str)
 
     @web.authenticated
     async def put(self, path=''):
