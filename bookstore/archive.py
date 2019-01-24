@@ -1,17 +1,15 @@
 import json
-from asyncio import Lock
-from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, NamedTuple
+import aiobotocore
 
-import s3fs
+from asyncio import Lock
+from typing import Dict, NamedTuple
+
 from notebook.services.contents.filemanager import FileContentsManager
-from tornado import gen, ioloop
-from tornado.concurrent import run_on_executor
-from tornado.util import TimeoutError
+from tornado import ioloop
 
 from .bookstore_config import BookstoreSettings
 
-from .s3_paths import s3_path, s3_display_path
+from .s3_paths import s3_key, s3_display_path
 
 
 class ArchiveRecord(NamedTuple):
@@ -33,18 +31,7 @@ class BookstoreContentsArchiver(FileContentsManager):
         self.log.info("Archiving notebooks to {}".format(s3_display_path(
             self.settings.s3_bucket, self.settings.workspace_prefix)))
 
-        self.fs = s3fs.S3FileSystem(
-            key=self.settings.s3_access_key_id,
-            secret=self.settings.s3_secret_access_key,
-            client_kwargs={
-                "endpoint_url": self.settings.s3_endpoint_url,
-                "region_name": self.settings.s3_region_name,
-            },
-            config_kwargs={},
-            s3_additional_kwargs={},
-        )
-
-        self._thread_pool = ThreadPoolExecutor(max_workers=self.settings.max_threads)
+        self.session = aiobotocore.get_session()
 
         # A lock per path to suppress writing to S3 when currently writing
         self.path_locks: Dict[str, Lock] = {}
@@ -68,26 +55,23 @@ class BookstoreContentsArchiver(FileContentsManager):
 
         async with lock:
             try:
-                self.log.info("Processing storage write of %s", record.filepath)
-                full_path = self.s3_path(record.filepath)
-                await self.write_to_s3(full_path, record.content)
-                self.log.info("Done with storage write of %s", record.filepath)
+                async with self.session.create_client('s3',
+                                                      aws_secret_access_key=self.settings.s3_secret_access_key,
+                                                      aws_access_key_id=self.settings.s3_access_key_id,
+                                                      endpoint_url=self.settings.s3_endpoint_url,
+                                                      region_name=self.settings.s3_region_name,
+                                                      ) as client:
+                    self.log.info("Processing storage write of %s", record.filepath)
+                    file_key = s3_key(self.settings.workspace_prefix, record.filepath)
+                    await client.put_object(Bucket=self.settings.s3_bucket, Key=file_key, Body=record.content)
+                    self.log.info("Done with storage write of %s", record.filepath)
             except Exception as e:
-                self.log.error(
-                    'Error while archiving file: %s %s',
-                    record.filepath,
-                    e,
-                    exc_info=True,
-                )
-
-    @run_on_executor(executor='_thread_pool')
-    def write_to_s3(self, full_path: str, content: str):
-        with self.fs.open(full_path, mode="wb") as f:
-            f.write(content.encode("utf-8"))
-
-    def s3_path(self, path):
-        """compute the s3 path based on the bucket, prefix, and the path to the notebook"""
-        return s3_path(self.settings.s3_bucket, self.settings.workspace_prefix, path)
+                    self.log.error(
+                        'Error while archiving file: %s %s',
+                        record.filepath,
+                        e,
+                        exc_info=True,
+                    )
 
     def run_pre_save_hook(self, model, path, **kwargs):
         """Store notebook to S3 when saves happen
