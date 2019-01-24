@@ -259,14 +259,14 @@ const main = async () => {
   await sleep(700);
 
   await comparePublishedNotebooks("ci-published-local-writeout.ipynb", originalNotebook);
-  // await comparePublishedNotebooks("ci-published-local-writeout2.ipynb", {
-  //   cells: [],
-  //   nbformat: 4,
-  //   nbformat_minor: 2,
-  //   metadata: {
-  //     save: 3
-  //   }
-  // });
+  await comparePublishedNotebooks("ci-published-local-writeout2.ipynb", {
+    cells: [],
+    nbformat: 4,
+    nbformat_minor: 2,
+    metadata: {
+      save: 3
+    }
+  });
   
   jupyterServer.shutdown();
 
