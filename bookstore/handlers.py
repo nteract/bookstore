@@ -33,7 +33,10 @@ class BookstorePublishHandler(APIHandler):
     def __init__(self, *args, **kwargs):
         super(APIHandler, self).__init__(*args, **kwargs)
         # create an easy helper to get at our bookstore settings quickly
-        self.bookstore_settings = BookstoreSettings(config=self.config['BookstoreSettings'])
+        # self.log.info(self.config['BookstoreSettings'])
+        # self.log.info(self.config['BookstoreSettings'].published_prefix)
+        # self.log.info(self.config)
+        self.bookstore_settings = BookstoreSettings(config=self.config)
 
         self.session = aiobotocore.get_session()
 
@@ -54,20 +57,23 @@ class BookstorePublishHandler(APIHandler):
             raise web.HTTPError(400, "bookstore only publishes notebooks")
         content = model['content']
 
-        full_s3_path = s3_path(self.settings.bucket, self.settings.published_prefix, path)
-        file_key = s3_key(self.settings.published_prefix, path)
+        full_s3_path = s3_path(self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path)
+        file_key = s3_key(self.bookstore_settings.published_prefix, path)
 
-        self.log.info("Publishing to %s", s3_display_path(self.settings.s3_bucket,
-                                                          self.settings.published_prefix,
+        self.log.info("Publishing to %s", s3_display_path(self.bookstore_settings.s3_bucket,
+                                                          self.bookstore_settings.published_prefix,
                                                           path))
         async with self.session.create_client('s3',
-                                              aws_secret_access_key=self.settings.s3_secret_access_key,
-                                              aws_access_key_id=self.settings.s3_access_key_id,
-                                              endpoint_url=self.settings.s3_endpoint_url,
-                                              region_name=self.settings.s3_region_name,
+                                              aws_secret_access_key=self.bookstore_settings.s3_secret_access_key,
+                                              aws_access_key_id=self.bookstore_settings.s3_access_key_id,
+                                              endpoint_url=self.bookstore_settings.s3_endpoint_url,
+                                              region_name=self.bookstore_settings.s3_region_name,
                                               ) as client:
             self.log.info("Processing published write of %s", path)
-            obj = await client.put_object(Bucket=self.settings.s3_bucket, Key=file_key, Body=content)
+            self.log.info(json.dumps(content).encode('utf-8'))
+            obj = await client.put_object(Bucket=self.bookstore_settings.s3_bucket,
+                                          Key=file_key,
+                                          Body=json.dumps(content).encode('utf-8'))
             self.log.info("Done with published write of %s", path)
 
         # Likely implementation:
@@ -85,7 +91,7 @@ class BookstorePublishHandler(APIHandler):
         # Return 501 - Not Implemented
         # Until we're ready
         # self.set_status(501)
-        self.status(201)
+        self.set_status(201)
         self.log.info(json.dumps({"s3path": full_s3_path, "versionID": obj['VersionId']}))
         self.finish(json.dumps({"s3path": full_s3_path, "versionID": obj['VersionId']}))
 
@@ -112,9 +118,10 @@ def load_jupyter_server_extension(nb_app):
     # Always enable the version handler
     web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
 
-    if not web_app.config.get("BookstoreSettings"):
+    if not nb_app.config.get("BookstoreSettings"):
         nb_app.log.info("Not enabling bookstore publishing since bookstore endpoint not configured")
     else:
+        nb_app.log.info("PUBLISSSHED::: since bookstore endpoint not configured")
         web_app.add_handlers(
             host_pattern,
             [
