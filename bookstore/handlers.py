@@ -69,7 +69,7 @@ class BookstorePublishHandler(APIHandler):
             self.log.info("Processing published write of %s", path)
             await client.put_object(Bucket=self.bookstore_settings.s3_bucket,
                                     Key=file_key,
-                                    Body=json.dumps(content).encode('utf-8'))
+                                    Body=json.dumps(content))
             self.log.info("Done with published write of %s", path)
 
         # Likely implementation:
