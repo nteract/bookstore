@@ -112,4 +112,5 @@ binder/*run*.ipynb
 
 # Local jupyter notebook config for working on bookstore
 jupyter_notebook_config.py
+jupyter_config.py
 
