@@ -196,6 +196,10 @@ const main = async () => {
     originalNotebook
   );
 
+  await jupyterServer.writeNotebook(
+    "ci-published-local-writeout.ipynb",
+    originalNotebook
+  );
   await jupyterServer.publishNotebook(
     "ci-published-local-writeout.ipynb",
     originalNotebook
@@ -227,7 +231,21 @@ const main = async () => {
         save: ii
       }
     });
+    await jupyterServer.writeNotebook("ci-published-local-writeout2.ipynb", {
+      cells: [],
+      nbformat: 4,
+      nbformat_minor: 2,
+      metadata: {
+        save: ii
+      }
+    });
     await jupyterServer.publishNotebook("ci-published-local-writeout3.ipynb", {
+      cells: [{ cell_type: "markdown", source: "# Hello world", metadata: {} }],
+      nbformat: 4,
+      nbformat_minor: 2,
+      metadata: {}
+    });
+    await jupyterServer.writeNotebook("ci-published-local-writeout3.ipynb", {
       cells: [{ cell_type: "markdown", source: "# Hello world", metadata: {} }],
       nbformat: 4,
       nbformat_minor: 2,
@@ -240,7 +258,7 @@ const main = async () => {
   // Future iterations of this script should poll to get the notebook
   await sleep(700);
 
-  // await comparePublishedNotebooks("ci-published-local-writeout.ipynb", originalNotebook);
+  await comparePublishedNotebooks("ci-published-local-writeout.ipynb", originalNotebook);
   // await comparePublishedNotebooks("ci-published-local-writeout2.ipynb", {
   //   cells: [],
   //   nbformat: 4,
