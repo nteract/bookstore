@@ -33,9 +33,6 @@ class BookstorePublishHandler(APIHandler):
     def __init__(self, *args, **kwargs):
         super(APIHandler, self).__init__(*args, **kwargs)
         # create an easy helper to get at our bookstore settings quickly
-        # self.log.info(self.config['BookstoreSettings'])
-        # self.log.info(self.config['BookstoreSettings'].published_prefix)
-        # self.log.info(self.config)
         self.bookstore_settings = BookstoreSettings(config=self.config)
 
         self.session = aiobotocore.get_session()
@@ -70,10 +67,9 @@ class BookstorePublishHandler(APIHandler):
                                               region_name=self.bookstore_settings.s3_region_name,
                                               ) as client:
             self.log.info("Processing published write of %s", path)
-            self.log.info(json.dumps(content).encode('utf-8'))
-            obj = await client.put_object(Bucket=self.bookstore_settings.s3_bucket,
-                                          Key=file_key,
-                                          Body=json.dumps(content).encode('utf-8'))
+            await client.put_object(Bucket=self.bookstore_settings.s3_bucket,
+                                    Key=file_key,
+                                    Body=json.dumps(content).encode('utf-8'))
             self.log.info("Done with published write of %s", path)
 
         # Likely implementation:
@@ -96,7 +92,7 @@ class BookstorePublishHandler(APIHandler):
             "s3path": full_s3_path,
             # "versionID": obj['VersionId'],
         }
-        resp_str =  json.dumps(resp_content)
+        resp_str = json.dumps(resp_content)
         self.finish(resp_str)
 
     @web.authenticated
@@ -125,7 +121,6 @@ def load_jupyter_server_extension(nb_app):
     if not nb_app.config.get("BookstoreSettings"):
         nb_app.log.info("Not enabling bookstore publishing since bookstore endpoint not configured")
     else:
-        nb_app.log.info("PUBLISSSHED::: since bookstore endpoint not configured")
         web_app.add_handlers(
             host_pattern,
             [

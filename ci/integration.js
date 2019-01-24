@@ -64,8 +64,6 @@ const main = async () => {
 
   async function compareArchivedNotebooks(filepath, originalNotebook) {
     /***** Check notebook from S3 *****/
-    console.log(`bucketName:${bucketName}`);
-    console.log(`ci-workspace/${filepath}`);
     
     const rawNotebook = await s3Client.getObject(
       bucketName,
@@ -109,9 +107,6 @@ const main = async () => {
   
   async function comparePublishedNotebooks(filepath, originalNotebook) {
     /***** Check notebook from S3 *****/
-  
-    console.log(`bucketName:${bucketName}`);
-    console.log(`ci-published/${filepath}`);
   
     const rawNotebook = await s3Client.getObject(
       bucketName,
