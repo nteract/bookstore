@@ -13,10 +13,11 @@ def s3_path(bucket, prefix, path=''):
     return _join(bucket, prefix, path)
 
 
+def s3_key(prefix, path=''):
+    """compute the s3 key based on the prefix, and the path to the notebook"""
+    return _join(prefix, path)
+
+
 def s3_display_path(bucket, prefix, path=''):
     """create a display name for use in logs"""
     return 's3://' + s3_path(bucket, prefix, path)
-
-
-print(s3_path('notebooks', 'workspace', 'test/what.ipynb'))
-print(s3_display_path('notebooks', 'workspace', 'test/what.ipynb'))
