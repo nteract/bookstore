@@ -62,11 +62,53 @@ const main = async () => {
   await s3Client.makeBucket(bucketName);
   console.log(`Created bucket ${bucketName}`);
 
-  async function compareNotebooks(filepath, originalNotebook) {
+  async function compareArchivedNotebooks(filepath, originalNotebook) {
     /***** Check notebook from S3 *****/
     const rawNotebook = await s3Client.getObject(
       bucketName,
       `ci-workspace/${filepath}`
+    );
+
+    console.log(filepath);
+    console.log(rawNotebook);
+
+    const notebook = JSON.parse(rawNotebook);
+
+    if (!_.isEqual(notebook, originalNotebook)) {
+      console.error("original");
+      console.error(originalNotebook);
+      console.error("from s3");
+      console.error(notebook);
+      throw new Error("Notebook on S3 does not match what we sent");
+    }
+
+    console.log("Notebook on S3 matches what we sent");
+
+    /***** Check notebook from Disk *****/
+    const diskNotebook = await new Promise((resolve, reject) =>
+      fs.readFile(path.join(__dirname, filepath), (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(JSON.parse(data));
+        }
+      })
+    );
+
+    if (!_.isEqual(diskNotebook, originalNotebook)) {
+      console.error("original");
+      console.error(originalNotebook);
+      console.error("from disk");
+      console.error(diskNotebook);
+      throw new Error("Notebook on Disk does not match what we sent");
+    }
+  }
+  
+  async function comparePublishedNotebooks(filepath, originalNotebook) {
+    /***** Check notebook from S3 *****/
+    const rawNotebook = await s3Client.getObject(
+      bucketName,
+      `ci-published/${filepath}`
     );
 
     console.log(filepath);
@@ -175,8 +217,18 @@ const main = async () => {
 
   jupyterServer.shutdown();
 
-  await compareNotebooks("ci-local-writeout.ipynb", originalNotebook);
-  await compareNotebooks("ci-local-writeout2.ipynb", {
+  await compareArchivedNotebooks("ci-local-writeout.ipynb", originalNotebook);
+  await compareArchivedNotebooks("ci-local-writeout2.ipynb", {
+    cells: [],
+    nbformat: 4,
+    nbformat_minor: 2,
+    metadata: {
+      save: 3
+    }
+  });
+  
+  await comparePublishedNotebooks("ci-local-writeout.ipynb", originalNotebook);
+  await comparePublishedNotebooks("ci-local-writeout2.ipynb", {
     cells: [],
     nbformat: 4,
     nbformat_minor: 2,
