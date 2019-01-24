@@ -1,18 +1,16 @@
 import json
-import s3fs
+import aiobotocore
 
-from notebook.base.handlers import APIHandler
+from notebook.base.handlers import APIHandler, path_regex
 from notebook.utils import url_path_join
-from tornado import web, gen
+from tornado import web
 
 from ._version import get_versions
 from .bookstore_config import BookstoreSettings
+from .s3_paths import s3_path, s3_key, s3_display_path
 
-from notebook.base.handlers import IPythonHandler, APIHandler, path_regex
 
 version = get_versions()['version']
-
-from .s3_paths import s3_path, s3_display_path
 
 
 class BookstoreVersionHandler(APIHandler):
@@ -35,41 +33,42 @@ class BookstorePublishHandler(APIHandler):
     def __init__(self, *args, **kwargs):
         super(APIHandler, self).__init__(*args, **kwargs)
         # create an easy helper to get at our bookstore settings quickly
-        self.bookstore_settings = BookstoreSettings(
-            config=self.settings['config']['BookstoreSettings']
-        )
+        self.bookstore_settings = BookstoreSettings(config=self.config['BookstoreSettings'])
 
-        self.fs = s3fs.S3FileSystem(
-            key=self.bookstore_settings.s3_access_key_id,
-            secret=self.bookstore_settings.s3_secret_access_key,
-            client_kwargs={
-                "endpoint_url": self.bookstore_settings.s3_endpoint_url,
-                "region_name": self.bookstore_settings.s3_region_name,
-            },
-            config_kwargs={},
-            s3_additional_kwargs={},
-        )
+        self.session = aiobotocore.get_session()
 
-    @property
-    def bucket(self):
-        return self.bookstore_settings.s3_bucket
+    # @property
+    # def bucket(self):
+    #     return self.bookstore_settings.s3_bucket
+    #
+    # @property
+    # def prefix(self):
+    #     return self.bookstore_settings.published_prefix
 
-    @property
-    def prefix(self):
-        return self.bookstore_settings.published_prefix
+    # def s3_path(self, path):
+    #     """compute the s3 path based on the bucket, prefix, and the path to the notebook"""
+    #     return s3_path(self.bucket, self.prefix, path)
 
-    def s3_path(self, path):
-        """compute the s3 path based on the bucket, prefix, and the path to the notebook"""
-        return s3_path(self.bucket, self.prefix, path)
-
-    def _publish(self, model, path):
+    async def _publish(self, model, path):
         if model['type'] != 'notebook':
             raise web.HTTPError(400, "bookstore only publishes notebooks")
         content = model['content']
 
-        full_s3_path = self.s3_path(path)
+        full_s3_path = s3_path(self.settings.bucket, self.settings.published_prefix, path)
+        file_key = s3_key(self.settings.published_prefix, path)
 
-        self.log.info("Publishing to %s", s3_display_path(self.bucket, self.prefix, path))
+        self.log.info("Publishing to %s", s3_display_path(self.settings.s3_bucket,
+                                                          self.settings.published_prefix,
+                                                          path))
+        async with self.session.create_client('s3',
+                                              aws_secret_access_key=self.settings.s3_secret_access_key,
+                                              aws_access_key_id=self.settings.s3_access_key_id,
+                                              endpoint_url=self.settings.s3_endpoint_url,
+                                              region_name=self.settings.s3_region_name,
+                                              ) as client:
+            self.log.info("Processing published write of %s", path)
+            obj = await client.put_object(Bucket=self.settings.s3_bucket, Key=file_key, Body=content)
+            self.log.info("Done with published write of %s", path)
 
         # Likely implementation:
         #
@@ -85,11 +84,13 @@ class BookstorePublishHandler(APIHandler):
 
         # Return 501 - Not Implemented
         # Until we're ready
-        self.set_status(501)
+        # self.set_status(501)
+        self.status(201)
+        self.log.info(json.dumps({"s3path": full_s3_path, "versionID": obj['VersionId']}))
+        self.finish(json.dumps({"s3path": full_s3_path, "versionID": obj['VersionId']}))
 
     @web.authenticated
-    @gen.coroutine
-    def put(self, path=''):
+    async def put(self, path=''):
         '''Publish a notebook on a given path. The payload for this directly matches that of the contents API for PUT.
         '''
         if path == '' or path == '/':
@@ -98,7 +99,7 @@ class BookstorePublishHandler(APIHandler):
         model = self.get_json_body()
 
         if model:
-            self._publish(model, path.lstrip('/'))
+            await self._publish(model, path.lstrip('/'))
         else:
             raise web.HTTPError(400, "Cannot publish empty model")
 
@@ -111,10 +112,7 @@ def load_jupyter_server_extension(nb_app):
     # Always enable the version handler
     web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
 
-    config = web_app.settings['config']
-    bookstore_settings = config.get("BookstoreSettings")
-
-    if not bookstore_settings:
+    if not web_app.config.get("BookstoreSettings"):
         nb_app.log.info("Not enabling bookstore publishing since bookstore endpoint not configured")
     else:
         web_app.add_handlers(
