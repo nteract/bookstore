@@ -3,6 +3,8 @@
 """"
 setup.py
 
+bookstore may be installed on Python 3.6 or higher.
+
 Note: Do a version check for IPython.
     IPython v6+ no longer supports Python 2.
     If Python 2, install ipython 5.x.
@@ -104,6 +106,5 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 2.7',
     ],
 )
