@@ -5,6 +5,6 @@ python:
   - nightly
 install:
   - pip install --upgrade pip setuptools wheel
-  - pip install versioneer
+  - pip install -r requirements-dev.txt
   - pip install -e .
   - pip install check-manifest flake8
