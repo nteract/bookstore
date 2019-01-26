@@ -13,3 +13,7 @@ def _jupyter_server_extension_paths():
 from .archive import BookstoreContentsArchiver
 
 from .bookstore_config import BookstoreSettings
+
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
