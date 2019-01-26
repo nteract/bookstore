@@ -4,7 +4,7 @@ python:
   - 3.6
   - nightly
 install:
-  - pip install setuptools pip --upgrade
+  - pip install --upgrade pip setuptools wheel
   - pip install -e .[test]
   - pip install check-manifest flake8
 
