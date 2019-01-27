@@ -1,8 +1,9 @@
 language: python
 sudo: false
 python:
-  - 3.6
-  - nightly
+  - "3.6"
+  - "3.5"
+  - "nightly"
 install:
   - pip install --upgrade pip setuptools
   - pip install -r requirements-dev.txt
