@@ -15,7 +15,7 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 
 """
-from __future__ import print_function
+# from __future__ import print_function
 import os
 import sys
 from os import path
@@ -29,11 +29,11 @@ from io import open
 
 import versioneer
 
-python_2 = sys.version_info[0] == 2
+# python_2 = sys.version_info[0] == 2
 
 
 def read(fname):
-    with open(fname, 'rU' if python_2 else 'r') as fhandle:
+    with open(fname, 'r') as fhandle:
         return fhandle.read()
 
 
