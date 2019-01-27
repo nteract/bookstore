@@ -13,3 +13,5 @@ install:
   - pip freeze
 script:
   - pytest -v --maxfail=2 bookstore/tests
+after_success:
+  - codecov
