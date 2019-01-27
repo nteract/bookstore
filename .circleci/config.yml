@@ -23,9 +23,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt"}}
-          # fallback to using the latest cache if no exact match is found
-          - v2-dependencies-
+            - v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt"}}
+            # fallback to using the latest cache if no exact match is found
+            - v2-dependencies-
 
       - run:
           name: install dependencies
@@ -78,4 +78,5 @@ jobs:
           name: python tests
           command: |
             . venv/bin/activate
-            pytest
+            python setup.py develop
+            pytest -v --maxfail=2 bookstore/tests
