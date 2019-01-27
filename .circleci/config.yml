@@ -78,5 +78,5 @@ jobs:
           name: python tests
           command: |
             . venv/bin/activate
-            python setup.py develop
+            pip install .
             pytest -v --maxfail=2 bookstore/tests

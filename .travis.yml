@@ -11,8 +11,8 @@ install:
   - pip install --upgrade -r requirements-dev.txt
   - pip install --upgrade -r requirements.txt
   - pip freeze
+  - pip install .
 script:
-  - python3 setup.py develop
   - pytest -v --maxfail=2 bookstore/tests
 after_success:
   - codecov
