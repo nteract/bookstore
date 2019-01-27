@@ -53,7 +53,6 @@ jobs:
             - ./venv
           key: v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
 
-
       - run:
           name: package up bookstore
           command: |
