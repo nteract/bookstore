@@ -1,8 +1,12 @@
 # bookstore :books:
 
 [![Documentation Status](https://readthedocs.org/projects/bookstore/badge/?version=latest)](https://bookstore.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.org/nteract/bookstore.svg?branch=master)](https://travis-ci.org/nteract/bookstore)
+[![CircleCI](https://circleci.com/gh/nteract/bookstore.svg?style=svg)](https://circleci.com/gh/nteract/bookstore)
 
 **bookstore** :books: provides tooling and workflow recommendations for storing :cd: , scheduling :calendar:, and publishing :book: notebooks.
+
+Note: Supports installation on Python 3.6 and above. Processes notebooks from Python 2 or Python 3.
 
 ## Automatic Notebook Versioning
 
