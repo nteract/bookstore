@@ -68,8 +68,6 @@ class BookstorePublishHandler(APIHandler):
             )
             self.log.info("Done with published write of %s", path)
 
-        self.log.info(obj)
-
         self.set_status(201)
 
         resp_content = {"s3path": full_s3_path}

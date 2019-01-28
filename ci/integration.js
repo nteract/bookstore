@@ -1,3 +1,4 @@
+const child_process = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
@@ -166,6 +167,13 @@ const main = async () => {
     "ci-local-writeout.ipynb",
     originalNotebook
   );
+
+  await jupyterServer.publishNotebook(
+    "ci-published.ipynb",
+    originalNotebook
+  )
+
+  await comparePublishedNotebooks("ci-published.ipynb", originalNotebook);
 
   const basicNotebook = {
     cells: [],

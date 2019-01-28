@@ -42,6 +42,16 @@ Since most people are on a regular filesystem, we'll start with writing to the `
 
 ---
 
+## Publishing
+
+The bookstore publishing endpoint is a serverextension to the classic Jupyter server. 
+
+This means if you are developing this you will need to explicitly enable it to use the endpoint. 
+
+To do so you run: `jupyter serverextension enable --py bookstore`. 
+
+If you wish to enable it only for your current environment, run: `jupyter serverextension enable --py bookstore --sys-prefix`.
+
 ## Installation
 
 **bookstore** requires Python 3.6 or higher.
