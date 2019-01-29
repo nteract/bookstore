@@ -39,6 +39,13 @@ class BookstoreSettings(LoggingConfigurable):
 
 
 def validate_bookstore(settings: BookstoreSettings):
+    """Test for establishing that bookstore has been appropriately set up.
+    
+    Parameters
+    ----------
+    settings: bookstore.bookstore_config.BookstoreSettings
+        The instantiated Settings object to be validated.
+    """
     valid_settings = [settings.workspace_prefix != "",
                       settings.published_prefix != "",
                       settings.s3_bucket != "",
