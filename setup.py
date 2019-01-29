@@ -3,8 +3,6 @@
 """"
 setup.py
 
-bookstore may be installed on Python 3.6 or higher.
-
 Note: Do a version check for IPython.
     IPython v6+ no longer supports Python 2.
     If Python 2, install ipython 5.x.
@@ -25,10 +23,6 @@ from setuptools import setup
 # and accepts an argument to specify the text encoding
 # Python 3 only projects can skip this import
 from io import open
-
-import versioneer
-
-# python_2 = sys.version_info[0] == 2
 
 
 def read(fname):
