@@ -36,3 +36,12 @@ class BookstoreSettings(LoggingConfigurable):
         16,
         help="Maximum number of threads for the threadpool allocated for S3 read/writes",
     ).tag(config=True)
+
+
+def validate_bookstore(settings: BookstoreSettings):
+    valid_settings = [settings.workspace_prefix != "",
+                      settings.published_prefix != "",
+                      settings.s3_bucket != "",
+                      settings.s3_endpoint_url != "",
+                      ]
+    return all(valid_settings)
