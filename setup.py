@@ -39,6 +39,11 @@ ns = {}
 with open(pjoin(here, 'bookstore', '_version.py')) as f:
     exec(f.read(), {}, ns)
 
+
+target_dir = pjoin("etc", "jupyter", "jupyter_notebook_config.d")
+config_files = [pjoin("jupyter_config", "jupyter_notebook_config.d", "bookstore.json")]
+data_files = [(target_dir, config_files)]
+
 setup(
     name='bookstore',
     version=ns['__version__'],
@@ -82,6 +87,7 @@ setup(
             'black',
         ],
     },
+    data_files=data_files,
     entry_points={},
     project_urls={
         'Documentation': 'https://github.com/nteract/bookstore/#todo',
