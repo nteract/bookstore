@@ -18,7 +18,6 @@ https://github.com/pypa/sampleproject
 # from __future__ import print_function
 import os
 import sys
-from os import path
 from setuptools import setup
 
 # io.open is needed for projects that support Python 2.7
@@ -37,12 +36,17 @@ def read(fname):
         return fhandle.read()
 
 
-req_path = os.path.join(os.path.dirname('__file__'), 'requirements.txt')
+setup_dir_name = os.path.abspath(os.path.dirname(__file__))
+req_path = os.path.join(setup_dir_name, 'requirements.txt')
 required = [req.strip() for req in read(req_path).splitlines() if req.strip()]
 
-test_req_path = os.path.join(os.path.dirname('__file__'), 'requirements-dev.txt')
+test_req_path = os.path.join(setup_dir_name, 'requirements-dev.txt')
 test_required = [req.strip() for req in read(test_req_path).splitlines() if req.strip()]
 extras_require = {"test": test_required, "dev": test_required}
+
+target_dir = os.path.join("etc", "jupyter", "jupyter_notebook_config.d")
+config_files = [os.path.join("jupyter_config", "jupyter_notebook_config.d", "bookstore.json")]
+data_files = [(target_dir, config_files)]
 
 pip_too_old = False
 pip_message = ''
@@ -72,8 +76,7 @@ if pip_message:
 
 
 # Get the long description from the README file
-here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(setup_dir_name, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
@@ -93,6 +96,7 @@ setup(
     install_requires=required,
     extras_require=extras_require,
     entry_points={},
+    data_files=data_files,
     project_urls={
         'Documentation': 'https://github.com/nteract/bookstore/#todo',
         'Funding': 'https://nteract.io',
