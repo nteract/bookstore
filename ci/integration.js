@@ -1,3 +1,4 @@
+const child_process = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
@@ -104,6 +105,31 @@ const main = async () => {
     }
   }
 
+  async function comparePublishedNotebooks(filepath, originalNotebook){
+    /***** Check published notebook from S3 prefix *****/
+    const rawNotebook = await s3Client.getObject(
+      bucketName,
+      `ci-published/${filepath}`
+    );
+
+    console.log(filepath);
+    console.log(rawNotebook);
+
+    const notebook = JSON.parse(rawNotebook);
+    console.log("Checking whether Notebook on s3 matches what we sent.");
+
+    if (!_.isEqual(notebook, originalNotebook)) {
+      console.error("original");
+      console.error(originalNotebook);
+      console.error("from s3");
+      console.error(notebook);
+      throw new Error("Notebook on S3 does not match what we sent");
+    }
+
+    console.log("Notebook on S3 matches what we sent");
+
+  }
+
   const originalNotebook = {
     cells: [
       {
@@ -141,6 +167,13 @@ const main = async () => {
     "ci-local-writeout.ipynb",
     originalNotebook
   );
+
+  await jupyterServer.publishNotebook(
+    "ci-published.ipynb",
+    originalNotebook
+  )
+
+  await comparePublishedNotebooks("ci-published.ipynb", originalNotebook);
 
   const basicNotebook = {
     cells: [],

@@ -114,3 +114,5 @@ binder/*run*.ipynb
 jupyter_notebook_config.py
 jupyter_config.py
 
+# node modules to ignore
+node_modules/
