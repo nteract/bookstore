@@ -21,7 +21,7 @@ from setuptools import setup
 v = sys.version_info
 
 if v[:2] < (3, 6):
-    print(f'ERROR: Bookstore requires Python 3.6 or higher', file=sys.stderr)
+    print('ERROR: Bookstore requires Python 3.6 or higher', file=sys.stderr)
     sys.exit(1)
 
 # We have the correct Python version, proceed.
@@ -71,9 +71,6 @@ setup(
         'aiobotocore==0.10.0',
     ],
     extras_require={
-        'dev': [
-            'check-manifest'
-        ],
         'test': [
             'codecov',
             'coverage',
@@ -82,7 +79,7 @@ setup(
             'pytest>=3.3',
             'pytest-cov',
             'pytest-mock',
-            'black; python_version >= 3.6',
+            'black',
         ],
     },
     entry_points={},

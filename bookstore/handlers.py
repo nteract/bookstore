@@ -6,12 +6,12 @@ from notebook.base.handlers import APIHandler, path_regex
 from notebook.utils import url_path_join
 from tornado import web
 
-from ._version import get_versions
+from ._version import __version__, version_info
 from .bookstore_config import BookstoreSettings
 from .s3_paths import s3_path, s3_key, s3_display_path
 
 
-version = get_versions()['version']
+version = __version__
 
 
 class BookstoreVersionHandler(APIHandler):
