@@ -71,7 +71,6 @@ jobs:
           command: |
             . venv_packaged_integration/bin/activate
             # Install the dependencies for our integration tester
-            jupyter serverextension enable --py bookstore
             npm i
             node ci/integration.js
 
