@@ -4,7 +4,6 @@ cache:
   - pip
 python:
   - "3.6"
-  - "3.5"
   - "nightly"
 install:
   - pip install --upgrade pip
