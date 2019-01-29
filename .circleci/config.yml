@@ -28,14 +28,14 @@ jobs:
             - v2-dependencies-
 
       - run:
-          name: install dependencies and editable version
+          name: install dependencies and version
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip setuptools wheel
             pip install -r requirements.txt
             pip install -r requirements-dev.txt
-            pip install -e .
+            pip install .
 
       - run:
           name: check types
