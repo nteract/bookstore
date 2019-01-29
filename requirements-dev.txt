@@ -1,6 +1,5 @@
 codecov
 coverage
-notebook
 mock
 mypy==0.660  # pin to avoid surprises
 pytest>=3.3
