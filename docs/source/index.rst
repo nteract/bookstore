@@ -6,8 +6,13 @@
 .. mdinclude:: ../../README.md
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
+
+   contributing
+   code_of_conduct
+   releasing
+   changelog
 
 
 Indices and tables
