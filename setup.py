@@ -27,6 +27,11 @@ from setuptools import setup
 # Python 3 only projects can skip this import
 from io import open
 
+print(sys.path)
+print(f"I'm a directory! {os.path.abspath(__file__)}")
+for d,_,f in os.walk(os.path.join(os.path.dirname(os.path.abspath(__file__)), "**")):
+    print(os.path.join(d,f))
+
 import versioneer
 
 # python_2 = sys.version_info[0] == 2
