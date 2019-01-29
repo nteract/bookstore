@@ -55,7 +55,7 @@ setup(
     author_email='nteract@googlegroups.com',
     license='BSD',
     classifiers=[
-        'Development Status :: 4 - Beta'
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Science/Research',
