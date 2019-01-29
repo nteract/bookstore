@@ -83,7 +83,6 @@ setup(
         ],
     },
     entry_points={},
-    data_files=data_files,
     project_urls={
         'Documentation': 'https://github.com/nteract/bookstore/#todo',
         'Funding': 'https://nteract.io',
