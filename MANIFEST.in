@@ -14,7 +14,6 @@ include MANIFEST.in
 include *.md
 include *.toml
 
-include versioneer.py
 include bookstore/_version.py
 include .coveragerc
 

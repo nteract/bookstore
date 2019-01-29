@@ -28,28 +28,31 @@ jobs:
           - v2-dependencies-
 
       - run:
-          name: install dependencies
+          name: install dependencies and editable version
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip setuptools wheel
             pip install -r requirements.txt
             pip install -r requirements-dev.txt
+            pip install -e .
 
       - run:
           name: check types
           command: |
             . venv/bin/activate
-            # pin mypy to avoid surprises
-            pip install mypy==0.660
-            # NOTE: We can add in stubs for modules we're using
-            # BONUS: Tornado 6 will include types
             mypy bookstore --ignore-missing-imports
+      - run:
+          name: python tests
+          command: |
+            . venv/bin/activate
+            pytest -v --maxfail=2 bookstore/tests
 
       - save_cache:
           paths:
             - ./venv
           key: v2-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}
+
 
       - run:
           name: package up bookstore
@@ -74,8 +77,4 @@ jobs:
             npm i
             node ci/integration.js
 
-      - run:
-          name: python tests
-          command: |
-            . venv/bin/activate
-            pytest
+
