@@ -4,7 +4,7 @@ version_info = (
     2,
     2,
     0,
-    "rc2",  # release (b1, rc1, or "" for final or dev)
+    "",  # release (b1, rc1, or "" for final or dev)
     # dev or nothing
 )
 
