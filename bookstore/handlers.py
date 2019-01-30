@@ -7,7 +7,7 @@ from notebook.utils import url_path_join
 from tornado import web
 
 from ._version import __version__, version_info
-from .bookstore_config import BookstoreSettings
+from .bookstore_config import BookstoreSettings, validate_bookstore
 from .s3_paths import s3_path, s3_key, s3_display_path
 
 
@@ -99,11 +99,12 @@ def load_jupyter_server_extension(nb_app):
     web_app = nb_app.web_app
     host_pattern = '.*$'
     base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
-
+    
     # Always enable the version handler
     web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
+    bookstore_settings = BookstoreSettings(parent=nb_app)
 
-    if not nb_app.config.get("BookstoreSettings"):
+    if not validate_bookstore(bookstore_settings):
         nb_app.log.info("Not enabling bookstore publishing since bookstore endpoint not configured")
     else:
         web_app.add_handlers(
