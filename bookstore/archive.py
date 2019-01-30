@@ -28,8 +28,11 @@ class BookstoreContentsArchiver(FileContentsManager):
         # opt ourselves into being part of the Jupyter App that should have Bookstore Settings applied
         self.settings = BookstoreSettings(parent=self)
 
-        self.log.info("Archiving notebooks to {}".format(s3_display_path(
-            self.settings.s3_bucket, self.settings.workspace_prefix)))
+        self.log.info(
+            "Archiving notebooks to {}".format(
+                s3_display_path(self.settings.s3_bucket, self.settings.workspace_prefix)
+            )
+        )
 
         self.session = aiobotocore.get_session()
 
@@ -55,23 +58,23 @@ class BookstoreContentsArchiver(FileContentsManager):
 
         async with lock:
             try:
-                async with self.session.create_client('s3',
-                                                      aws_secret_access_key=self.settings.s3_secret_access_key,
-                                                      aws_access_key_id=self.settings.s3_access_key_id,
-                                                      endpoint_url=self.settings.s3_endpoint_url,
-                                                      region_name=self.settings.s3_region_name,
-                                                      ) as client:
+                async with self.session.create_client(
+                    's3',
+                    aws_secret_access_key=self.settings.s3_secret_access_key,
+                    aws_access_key_id=self.settings.s3_access_key_id,
+                    endpoint_url=self.settings.s3_endpoint_url,
+                    region_name=self.settings.s3_region_name,
+                ) as client:
                     self.log.info("Processing storage write of %s", record.filepath)
                     file_key = s3_key(self.settings.workspace_prefix, record.filepath)
-                    await client.put_object(Bucket=self.settings.s3_bucket, Key=file_key, Body=record.content)
+                    await client.put_object(
+                        Bucket=self.settings.s3_bucket, Key=file_key, Body=record.content
+                    )
                     self.log.info("Done with storage write of %s", record.filepath)
             except Exception as e:
-                    self.log.error(
-                        'Error while archiving file: %s %s',
-                        record.filepath,
-                        e,
-                        exc_info=True,
-                    )
+                self.log.error(
+                    'Error while archiving file: %s %s', record.filepath, e, exc_info=True
+                )
 
     def run_pre_save_hook(self, model, path, **kwargs):
         """Store notebook to S3 when saves happen
@@ -87,8 +90,6 @@ class BookstoreContentsArchiver(FileContentsManager):
         loop.spawn_callback(
             self.archive,
             ArchiveRecord(
-                content=content,
-                filepath=path,
-                queued_time=ioloop.IOLoop.current().time(),
+                content=content, filepath=path, queued_time=ioloop.IOLoop.current().time()
             ),
         )
