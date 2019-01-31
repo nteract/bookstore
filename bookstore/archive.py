@@ -77,8 +77,8 @@ class BookstoreContentsArchiver(FileContentsManager):
         allowed to a path if a valid path_lock is held and the path is not
         locked by another process.
 
-        Attribute
-        ---------
+        Parameters
+        ----------
         record : ArchiveRecord
             A notebook and where it should be written to storage
         """
@@ -121,8 +121,8 @@ class BookstoreContentsArchiver(FileContentsManager):
         When the event loop is available for execution of the request, the
         storage of the notebook will be done and the write to storage occurs.
 
-        Arguments
-        ---------
+        Parameters
+        ----------
         model : str
             The type of file
         path : str
