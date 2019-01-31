@@ -15,17 +15,17 @@ Storage Paths
 All notebooks are archived to a single versioned S3 bucket with specific **prefixes** denoting the lifecycle of
 the notebook. For example:
 
-- `/workspace` - where users edit
-- `/published` - public notebooks (to an organization)
+- ``/workspace`` - where users edit
+- ``/published`` - public notebooks (to an organization)
 
 Each notebook path is a namespace that an external service ties into the schedule. We archive off versions,
 keeping the path intact (until a user changes them). For example, the prefixes that could be associated with
 storage types:
 
-- Notebook in "draft" form: `/workspace/kylek/notebooks/mine.ipynb`
-- Most recent published copy of a notebook: `/published/kylek/notebooks/mine.ipynb`
+- Notebook in "draft" form: ``/workspace/kylek/notebooks/mine.ipynb``
+- Most recent published copy of a notebook: ``/published/kylek/notebooks/mine.ipynb``
 
-Scheduled notebooks will also be referred to by the notebook `key`. In addition, we'll need to be able to surface
+Scheduled notebooks will also be referred to by the notebook ``key``. In addition, we'll need to be able to surface
 version IDs as well.
 
 Transitioning to this Storage Plan
@@ -37,11 +37,11 @@ Storage (writing on save using a ``post_save_hook`` for a Jupyter contents manag
 Publishing
 ----------
 
-The bookstore publishing endpoint is a `serverextension` to the classic Jupyter server. This means if you are
+The bookstore publishing endpoint is a ``serverextension`` to the classic Jupyter server. This means if you are
 developing this you will need to explicitly enable it to use the endpoint.
 
-To do so you run: `jupyter serverextension enable --py bookstore`.
+To do so you run: ``jupyter serverextension enable --py bookstore``.
 
 If you wish to enable it only for your current environment, run:
 
-`jupyter serverextension enable --py bookstore --sys-prefix`.
+``jupyter serverextension enable --py bookstore --sys-prefix``.

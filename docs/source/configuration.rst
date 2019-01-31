@@ -5,7 +5,7 @@ Configuration
 Bookstore ettings in Jupyter configuration file
 -----------------------------------------------
 
-`~/.jupyter/jupyter_notebook_config.py` can store commonly used settings for
+``~/.jupyter/jupyter_notebook_config.py`` can store commonly used settings for
 bookstore. Bookstore settings include:
 
     - the workspace and published storage location
