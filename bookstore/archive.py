@@ -42,8 +42,9 @@ class BookstoreContentsArchiver(FileContentsManager):
     path_lock_ready: ayncio mutex lock
         A mutex lock associated with a path
 
-    See also:
-        https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html#contents-api
+    See also
+    --------
+    https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html#contents-api
     """
     def __init__(self, *args, **kwargs):
         super(FileContentsManager, self).__init__(*args, **kwargs)
