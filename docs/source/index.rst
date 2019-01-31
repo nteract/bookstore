@@ -9,6 +9,7 @@
    :maxdepth: 1
    :caption: Contents:
 
+   reference/modules
    contributing
    code_of_conduct
    releasing
