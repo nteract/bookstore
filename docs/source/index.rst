@@ -3,17 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+bookstore
+=========
+
 .. mdinclude:: ../../README.md
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Contents:
+Table of Contents
+=================
 
-   reference/modules
-   contributing
-   code_of_conduct
-   releasing
-   changelog
+.. toctree::
+   :maxdepth: 2
+
+   reference/bookstore
+   project/index
+
+
 
 
 Indices and tables
