@@ -6,7 +6,8 @@
 bookstore
 =========
 
-.. mdinclude:: ../../README.md
+**bookstore** provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks.
+
 
 Table of Contents
 =================
@@ -19,8 +20,6 @@ Table of Contents
    usage
    reference/bookstore
    project/index
-
-
 
 
 Indices and tables
