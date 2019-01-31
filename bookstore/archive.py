@@ -12,22 +12,38 @@ from .s3_paths import s3_key, s3_display_path
 
 
 class ArchiveRecord(NamedTuple):
-    """Representation of archived content"""
+    """Representation of content to archive
+
+    A record to be archived is a tuple containing `filepath`, the `content` to
+    be archived, and the length of time in queue for archiving (`queued_time`).
+    """
     filepath: str
     content: str
     queued_time: float
 
 
 class BookstoreContentsArchiver(FileContentsManager):
-    """Archives notebooks to S3 on save by UI or parameterized workflow
+    """Archives notebooks to storage (S3) on save by UI or parameterized workflow
 
-    Bookstore settings and Jupyter application settings are shared
-    A session is created for the current event loop
-    To write to a particular path on S3, acquire a path_lock.
-    The lock avoids multiple writes contending to write at the same time.
+    This class is a custom Jupyter `FileContentsManager` which holds information
+    on storage location, path to it, and file to be written there.
 
-    After acquiring the lock, `archive` authenticates using the storage service's
-    credentials. If allowed, the notebook is written to storage (i.e. S3).
+    Bookstore settings combine with the parent Jupyter application settings.
+
+    A session is created for the current event loop. To write to a particular
+    path on S3, acquire a lock. After acquiring the lock, `archive`
+    authenticates using the storage service's credentials. If allowed, the
+    notebook is queued to be written to storage (i.e. S3).
+
+    Attributes
+    ----------
+    path_locks : dict
+        Dictionary of paths to storage and the lock associated with a path
+    path_lock_ready: ayncio mutex lock
+        A mutex lock associated with a path
+
+    See also:
+        https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html#contents-api
     """
     def __init__(self, *args, **kwargs):
         super(FileContentsManager, self).__init__(*args, **kwargs)
@@ -50,20 +66,23 @@ class BookstoreContentsArchiver(FileContentsManager):
                 "{} : Check credentials and configuration".format(e)
             )
 
-        # A lock per path to suppress writing to S3 when currently writing
+        # a collection of locks per path to suppress writing while the path may be in use
         self.path_locks: Dict[str, Lock] = {}
-        # Since locks are not pre-created,
-        self.ability_to_create_path_lock = Lock()
+        self.path_lock_ready = Lock()
 
     async def archive(self, record: ArchiveRecord):
-        """Process a storage write
+        """Process a record to write to storage.
 
-        Acquire a path lock before archive.
-        Writing to storage will only be allowed to a path if there
-        is a valid path_lock held and the path is not locked by
-        another process.
+        Acquire a path lock before archive. Writing to storage will only be
+        allowed to a path if a valid path_lock is held and the path is not
+        locked by another process.
+
+        Attribute
+        ---------
+        record : ArchiveRecord
+            A notebook and where it should be written to storage
         """
-        async with self.ability_to_create_path_lock:
+        async with self.path_lock_ready:
             lock = self.path_locks.get(record.filepath)
 
             if lock is None:
@@ -101,6 +120,13 @@ class BookstoreContentsArchiver(FileContentsManager):
         This hook offloads the storage request to the event loop.
         When the event loop is available for execution of the request, the
         storage of the notebook will be done and the write to storage occurs.
+
+        Arguments
+        ---------
+        model : str
+            The type of file
+        path : str
+            The storage location
         """
         if model["type"] != "notebook":
             return
