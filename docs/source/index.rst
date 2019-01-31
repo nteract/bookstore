@@ -14,6 +14,9 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
+   installation
+   configuration
+   usage
    reference/bookstore
    project/index
 
