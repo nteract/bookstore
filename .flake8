@@ -6,6 +6,7 @@
 # F401: module imported but unused
 # F403: import *
 # F811: redefinition of unused `name` from line `N`
+# F821:
 # F841: local variable assigned but never used
 # E402: module level import not at top of file
 # I100: Import statements are in the wrong order
