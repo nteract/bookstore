@@ -4,7 +4,7 @@ ipython >= 5.0
 notebook
 s3fs
 tornado >= 5.1.1
-aiobotocore==0.10.0
+aiobotocore==0.10.0  # this item and below are pinned. Avoids dependency conflicts. See setup.py too.
 aiohttp==3.3.2
 botocore==1.12.49
 boto3==1.9.49
