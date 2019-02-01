@@ -3,16 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. mdinclude:: ../../README.md
+bookstore
+=========
+
+**bookstore** provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks.
+
+
+Table of Contents
+=================
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Contents:
+   :maxdepth: 2
 
-   contributing
-   code_of_conduct
-   releasing
-   changelog
+   installation
+   configuration
+   usage
+   reference/bookstore
+   project/index
 
 
 Indices and tables

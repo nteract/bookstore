@@ -1,3 +1,5 @@
+# Contributing
+
 Oh, hello there! You're probably reading this because you are interested in
 contributing to nteract. That's great to hear! This document will help you
 through your journey of open source. Love it, cherish it, take it out to
