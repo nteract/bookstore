@@ -23,16 +23,17 @@ class ArchiveRecord(NamedTuple):
 
 
 class BookstoreContentsArchiver(FileContentsManager):
-    """Archives notebooks to storage (S3) on save by UI or parameterized workflow
+    """Archives notebooks to storage (S3) on notebook save
 
     This class is a custom Jupyter `FileContentsManager` which holds information
     on storage location, path to it, and file to be written there.
 
     Bookstore settings combine with the parent Jupyter application settings.
-
+``
     A session is created for the current event loop. To write to a particular
     path on S3, acquire a lock. After acquiring the lock, `archive`
     authenticates using the storage service's credentials. If allowed, the
+
     notebook is queued to be written to storage (i.e. S3).
 
     Attributes
