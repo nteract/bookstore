@@ -6,7 +6,7 @@
 
 **bookstore** :books: provides tooling and workflow recommendations for storing :cd: , scheduling :calendar:, and publishing :book: notebooks.
 
-Note: Supports installation on Python 3.6 and above. Processes notebooks from Python 2 or Python 3.
+Note: Supports installation on Jupyter servers running Python 3.6 and above. Your notebooks can still be run in Python 2 or Python 3.
 
 ## Automatic Notebook Versioning
 
