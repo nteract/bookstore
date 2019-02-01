@@ -1,5 +1,6 @@
 """Archival of notebooks"""
 import json
+import logging
 from asyncio import Lock
 from typing import Dict, NamedTuple
 
@@ -9,6 +10,9 @@ from tornado import ioloop
 
 from .bookstore_config import BookstoreSettings
 from .s3_paths import s3_key, s3_display_path
+
+
+log = logging.logger(__name__)
 
 
 class ArchiveRecord(NamedTuple):
@@ -59,14 +63,14 @@ class BookstoreContentsArchiver(FileContentsManager):
             )
         )
 
-        # TODO: create a better check for credentials - keys and config or it will fail
         try:
             # create a session object from the current event loop
             self.session = aiobotocore.get_session()
         except Exception as e:
-            self.log.error(
-                "{} : Check credentials and configuration".format(e)
+            self.log.warn(
+                "Unable to create a session"
             )
+            raise
 
         # a collection of locks per path to suppress writing while the path may be in use
         self.path_locks: Dict[str, Lock] = {}
