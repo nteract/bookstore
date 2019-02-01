@@ -1,8 +1,11 @@
 name: bookstore
 type: sphinx
 requirements_file: docs/requirements-doc.txt
+build:
+    image: latest
 python:
-  version: 3
+    version: 3.6
+    setup_py_install: true
 formats:
   - htmlzip
   - epub
