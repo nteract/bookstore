@@ -12,9 +12,6 @@ from .bookstore_config import BookstoreSettings
 from .s3_paths import s3_key, s3_display_path
 
 
-log = logging.getLogger(__name__)
-
-
 class ArchiveRecord(NamedTuple):
     """Representation of content to archive
 
@@ -68,7 +65,7 @@ class BookstoreContentsArchiver(FileContentsManager):
         try:
             # create a session object from the current event loop
             self.session = aiobotocore.get_session()
-        except Exception as e:
+        except Exception:
             self.log.warn("Unable to create a session")
             raise
 
