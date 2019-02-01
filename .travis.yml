@@ -12,6 +12,7 @@ install:
   - pip freeze
   - pip install .
 script:
+  - black --check bookstore
   - pytest -v --maxfail=2 bookstore/tests
 after_success:
   - codecov
