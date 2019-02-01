@@ -28,7 +28,7 @@ class BookstoreSettings(LoggingConfigurable):
     s3_region_name = Unicode("us-east-1", help="Region name").tag(
         config=True, env="JPYNB_S3_REGION_NAME"
     )
-    s3_bucket = Unicode("bookstore", help="Bucket name to store notebooks").tag(
+    s3_bucket = Unicode("", help="Bucket name to store notebooks").tag(
         config=True, env="JPYNB_S3_BUCKET"
     )
 

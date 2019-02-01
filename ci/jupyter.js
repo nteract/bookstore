@@ -38,7 +38,8 @@ class JupyterServer {
         `--NotebookApp.token=${this.token}`,
         `--NotebookApp.disable_check_xsrf=True`,
         `--port=${this.port}`,
-        `--ip=${this.ip}`
+        `--ip=${this.ip}`,
+        `--log-level=10`
       ],
       { cwd: this.cwd }
     );

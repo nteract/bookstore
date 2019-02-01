@@ -7,7 +7,7 @@ from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
 def test_validate_bookstore_defaults():
     """Tests that all bookstore validates with default values."""
     settings = BookstoreSettings()
-    assert validate_bookstore(settings)
+    assert not validate_bookstore(settings)
 
 
 def test_validate_bookstore_published():
@@ -30,5 +30,5 @@ def test_validate_bookstore_endpoint():
 
 def test_validate_bookstore_bucket():
     """Tests that bookstore does not validate with an empty s3_bucket."""
-    settings = BookstoreSettings(s3_bucket="")
-    assert not validate_bookstore(settings)
+    settings = BookstoreSettings(s3_bucket="A_bucket")
+    assert validate_bookstore(settings)

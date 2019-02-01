@@ -7,7 +7,7 @@ from notebook.utils import url_path_join
 from tornado import web
 
 from ._version import __version__, version_info
-from .bookstore_config import BookstoreSettings
+from .bookstore_config import BookstoreSettings, validate_bookstore
 from .s3_paths import s3_path, s3_key, s3_display_path
 
 
@@ -21,7 +21,9 @@ class BookstoreVersionHandler(APIHandler):
 
     @web.authenticated
     def get(self):
-        self.finish(json.dumps({"bookstore": True, "version": version}))
+        self.finish(json.dumps({"bookstore": True,
+                                "version": version,
+                                "bookstore_validated": self.settings['bookstore_validated']}))
 
 
 # NOTE: We need to ensure that publishing is not configured if bookstore settings are not
@@ -32,8 +34,7 @@ class BookstoreVersionHandler(APIHandler):
 class BookstorePublishHandler(APIHandler):
     """Publish a notebook to the publish path"""
 
-    def __init__(self, *args, **kwargs):
-        super(APIHandler, self).__init__(*args, **kwargs)
+    def initialize(self):
         # create an easy helper to get at our bookstore settings quickly
         self.bookstore_settings = BookstoreSettings(config=self.config)
 
@@ -98,14 +99,20 @@ class BookstorePublishHandler(APIHandler):
 def load_jupyter_server_extension(nb_app):
     web_app = nb_app.web_app
     host_pattern = '.*$'
-    base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
-
+    
     # Always enable the version handler
+    base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
     web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
+    bookstore_settings = BookstoreSettings(parent=nb_app)
+    web_app.settings['bookstore_validated'] = validate_bookstore(bookstore_settings)
+                                               # and nb_app.nbserver_extensions.get("bookstore")
+                                               # need to delay adding this check until server
+                                               # has been updated
 
-    if not nb_app.config.get("BookstoreSettings"):
-        nb_app.log.info("Not enabling bookstore publishing since bookstore endpoint not configured")
+    if not web_app.settings['bookstore_validated']:
+        nb_app.log.info("[bookstore] Not enabling bookstore publishing, endpoint not configured")
     else:
+        nb_app.log.info(f"[bookstore] Enabling bookstore publishing, version: {version}")
         web_app.add_handlers(
             host_pattern,
             [
