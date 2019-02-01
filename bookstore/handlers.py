@@ -21,9 +21,15 @@ class BookstoreVersionHandler(APIHandler):
 
     @web.authenticated
     def get(self):
-        self.finish(json.dumps({"bookstore": True,
-                                "version": version,
-                                "bookstore_validated": self.settings['bookstore_validated']}))
+        self.finish(
+            json.dumps(
+                {
+                    "bookstore": True,
+                    "version": version,
+                    "bookstore_validated": self.settings['bookstore_validated'],
+                }
+            )
+        )
 
 
 # NOTE: We need to ensure that publishing is not configured if bookstore settings are not
@@ -99,15 +105,15 @@ class BookstorePublishHandler(APIHandler):
 def load_jupyter_server_extension(nb_app):
     web_app = nb_app.web_app
     host_pattern = '.*$'
-    
+
     # Always enable the version handler
     base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
     web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
     bookstore_settings = BookstoreSettings(parent=nb_app)
     web_app.settings['bookstore_validated'] = validate_bookstore(bookstore_settings)
-                                               # and nb_app.nbserver_extensions.get("bookstore")
-                                               # need to delay adding this check until server
-                                               # has been updated
+    # and nb_app.nbserver_extensions.get("bookstore")
+    # need to delay adding this check until server
+    # has been updated
 
     if not web_app.settings['bookstore_validated']:
         nb_app.log.info("[bookstore] Not enabling bookstore publishing, endpoint not configured")

@@ -21,6 +21,7 @@ class ArchiveRecord(NamedTuple):
     A record to be archived is a tuple containing `filepath`, the `content` to
     be archived, and the length of time in queue for archiving (`queued_time`).
     """
+
     filepath: str
     content: str
     queued_time: float
@@ -51,6 +52,7 @@ class BookstoreContentsArchiver(FileContentsManager):
     --------
     https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html#contents-api
     """
+
     def __init__(self, *args, **kwargs):
         super(FileContentsManager, self).__init__(*args, **kwargs)
 
@@ -67,9 +69,7 @@ class BookstoreContentsArchiver(FileContentsManager):
             # create a session object from the current event loop
             self.session = aiobotocore.get_session()
         except Exception as e:
-            self.log.warn(
-                "Unable to create a session"
-            )
+            self.log.warn("Unable to create a session")
             raise
 
         # a collection of locks per path to suppress writing while the path may be in use
