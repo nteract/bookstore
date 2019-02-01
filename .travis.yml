@@ -26,8 +26,8 @@ matrix:
     - name: "flake8"
       python: 3.6
       env:
-        - TEST_CMD="flake8 bookstore"
-    - name: "py6"
+        - TEST_CMD="flake8 bookstore --count --ignore=E203,E731,F811,W503 --max-complexity=23 --max-line-length=104 --show-source --statistics"
+    - name: "py36"
       python: 3.6
       env:
         - TEST_CMD="pytest -v --maxfail=2 bookstore/tests"
