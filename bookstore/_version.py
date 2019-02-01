@@ -1,12 +1,6 @@
 """Bookstore version info"""
 
-version_info = (
-    2,
-    3,
-    0,
-    "",  # release (b1, rc1, or "" for final or dev)
-    "dev"  # dev or nothing
-)
+version_info = (2, 3, 0, "", "dev")  # release (b1, rc1, or "" for final or dev)  # dev or nothing
 
 # pep 440 version: no dot before beta/rc, but before .dev
 # 0.1.0rc1

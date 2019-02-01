@@ -6,12 +6,10 @@ class BookstoreSettings(LoggingConfigurable):
     """The same settings to be shared across archival, publishing, and scheduling
     """
 
-    workspace_prefix = Unicode(
-        "workspace", help="Prefix for the live workspace notebooks"
-    ).tag(config=True)
-    published_prefix = Unicode("published", help="Prefix for published notebooks").tag(
+    workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(
         config=True
     )
+    published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
 
     ## S3 Settings for the S3 backed storage (other implementations can add on below)
     # Allowed to not set these as we can pick up IAM roles instead
@@ -33,8 +31,7 @@ class BookstoreSettings(LoggingConfigurable):
     )
 
     max_threads = Int(
-        16,
-        help="Maximum number of threads for the threadpool allocated for S3 read/writes",
+        16, help="Maximum number of threads for the threadpool allocated for S3 read/writes"
     ).tag(config=True)
 
 
@@ -46,9 +43,10 @@ def validate_bookstore(settings: BookstoreSettings):
     settings: bookstore.bookstore_config.BookstoreSettings
         The instantiated Settings object to be validated.
     """
-    valid_settings = [settings.workspace_prefix != "",
-                      settings.published_prefix != "",
-                      settings.s3_bucket != "",
-                      settings.s3_endpoint_url != "",
-                      ]
+    valid_settings = [
+        settings.workspace_prefix != "",
+        settings.published_prefix != "",
+        settings.s3_bucket != "",
+        settings.s3_endpoint_url != "",
+    ]
     return all(valid_settings)

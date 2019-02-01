@@ -85,7 +85,7 @@ setup(
             'pytest-cov',
             'pytest-mock',
             'black',
-        ],
+        ]
     },
     data_files=data_files,
     entry_points={},
@@ -95,5 +95,4 @@ setup(
         'Source': 'https://github.com/nteract/bookstore/',
         'Tracker': 'https://github.com/nteract/bookstore/issues',
     },
-
 )
