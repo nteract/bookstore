@@ -12,7 +12,7 @@ from .bookstore_config import BookstoreSettings
 from .s3_paths import s3_key, s3_display_path
 
 
-log = logging.logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class ArchiveRecord(NamedTuple):
