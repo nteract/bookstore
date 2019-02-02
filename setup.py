@@ -73,7 +73,7 @@ setup(
         'notebook',
         's3fs',
         'tornado >= 5.1.1',
-        'aiobotocore==0.10.0',
+        'aiobotocore>=0.10.0',
     ],
     extras_require={
         'test': [
