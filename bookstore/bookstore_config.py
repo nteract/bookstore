@@ -36,12 +36,11 @@ class BookstoreSettings(LoggingConfigurable):
     - max_threads : int(16)
         Maximum threads from the threadpool available to do S3 read and writes
     """
-    workspace_prefix = Unicode("workspace",
-        help="Prefix for the live workspace notebooks"
-    ).tag(config=True)
-    published_prefix = Unicode("published",
-        help="Prefix for published notebooks"
-    ).tag(config=True)
+
+    workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(
+        config=True
+    )
+    published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
 
     # S3 Settings for the S3 backed storage
     # (other implementations can add on below)
@@ -53,18 +52,18 @@ class BookstoreSettings(LoggingConfigurable):
         help="S3/AWS secret access key", allow_none=True, default_value=None
     ).tag(config=True, env="JPYNB_S3_SECRET_ACCESS_KEY")
 
-    s3_endpoint_url = Unicode("https://s3.amazonaws.com",
-        help="S3 endpoint URL"
-    ).tag(config=True, env="JPYNB_S3_ENDPOINT_URL")
-    s3_region_name = Unicode("us-east-1",
-        help="Region name"
-     ).tag(config=True, env="JPYNB_S3_REGION_NAME")
-    s3_bucket = Unicode("",
-        help="Bucket name to store notebooks"
-    ).tag(config=True, env="JPYNB_S3_BUCKET")
+    s3_endpoint_url = Unicode("https://s3.amazonaws.com", help="S3 endpoint URL").tag(
+        config=True, env="JPYNB_S3_ENDPOINT_URL"
+    )
+    s3_region_name = Unicode("us-east-1", help="Region name").tag(
+        config=True, env="JPYNB_S3_REGION_NAME"
+    )
+    s3_bucket = Unicode("", help="Bucket name to store notebooks").tag(
+        config=True, env="JPYNB_S3_BUCKET"
+    )
 
-    max_threads = Int(16,
-        help="Maximum number of threads for the threadpool allocated for S3 read/writes"
+    max_threads = Int(
+        16, help="Maximum number of threads for the threadpool allocated for S3 read/writes"
     ).tag(config=True)
 
 
