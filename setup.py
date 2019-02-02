@@ -74,10 +74,6 @@ setup(
         's3fs',
         'tornado >= 5.1.1',
         'aiobotocore==0.10.0',
-        'aiohttp==3.3.2',
-        'botocore==1.12.49',
-        'boto3==1.9.49',
-        'awscli==1.16.59',
     ],
     extras_require={
         'test': [
