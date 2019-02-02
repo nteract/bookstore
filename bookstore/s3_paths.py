@@ -8,7 +8,7 @@ delimiter = "/"
 def _join(*args):
     """Join S3 bucket args together.
 
-    Remove empty entries and strip left-leading.
+    Remove empty entries and strip left-leading ``/``
     """
     return delimiter.join(filter(lambda s: s != '', map(lambda s: s.lstrip(delimiter), args)))
 
@@ -29,7 +29,7 @@ def s3_path(bucket, prefix, path=''):
 
 
 def s3_key(prefix, path=''):
-    """compute the s3 key
+    """Compute the s3 key
 
     Parameters
     ----------
@@ -42,7 +42,7 @@ def s3_key(prefix, path=''):
 
 
 def s3_display_path(bucket, prefix, path=''):
-    """create a display name for use in logs
+    """Create a display name for use in logs
 
     Parameters
     ----------
