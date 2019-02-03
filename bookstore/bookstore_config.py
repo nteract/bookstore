@@ -1,9 +1,40 @@
+"""Configuration of bookstore"""
 from traitlets import Int, Unicode
 from traitlets.config import LoggingConfigurable
 
 
 class BookstoreSettings(LoggingConfigurable):
-    """The same settings to be shared across archival, publishing, and scheduling
+    """The settings to be used for archival, publishing, and scheduling
+
+    These settings are configurable.
+
+    The storage locations for user workspace and published notebooks:
+
+    - workspace_prefix : str('workspace')
+        the directory to use for user workspace storage
+    - published_prefix : str('published')
+        the directory to use for published notebook storage
+
+    S3 authentication settings can be set or they can be left unset when IAM is used:
+
+    - s3_access_key_id : str, optional
+        environment variable JPYNB_S3_ACCESS_KEY_ID
+    - s3_secret_access_key : str, optional
+        environment variable JPYNB_S3_SECRET_ACCESS_KEY
+
+    Additional S3 settings include:
+
+    - s3_endpoint_url : str("https://s3.amazonaws.com")
+        environment variable JPYNB_S3_ENDPOINT_URL
+    - s3_region_name : str("us-east-1")
+        environment variable JPYNB_S3_REGION_NAME
+    - s3_bucket : str("")
+        bucket name, environment variable JPYNB_S3_BUCKET
+
+    This bookstore setting determines the resources available:
+    
+    - max_threads : int(16)
+        Maximum threads from the threadpool available to do S3 read and writes
     """
 
     workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(
@@ -11,7 +42,8 @@ class BookstoreSettings(LoggingConfigurable):
     )
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
 
-    ## S3 Settings for the S3 backed storage (other implementations can add on below)
+    # S3 Settings for the S3 backed storage
+    # (other implementations can add on below)
     # Allowed to not set these as we can pick up IAM roles instead
     s3_access_key_id = Unicode(
         help="S3/AWS access key ID", allow_none=True, default_value=None
@@ -36,7 +68,7 @@ class BookstoreSettings(LoggingConfigurable):
 
 
 def validate_bookstore(settings: BookstoreSettings):
-    """Test for establishing that bookstore has been appropriately set up.
+    """Ensure that bookstore settings are valid to appropriately set up the application.
     
     Parameters
     ----------
