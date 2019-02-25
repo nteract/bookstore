@@ -115,7 +115,12 @@ def load_jupyter_server_extension(nb_app):
     # need to delay adding this check until server
     # has been updated
 
-    if not web_app.settings['bookstore_validated']:
+    check_published = [ 
+        web_app.settings['bookstore_validated'].get("bookstore_validation"),
+        web_app.settings['bookstore_validated'].get("published_validation"),
+    ]
+    
+    if not all(check_published):
         nb_app.log.info("[bookstore] Not enabling bookstore publishing, endpoint not configured")
     else:
         nb_app.log.info(f"[bookstore] Enabling bookstore publishing, version: {version}")
