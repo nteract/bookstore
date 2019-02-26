@@ -7,6 +7,7 @@ from tornado import web
 from ._version import __version__, version_info
 from .bookstore_config import BookstoreSettings, validate_bookstore
 from .publish import BookstorePublishHandler
+from .clone import BookstoreCloneHandler
 
 version = __version__
 
@@ -64,3 +65,14 @@ def load_jupyter_server_extension(nb_app):
                 )
             ],
         )
+    
+    nb_app.log.info("I am reached!!!! " + url_path_join(base_bookstore_pattern, r"/clone%s" % path_regex))
+    web_app.add_handlers(
+        host_pattern,
+        [
+            (
+                url_path_join(base_bookstore_pattern, r"/clone%s" % path_regex),
+                BookstoreCloneHandler,
+            )
+        ],
+    )
