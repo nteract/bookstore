@@ -77,7 +77,7 @@ def load_jupyter_server_extension(nb_app):
         host_pattern,
         [
             (
-                url_path_join(base_bookstore_pattern, r"/clone%s" % path_regex),
+                url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"),
                 BookstoreCloneHandler,
             )
         ],
