@@ -23,6 +23,6 @@ You will also need a up-to-date version of `node`.
 
 Create two shell sessions with working directories as the `bookstore` directory. 
 
-In one session run `ci/local.sh`, this will start up minio.
+In one session run `yarn test:server` (this will start up minio).
 
-In the other session run `node ci/integration.js`, this will run the integration tests
+In the other session run `yarn test`, this will run the integration tests.
