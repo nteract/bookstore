@@ -21,14 +21,7 @@ class BookstoreVersionHandler(APIHandler):
 
     @web.authenticated
     def get(self):
-        self.finish(
-            json.dumps(
-                {
-                    "bookstore": True,
-                    **self.settings['bookstore']
-                }
-            )
-        )
+        self.finish(json.dumps({"bookstore": True, **self.settings['bookstore']}))
 
 
 # NOTE: We need to ensure that publishing is not configured if bookstore settings are not
@@ -111,8 +104,8 @@ def load_jupyter_server_extension(nb_app):
     bookstore_settings = BookstoreSettings(parent=nb_app)
     web_app.settings['bookstore'] = {
         "version": version,
-        "validation": validate_bookstore(bookstore_settings), 
-        }
+        "validation": validate_bookstore(bookstore_settings),
+    }
 
     check_published = [
         web_app.settings['bookstore']['validation'].get("bookstore_valid"),
