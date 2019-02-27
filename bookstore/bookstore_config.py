@@ -75,10 +75,16 @@ def validate_bookstore(settings: BookstoreSettings):
     settings: bookstore.bookstore_config.BookstoreSettings
         The instantiated Settings object to be validated.
     """
-    valid_settings = [
-        settings.workspace_prefix != "",
-        settings.published_prefix != "",
-        settings.s3_bucket != "",
-        settings.s3_endpoint_url != "",
-    ]
-    return all(valid_settings)
+
+    general_settings = [settings.s3_bucket != "", settings.s3_endpoint_url != ""]
+
+    archive_settings = [settings.workspace_prefix != ""]
+
+    published_settings = [settings.published_prefix != ""]
+
+    validation_checks = {
+        "bookstore_valid": all(general_settings),
+        "archive_valid": all(archive_settings),
+        "publish_valid": all(published_settings),
+    }
+    return validation_checks

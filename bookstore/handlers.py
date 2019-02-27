@@ -26,7 +26,7 @@ class BookstoreVersionHandler(APIHandler):
                 {
                     "bookstore": True,
                     "version": version,
-                    "bookstore_validated": self.settings['bookstore_validated'],
+                    "bookstore_validation": self.settings['bookstore_validation'],
                 }
             )
         )
@@ -110,12 +110,17 @@ def load_jupyter_server_extension(nb_app):
     base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
     web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
     bookstore_settings = BookstoreSettings(parent=nb_app)
-    web_app.settings['bookstore_validated'] = validate_bookstore(bookstore_settings)
+    web_app.settings['bookstore_validation'] = validate_bookstore(bookstore_settings)
     # and nb_app.nbserver_extensions.get("bookstore")
     # need to delay adding this check until server
     # has been updated
 
-    if not web_app.settings['bookstore_validated']:
+    check_published = [
+        web_app.settings['bookstore_validation'].get("bookstore_valid"),
+        web_app.settings['bookstore_validation'].get("publish_valid"),
+    ]
+
+    if not all(check_published):
         nb_app.log.info("[bookstore] Not enabling bookstore publishing, endpoint not configured")
     else:
         nb_app.log.info(f"[bookstore] Enabling bookstore publishing, version: {version}")
