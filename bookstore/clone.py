@@ -21,7 +21,7 @@ class BookstoreCloneHandler(APIHandler):
 
     async def _clone(self, s3_bucket, file_key):
         path = file_key
-        
+
         self.log.info(f"bucket: {s3_bucket}")
         self.log.info(f"key: {file_key}")
         full_s3_path = s3_path(s3_bucket, path)
@@ -34,22 +34,17 @@ class BookstoreCloneHandler(APIHandler):
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
             self.log.info("Processing published write of %s", path)
-            obj = await client.get_object(
-                Bucket=s3_bucket, Key=file_key
-            )
+            obj = await client.get_object(Bucket=s3_bucket, Key=file_key)
             content = await obj['Body'].read()
             self.log.info("Done with published write of %s", path)
-        
+
         self.set_status(201)
-        resp_content = {
-            "s3_path": full_s3_path,
-            "content": content.decode('utf-8')
-        }
-        
+        resp_content = {"s3_path": full_s3_path, "content": content.decode('utf-8')}
+
         self.log.info(obj)
         if 'VersionId' in obj:
             resp_content["versionID"] = obj['VersionId']
-        
+
         resp_str = json.dumps(resp_content)
         self.finish(resp_str)
 
@@ -69,5 +64,3 @@ class BookstoreCloneHandler(APIHandler):
         if file_key == '' or file_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
         await self._clone(s3_bucket, file_key)
-
-        

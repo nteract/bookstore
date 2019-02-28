@@ -11,6 +11,7 @@ from .clone import BookstoreCloneHandler
 
 version = __version__
 
+
 class BookstoreVersionHandler(APIHandler):
     """Returns the version of bookstore currently running. Used mostly to lay foundations
     for this package though frontends can use this endpoint for feature detection.
@@ -65,14 +66,8 @@ def load_jupyter_server_extension(nb_app):
                 )
             ],
         )
-    
-    nb_app.log.info("I am reached!!!! " + url_path_join(base_bookstore_pattern, r"/clone%s" % path_regex))
+
     web_app.add_handlers(
         host_pattern,
-        [
-            (
-                url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"),
-                BookstoreCloneHandler,
-            )
-        ],
+        [(url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"), BookstoreCloneHandler)],
     )

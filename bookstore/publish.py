@@ -9,6 +9,7 @@ from tornado import web
 from .s3_paths import s3_path, s3_key, s3_display_path
 from .bookstore_config import BookstoreSettings
 
+
 class BookstorePublishHandler(APIHandler):
     """Publish a notebook to the publish path"""
 
