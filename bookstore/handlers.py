@@ -21,7 +21,15 @@ class BookstoreVersionHandler(APIHandler):
 
     @web.authenticated
     def get(self):
-        self.finish(json.dumps({"bookstore": True, **self.settings['bookstore']}))
+        self.finish(
+            json.dumps(
+                {
+                    "bookstore": True,
+                    "version": self.settings['bookstore']["version"],
+                    "validation": self.settings['bookstore']["validation"],
+                }
+            )
+        )
 
 
 # NOTE: We need to ensure that publishing is not configured if bookstore settings are not
