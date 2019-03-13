@@ -2,15 +2,19 @@ import json
 
 import aiobotocore
 
-from notebook.base.handlers import APIHandler, path_regex
-from notebook.utils import url_path_join
+from notebook.base.handlers import IPythonHandler
 from tornado import web
+from jinja2 import FileSystemLoader
 
-from .s3_paths import s3_path, s3_display_path
+from . import PACKAGE_DIR
+from .s3_paths import s3_path
 from .bookstore_config import BookstoreSettings
 
 
-class BookstoreCloneHandler(APIHandler):
+BOOKSTORE_FILE_LOADER = FileSystemLoader(PACKAGE_DIR)
+
+
+class BookstoreCloneHandler(IPythonHandler):
     """Clone a notebook from s3."""
 
     def initialize(self):
@@ -49,10 +53,9 @@ class BookstoreCloneHandler(APIHandler):
 
         if 'VersionId' in obj:
             resp_content["versionID"] = obj['VersionId']
-        resp_str = json.dumps(resp_content)
-        self.finish(resp_str)
         return model
 
+    @web.authenticated
     async def get(self):
         """Clone a notebook to a given path.
         
@@ -63,11 +66,17 @@ class BookstoreCloneHandler(APIHandler):
         But this all should go away.
         """
         s3_bucket = self.get_argument("s3_bucket", "")
+        # s3_paths module has an s3_key function; file_key avoids confusion
         file_key = self.get_argument("s3_key", "")
         self.log.info("About to clone from %s", file_key)
 
         if file_key == '' or file_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
         model = await self._clone(s3_bucket, file_key)
+        self.set_header('Content-Type', 'text/html')
+        template_params = {"s3_bucket": s3_bucket, "s3_key": file_key}
+        self.write(self.render_template('clone.html', **template_params))
+        # self.contents_manager.save(model, file_key)
 
-        self.contents_manager.save(model, file_key)
+    def get_template(self, name):
+        return BOOKSTORE_FILE_LOADER.load(self.settings['jinja2_env'], name)
