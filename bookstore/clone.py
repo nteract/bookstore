@@ -38,9 +38,14 @@ class BookstoreCloneHandler(APIHandler):
             content = await obj['Body'].read()
             self.log.info("Done with published write of %s", path)
 
-        self.set_status(201)
         resp_content = {"s3_path": full_s3_path}
-        model = {"type": "notebook", "content": json.loads(content.decode('utf-8'))}
+        model = {
+            "type": "file",
+            "format": "text",
+            "mimetype": "text/plain",
+            "content": content.decode('utf-8'),
+        }
+        self.set_status(201)
 
         if 'VersionId' in obj:
             resp_content["versionID"] = obj['VersionId']
