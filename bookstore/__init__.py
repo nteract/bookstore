@@ -1,3 +1,9 @@
+import os
+
+PACKAGE_DIR: str = os.path.realpath(os.path.dirname(__file__))
+
+del os
+
 from .archive import BookstoreContentsArchiver
 from .bookstore_config import BookstoreSettings
 from .handlers import load_jupyter_server_extension
