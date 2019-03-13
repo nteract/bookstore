@@ -39,14 +39,14 @@ class BookstoreCloneHandler(APIHandler):
             self.log.info("Done with published write of %s", path)
 
         self.set_status(201)
-        resp_content = {"s3_path": full_s3_path, "content": content.decode('utf-8')}
+        resp_content = {"s3_path": full_s3_path}
+        model = {"type": "notebook", "content": json.loads(content.decode('utf-8'))}
 
-        self.log.info(obj)
         if 'VersionId' in obj:
             resp_content["versionID"] = obj['VersionId']
-
         resp_str = json.dumps(resp_content)
         self.finish(resp_str)
+        return model
 
     async def get(self):
         """Clone a notebook to a given path.
@@ -63,4 +63,6 @@ class BookstoreCloneHandler(APIHandler):
 
         if file_key == '' or file_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
-        await self._clone(s3_bucket, file_key)
+        model = await self._clone(s3_bucket, file_key)
+
+        self.contents_manager.save(model, file_key)
