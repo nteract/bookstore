@@ -8,8 +8,8 @@ def main(queries):
 
 if __name__ == "__main__":
     # res = main("?s3_bucket=nteract-notebooks&s3_key=published/whateverwewant.json")
-    # print(res.json())
+    # print(res.content)
     # res = main("/?s3_bucket=nteract-notebooks&s3_key=published/whateverwewant.json")
-    # print(res.json())
+    # print(res.content)
     res = main("?s3_bucket=nteract-notebooks&s3_key=Introduction_to_Chainer.ipynb")
-    print(res.json())
+    print(res.content)
