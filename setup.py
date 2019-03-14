@@ -66,6 +66,7 @@ setup(
     # Note that this is a string of words separated by whitespace, not a list.
     keywords='jupyter storage nteract notebook',
     packages=['bookstore'],
+    include_package_data=True,
     install_requires=[
         'future',
         'futures ; python_version < "3.0"',
