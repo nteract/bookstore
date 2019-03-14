@@ -94,7 +94,7 @@ class JupyterServer {
 
     return xhr;
   }
-  
+
   async publishNotebook(path, notebook) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
@@ -116,6 +116,26 @@ class JupyterServer {
     return xhr;
   }
 
+  populateCloneQuery(s3Bucket, s3Key) {
+    return `${
+      this.endpoint
+    }/api/bookstore/clone?s3_bucket=${s3Bucket}&s3_key=${s3Key}`;
+  }
+  async cloneNotebook(s3Bucket, s3Key) {
+    // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
+    // rx-jupyter for writing a notebook to the contents API
+    const xhr = await ajax({
+      url: this.populateCloneQuery(s3Bucket, s3Key),
+      responseType: "text",
+      createXHR: () => new XMLHttpRequest(),
+      method: "GET",
+      headers: {
+        Authorization: `token ${this.token}`
+      }
+    }).toPromise();
+
+    return xhr;
+  }
   shutdown() {
     this.process.kill();
   }
