@@ -99,7 +99,8 @@ class NotebookClient:
 
     def get_sessions(self):
         target_url = f"{self.sessions_endpoint}"
-        resp = requests.get(target_url)
+        headers = {'Authorization': f'token {self.token}'}
+        resp = requests.get(target_url, headers=headers)
         return resp.json()
 
     @property
@@ -109,7 +110,8 @@ class NotebookClient:
 
     def get_kernels(self):
         target_url = f"{self.sessions_endpoint}"
-        resp = requests.get(target_url)
+        headers = {'Authorization': f'token {self.token}'}
+        resp = requests.get(target_url, headers=headers)
         return resp.json()
 
     @property
@@ -119,7 +121,8 @@ class NotebookClient:
 
     def get_contents(self, path):
         target_url = f"{self.contents_endpoint}{path}"
-        resp = requests.get(target_url)
+        headers = {'Authorization': f'token {self.token}'}
+        resp = requests.get(target_url, headers=headers)
         return resp.json()
 
 
@@ -160,4 +163,3 @@ class CurrentNotebookClient(NotebookClient):
     @property
     def kernel_id(self):
         return os.path.basename(self.connection_file).lstrip('kernel-').rstrip('.json')
-
