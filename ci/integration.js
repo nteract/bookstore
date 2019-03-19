@@ -5,7 +5,7 @@ const fs = require("fs");
 const _ = require("lodash");
 
 const s3 = require("./s3");
-const { JupyterServer } = require("./jupyter");
+const { url_path_join, JupyterServer } = require("./jupyter");
 
 const { sleep } = require("./sleep");
 
@@ -228,9 +228,10 @@ const main = async () => {
   const publishedPath = "ci-published/ci-published.ipynb";
   cloneQueryCheck(
     publishedPath,
-    `${
-      jupyterServer.endpoint
-    }/api/bookstore/clone?s3_bucket=${bucketName}&s3_key=${publishedPath}`
+    url_path_join(
+      jupyterServer.endpoint,
+      `api/bookstore/clone?s3_bucket=${bucketName}&s3_key=${publishedPath}`
+    )
   );
   const cloneRes = await jupyterServer.cloneNotebook(bucketName, publishedPath);
   checkCloneResponse(cloneRes, publishedPath);

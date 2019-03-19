@@ -6,14 +6,41 @@ const { sleep } = require("./sleep");
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const { ajax } = require("rxjs/ajax");
 
+let url_path_join = function(...pieces) {
+  // """Join components of url into a relative url
+  // Use to prevent double slash when joining subpath. This will leave the
+  // initial and final / in place
+  // """
+  initial = pieces[0].startsWith("/");
+  final = pieces[pieces.length - 1].endsWith("/");
+  const hi = [];
+  for (s of pieces) {
+    if (s === "") {
+      continue;
+    }
+    let clean = s.replace(/(^[ /]+)|([/]+$)/g, "");
+    hi.push(clean);
+  }
+  result = hi.join("/");
+  if (initial) {
+    result = "/" + result;
+  }
+  if (final) {
+    result = result + "/";
+  }
+  if (result == "//") {
+    result = "/";
+  }
+  return result;
+};
 class JupyterServer {
   constructor(config = {}) {
     this.port = config.port || 9988;
     this.ip = config.ip || "127.0.0.1";
     this.scheme = config.scheme || "http";
     this.token = null;
-    this.baseUrl = config.baseUrl || "";
-    // this.baseUrl = config.baseUrl || "mybaseUrl/ipynb/";
+    // this.baseUrl = config.baseUrl || "";
+    this.baseUrl = config.baseUrl || "mybaseUrl/ipynb/";
 
     // Launch the server from the directory of this script by default
     this.cwd = config.cwd || __dirname;
@@ -80,8 +107,9 @@ class JupyterServer {
   async writeNotebook(path, notebook) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
+    const apiPath = "/api/contents/";
     const xhr = await ajax({
-      url: `${this.endpoint}/api/contents/${path}`,
+      url: url_path_join(this.endpoint, apiPath, path),
       responseType: "json",
       createXHR: () => new XMLHttpRequest(),
       method: "PUT",
@@ -101,8 +129,9 @@ class JupyterServer {
   async publishNotebook(path, notebook) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
+    const apiPath = "/api/bookstore/published/";
     const xhr = await ajax({
-      url: `${this.endpoint}/api/bookstore/published/${path}`,
+      url: url_path_join(this.endpoint, apiPath, path),
       responseType: "json",
       createXHR: () => new XMLHttpRequest(),
       method: "PUT",
@@ -120,9 +149,10 @@ class JupyterServer {
   }
 
   populateCloneQuery(s3Bucket, s3Key) {
-    return `${
-      this.endpoint
-    }/api/bookstore/clone?s3_bucket=${s3Bucket}&s3_key=${s3Key}`;
+    return url_path_join(
+      this.endpoint,
+      `/api/bookstore/clone?s3_bucket=${s3Bucket}&s3_key=${s3Key}`
+    );
   }
   async cloneNotebook(s3Bucket, s3Key) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
@@ -144,12 +174,14 @@ class JupyterServer {
   }
 
   get endpoint() {
-    return `${this.scheme}://${this.ip}:${this.port}${
-      this.baseUrl ? "/" + this.baseUrl : ""
-    }`;
+    return url_path_join(
+      `${this.scheme}://${this.ip}:${this.port}`,
+      this.baseUrl
+    );
   }
 }
 
 module.exports = {
-  JupyterServer
+  JupyterServer,
+  url_path_join
 };
