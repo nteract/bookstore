@@ -25,8 +25,8 @@ class BookstoreVersionHandler(APIHandler):
             json.dumps(
                 {
                     "bookstore": True,
-                    "version": version,
-                    "bookstore_validation": self.settings['bookstore_validation'],
+                    "version": self.settings['bookstore']["version"],
+                    "validation": self.settings['bookstore']["validation"],
                 }
             )
         )
@@ -110,14 +110,14 @@ def load_jupyter_server_extension(nb_app):
     base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
     web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
     bookstore_settings = BookstoreSettings(parent=nb_app)
-    web_app.settings['bookstore_validation'] = validate_bookstore(bookstore_settings)
-    # and nb_app.nbserver_extensions.get("bookstore")
-    # need to delay adding this check until server
-    # has been updated
+    web_app.settings['bookstore'] = {
+        "version": version,
+        "validation": validate_bookstore(bookstore_settings),
+    }
 
     check_published = [
-        web_app.settings['bookstore_validation'].get("bookstore_valid"),
-        web_app.settings['bookstore_validation'].get("publish_valid"),
+        web_app.settings['bookstore']['validation'].get("bookstore_valid"),
+        web_app.settings['bookstore']['validation'].get("publish_valid"),
     ]
 
     if not all(check_published):
