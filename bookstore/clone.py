@@ -1,4 +1,5 @@
 import json
+import os
 
 import aiobotocore
 
@@ -72,11 +73,35 @@ class BookstoreCloneHandler(IPythonHandler):
 
         if file_key == '' or file_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
-        model = await self._clone(s3_bucket, file_key)
         self.set_header('Content-Type', 'text/html')
         template_params = {"s3_bucket": s3_bucket, "s3_key": file_key}
         self.write(self.render_template('clone.html', **template_params))
-        # self.contents_manager.save(model, file_key)
+
+    @web.authenticated
+    async def post(self):
+        """Clone a notebook to a given path.
+        
+        The payload for this should match that of the contents API for POST.
+        
+        Also, you could … *not* do that while still prototyping.
+        That's ok! 
+        But this all should go away.
+        """
+        model = self.get_json_body()
+        s3_bucket = model.get("s3_bucket", "")
+        # s3_paths module has an s3_key function; file_key avoids confusion
+        file_key = model.get("s3_key", "")
+        target_path = model.get("target_path", "") or os.path.basename(os.path.relpath(file_key))
+
+        self.log.info("About to clone from %s", file_key)
+
+        if file_key == '' or file_key == '/':
+            raise web.HTTPError(400, "Must have a key to clone from")
+        model = await self._clone(s3_bucket, file_key)
+        self.set_header('Content-Type', 'text/html')
+        print(target_path)
+        name = self.contents_manager.increment_filename(target_path)
+        self.contents_manager.save(model, name)
 
     def get_template(self, name):
         return BOOKSTORE_FILE_LOADER.load(self.settings['jinja2_env'], name)

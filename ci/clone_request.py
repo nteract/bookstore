@@ -27,6 +27,12 @@ def main(queries):
     return requests.get(f"http://localhost:8888/api/bookstore/clone{queries}")
 
 
+def post(s3_bucket, s3_key):
+    return requests.post(
+        "http://localhost:8888/api/bookstore/clone", json={"s3_bucket": s3_bucket, "s3_key": s3_key}
+    )
+
+
 if __name__ == "__main__":
 
     # tests s3 hosted 'nteract-notebooks' bucket
@@ -38,5 +44,9 @@ if __name__ == "__main__":
     # print(res.content)
 
     # tests minio created 'bookstore' bucket
-    res = main("?s3_bucket=bookstore&s3_key=ci-published/ci-published.ipynb")
+    # res = main("?s3_bucket=bookstore&s3_key=ci-published/ci-published.ipynb")
+    # print(res.content)
+    # res = main(s3_bucket="nteract-notebooks", s3_key="Introduction_to_Chainer.ipynb")
+    # print(res.content)
+    res = post(s3_bucket="bookstore", s3_key="ci-published/ci-published.ipynb")
     print(res.content)
