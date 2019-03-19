@@ -12,6 +12,8 @@ class JupyterServer {
     this.ip = config.ip || "127.0.0.1";
     this.scheme = config.scheme || "http";
     this.token = null;
+    this.baseUrl = config.baseUrl || "";
+    // this.baseUrl = config.baseUrl || "mybaseUrl/ipynb/";
 
     // Launch the server from the directory of this script by default
     this.cwd = config.cwd || __dirname;
@@ -37,6 +39,7 @@ class JupyterServer {
         "--no-browser",
         `--NotebookApp.token=${this.token}`,
         `--NotebookApp.disable_check_xsrf=True`,
+        `--NotebookApp.base_url=${this.baseUrl}`,
         `--port=${this.port}`,
         `--ip=${this.ip}`,
         `--log-level=10`
@@ -141,7 +144,9 @@ class JupyterServer {
   }
 
   get endpoint() {
-    return `${this.scheme}://${this.ip}:${this.port}`;
+    return `${this.scheme}://${this.ip}:${this.port}${
+      this.baseUrl ? "/" + this.baseUrl : ""
+    }`;
   }
 }
 
