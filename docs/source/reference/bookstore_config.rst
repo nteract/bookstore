@@ -1,5 +1,8 @@
-bookstore.bookstore_config module
-=================================
+Configuration
+=============
+
+``bookstore.bookstore_config``
+------------------------------
 
 .. automodule:: bookstore.bookstore_config
     :members:
