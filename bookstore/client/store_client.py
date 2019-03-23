@@ -4,6 +4,8 @@ from .notebook import CurrentNotebookClient
 
 
 class BookstoreClient(CurrentNotebookClient):
+    """Represents a bookstore client that corresponds to the active nb client"""
+
     def __init__(self, s3_bucket=""):
         if s3_bucket:
             self.default_bucket = s3_bucket
@@ -34,5 +36,7 @@ class BookstoreClient(CurrentNotebookClient):
         s3_bucket = s3_bucket or self.default_bucket
         json_body = {"s3_bucket": s3_bucket, "s3_key": s3_key, "target_path": target_path}
         target_url = f"{self.clone_endpoint}"
+        # TODO: Add a check for success
         resp = self.req_session.post(target_url, json=json_body)
         return resp
+
