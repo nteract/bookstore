@@ -47,6 +47,7 @@ class BookstoreSettings(LoggingConfigurable):
     - max_threads : int(16)
         Maximum threads from the threadpool available to do S3 read and writes
     """
+
     workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(
         config=True
     )
