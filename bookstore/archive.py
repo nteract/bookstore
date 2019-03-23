@@ -27,6 +27,7 @@ class ArchiveRecord(NamedTuple):
     - the `content` for archival
     - the `queued time` length of time waiting in the queue for archiving
     """
+
     filepath: str
     content: str
     queued_time: float  # TODO: refactor to a datetime time
@@ -56,6 +57,7 @@ class BookstoreContentsArchiver(FileContentsManager):
     path_lock_ready: asyncio mutex lock
         A mutex lock associated with a path.
     """
+
     def __init__(self, *args, **kwargs):
         super(FileContentsManager, self).__init__(*args, **kwargs)
 
