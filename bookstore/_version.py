@@ -12,6 +12,6 @@ version info type of release (b1, rc1, or "" for final or dev)
 dev or "" to designate a final version
 """
 
-version_info = (2, 3, 0, "", "dev",)
+version_info = (2, 3, 0, "", "dev")
 
 __version__ = ".".join(map(str, version_info[:3])) + ".".join(version_info[3:])
