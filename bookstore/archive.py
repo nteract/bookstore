@@ -1,8 +1,9 @@
 """Archival of notebooks"""
+
 import json
-import logging
 from asyncio import Lock
-from typing import Dict, NamedTuple
+from typing import Dict
+from typing import NamedTuple
 
 import aiobotocore
 from notebook.services.contents.filemanager import FileContentsManager
@@ -13,43 +14,48 @@ from .s3_paths import s3_key, s3_display_path
 
 
 class ArchiveRecord(NamedTuple):
-    """Representation of content to archive
+    """Represents an archival record.
 
-    A record to be archived is a tuple containing `filepath`, the `content` to
-    be archived, and the length of time in queue for archiving (`queued_time`).
+    An `ArchiveRecord` uses a Typed version of `collections.namedtuple()`. The
+    record is immutable.
+
+    Example
+    -------
+    An archive record (`filepath`, `content`, `queued_time`) contains:
+
+    - a `filepath` to the record
+    - the `content` for archival
+    - the `queued time` length of time waiting in the queue for archiving
     """
-
     filepath: str
     content: str
-    queued_time: float
+    queued_time: float  # TODO: refactor to a datetime time
 
 
 class BookstoreContentsArchiver(FileContentsManager):
-    """Archives notebooks to storage (S3) on notebook save
+    """Manages archival of notebooks to storage (S3) when notebook save occurs.
 
-    This class is a custom Jupyter `FileContentsManager` which holds information
-    on storage location, path to it, and file to be written there.
+    This class is a custom Jupyter
+    `FileContentsManager <https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html#contents-api>`_
+    which holds information on storage location, path to it, and file to be
+    written.
 
-    Bookstore settings combine with the parent Jupyter application settings.
-``
-    A session is created for the current event loop. To write to a particular
-    path on S3, acquire a lock. After acquiring the lock, `archive`
-    authenticates using the storage service's credentials. If allowed, the
-
-    notebook is queued to be written to storage (i.e. S3).
+    Example
+    -------
+    - Bookstore settings combine with the parent Jupyter application settings.
+    - A session is created for the current event loop.
+    - To write to a particular path on S3, acquire a lock.
+    - After acquiring the lock, `archive` method authenticates using the storage
+      service's credentials.
+    - If allowed, the notebook is queued to be written to storage (i.e. S3).
 
     Attributes
     ----------
     path_locks : dict
-        Dictionary of paths to storage and the lock associated with a path
-    path_lock_ready: ayncio mutex lock
-        A mutex lock associated with a path
-
-    See also
-    --------
-    https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html#contents-api
+        Dictionary of paths to storage and the lock associated with a path.
+    path_lock_ready: asyncio mutex lock
+        A mutex lock associated with a path.
     """
-
     def __init__(self, *args, **kwargs):
         super(FileContentsManager, self).__init__(*args, **kwargs)
 
@@ -77,7 +83,7 @@ class BookstoreContentsArchiver(FileContentsManager):
         """Process a record to write to storage.
 
         Acquire a path lock before archive. Writing to storage will only be
-        allowed to a path if a valid path_lock is held and the path is not
+        allowed to a path if a valid `path_lock` is held and the path is not
         locked by another process.
 
         Parameters
@@ -118,7 +124,7 @@ class BookstoreContentsArchiver(FileContentsManager):
                 )
 
     def run_pre_save_hook(self, model, path, **kwargs):
-        """Store notebook to S3 when save occurs
+        """Send request to store notebook to S3.
 
         This hook offloads the storage request to the event loop.
         When the event loop is available for execution of the request, the
