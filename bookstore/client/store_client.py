@@ -1,6 +1,7 @@
+"""Client to interact with the notebook store"""
 import requests
 
-from .notebook import CurrentNotebookClient
+from .nb_client import CurrentNotebookClient
 
 
 class BookstoreClient(CurrentNotebookClient):
@@ -17,6 +18,7 @@ class BookstoreClient(CurrentNotebookClient):
         return f"{self.url}{api_endpoint}"
 
     def publish(self, path=None):
+        """Publish notebook to bookstore"""
         if path is None:
             path = self.session.path
         nb_json = self.get_contents(self.session.path)['content']
