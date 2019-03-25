@@ -58,13 +58,7 @@ class BookstoreCloneHandler(IPythonHandler):
 
     @web.authenticated
     async def get(self):
-        """Clone a notebook to a given path.
-        
-        The payload for this should match that of the contents API for POST.
-        
-        Also, you could … *not* do that while still prototyping.
-        That's ok! 
-        But this all should go away.
+        """Open a page that will allow you to clone a notebook from a specific bucket.
         """
         s3_bucket = self.get_argument("s3_bucket", "")
         # s3_paths module has an s3_key function; file_key avoids confusion
@@ -99,9 +93,11 @@ class BookstoreCloneHandler(IPythonHandler):
             raise web.HTTPError(400, "Must have a key to clone from")
         model = await self._clone(s3_bucket, file_key)
         self.set_header('Content-Type', 'text/html')
-        print(target_path)
-        name = self.contents_manager.increment_filename(target_path)
-        self.contents_manager.save(model, name)
+        path = self.contents_manager.increment_filename(target_path)
+        model['name'] = os.path.basename(os.path.relpath(path))
+        model['path'] = os.path.relpath(path)
+        self.contents_manager.save(model, path)
+        self.finish(model)
 
     def get_template(self, name):
         return BOOKSTORE_FILE_LOADER.load(self.settings['jinja2_env'], name)
