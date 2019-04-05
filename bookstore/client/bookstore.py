@@ -4,6 +4,11 @@ from .notebook import CurrentNotebookClient
 
 
 class BookstoreClient(CurrentNotebookClient):
+    def __init__(self, s3_bucket=""):
+        if s3_bucket:
+            self.default_bucket = s3_bucket
+        super().__init__()
+
     @property
     def publish_endpoint(self):
         api_endpoint = "/api/bookstore/published/"
@@ -19,3 +24,20 @@ class BookstoreClient(CurrentNotebookClient):
         target_url = f"{self.publish_endpoint}{self.notebook['path']}"
 
         resp = requests.put(target_url, **req)
+
+    @property
+    def clone_endpoint(self):
+        api_endpoint = "/api/bookstore/cloned/"
+        return f"{self.url}{api_endpoint}"
+
+    def clone(self, s3_bucket="", s3_key="", target_path=""):
+        s3_bucket = s3_bucket or self.default_bucket
+        req_dict = {"s3_bucket": s3_bucket, "s3_key": s3_key, "target_path": target_path}
+        req = {
+            "json": req_dict,
+            "headers": {"Content-Type": "application/json", 'Authorization': f'token {self.token}'},
+        }
+
+        target_url = f"{self.clone_endpoint}"
+        resp = requests.post(target_url, **req)
+
