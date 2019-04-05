@@ -23,28 +23,28 @@ jupyter notebook --NotebookApp.allow_origin="*" --NotebookApp.disable_check_xsrf
 '''
 
 
-def main(queries):
-    return requests.get(f"http://localhost:8888/api/bookstore/clone{queries}")
+def get(queries):
+    return requests.get(f"http://localhost:8888/api/bookstore/cloned{queries}")
 
 
 def post(**kwargs):
-    return requests.post("http://localhost:8888/api/bookstore/clone", json={**kwargs})
+    return requests.post("http://localhost:8888/api/bookstore/cloned", json={**kwargs})
 
 
 if __name__ == "__main__":
 
     # tests s3 hosted 'nteract-notebooks' bucket
-    # res = main("?s3_bucket=nteract-notebooks&s3_key=published/whateverwewant.json")
+    # res = get("?s3_bucket=nteract-notebooks&s3_key=published/whateverwewant.json")
     # print(res.content)
-    # res = main("/?s3_bucket=nteract-notebooks&s3_key=published/whateverwewant.json")
+    # res = get("/?s3_bucket=nteract-notebooks&s3_key=published/whateverwewant.json")
     # print(res.content)
-    # res = main("?s3_bucket=nteract-notebooks&s3_key=Introduction_to_Chainer.ipynb")
+    # res = get("?s3_bucket=nteract-notebooks&s3_key=Introduction_to_Chainer.ipynb")
     # print(res.content)
 
     # tests minio created 'bookstore' bucket
-    # res = main("?s3_bucket=bookstore&s3_key=ci-published/ci-published.ipynb")
+    # res = get("?s3_bucket=bookstore&s3_key=ci-published/ci-published.ipynb")
     # print(res.content)
-    # res = main(s3_bucket="nteract-notebooks", s3_key="Introduction_to_Chainer.ipynb")
+    # res = post(s3_bucket="nteract-notebooks", s3_key="Introduction_to_Chainer.ipynb")
     # print(res.content)
     res = post(s3_bucket="bookstore", s3_key="ci-published/ci-published.ipynb")
     pprint.pprint(res.json())

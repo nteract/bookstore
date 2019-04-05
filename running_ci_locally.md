@@ -34,7 +34,7 @@ makes it harder to iterate rapidly when you don't want to test the _entire_ syst
 you do need to integrate with a Jupyter server.
 
 In addition the CI scripts, we have included `./ci/clone_request.py` for testing the clone
-endpoint. This is particularly useful for the `/api/bookstore/clone` endpoint because while it
+endpoint. This is particularly useful for the `/api/bookstore/cloned` endpoint because while it
 is an API to be used by other applications, it also acts as a user facing endpoint since it
 provides a landing page for confirming whether or not a clone is to be approved.
 

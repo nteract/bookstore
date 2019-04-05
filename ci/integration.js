@@ -230,7 +230,7 @@ const main = async () => {
     publishedPath,
     url_path_join(
       jupyterServer.endpoint,
-      `api/bookstore/clone?s3_bucket=${bucketName}&s3_key=${publishedPath}`
+      `api/bookstore/cloned?s3_bucket=${bucketName}&s3_key=${publishedPath}`
     )
   );
   const cloneRes = await jupyterServer.cloneNotebook(bucketName, publishedPath);

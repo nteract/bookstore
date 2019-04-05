@@ -74,5 +74,5 @@ def load_jupyter_server_extension(nb_app):
 
     web_app.add_handlers(
         host_pattern,
-        [(url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"), BookstoreCloneHandler)],
+        [(url_path_join(base_bookstore_pattern, r"/cloned(?:/?)*"), BookstoreCloneHandler)],
     )
