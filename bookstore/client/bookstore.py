@@ -24,6 +24,7 @@ class BookstoreClient(CurrentNotebookClient):
         target_url = f"{self.publish_endpoint}{self.notebook['path']}"
 
         resp = requests.put(target_url, **req)
+        return resp
 
     @property
     def clone_endpoint(self):
@@ -40,4 +41,5 @@ class BookstoreClient(CurrentNotebookClient):
 
         target_url = f"{self.clone_endpoint}"
         resp = requests.post(target_url, **req)
+        return resp
 
