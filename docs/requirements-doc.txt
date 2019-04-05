@@ -1,3 +1,4 @@
 sphinx
 recommonmark
 m2r
+sphinxcontrib-napoleon

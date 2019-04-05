@@ -1,38 +1,49 @@
-"""Configuration of bookstore"""
+"""Configuration settings for bookstore"""
 from traitlets import Int, Unicode
 from traitlets.config import LoggingConfigurable
 
 
 class BookstoreSettings(LoggingConfigurable):
-    """The settings to be used for archival, publishing, and scheduling
+    """Configuration settings for archival, publishing, and scheduling.
 
-    These settings are configurable.
+    Settings include storage directory locations, S3 authentication,
+    additional S3 settings, and Bookstore resources.
 
-    The storage locations for user workspace and published notebooks:
+    S3 authentication settings can be set, or they can be left unset when
+    IAM is used.
+
+    Attributes
+    ----------
+
+    storage directory locations
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     - workspace_prefix : str('workspace')
         the directory to use for user workspace storage
     - published_prefix : str('published')
         the directory to use for published notebook storage
 
-    S3 authentication settings can be set or they can be left unset when IAM is used:
+    S3 authentication
+    ~~~~~~~~~~~~~~~~~
 
     - s3_access_key_id : str, optional
-        environment variable JPYNB_S3_ACCESS_KEY_ID
+        environment variable ``JPYNB_S3_ACCESS_KEY_ID``
     - s3_secret_access_key : str, optional
-        environment variable JPYNB_S3_SECRET_ACCESS_KEY
+        environment variable ``JPYNB_S3_SECRET_ACCESS_KEY``
 
-    Additional S3 settings include:
+    Additional S3
+    ~~~~~~~~~~~~~
 
     - s3_endpoint_url : str("https://s3.amazonaws.com")
-        environment variable JPYNB_S3_ENDPOINT_URL
+        environment variable ``JPYNB_S3_ENDPOINT_URL``
     - s3_region_name : str("us-east-1")
-        environment variable JPYNB_S3_REGION_NAME
+        environment variable ``JPYNB_S3_REGION_NAME``
     - s3_bucket : str("")
-        bucket name, environment variable JPYNB_S3_BUCKET
+        bucket name, environment variable ``JPYNB_S3_BUCKET``
 
-    This bookstore setting determines the resources available:
-    
+    Bookstore resources
+    ~~~~~~~~~~~~~~~~~~~
+
     - max_threads : int(16)
         Maximum threads from the threadpool available to do S3 read and writes
     """
@@ -42,9 +53,6 @@ class BookstoreSettings(LoggingConfigurable):
     )
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
 
-    # S3 Settings for the S3 backed storage
-    # (other implementations can add on below)
-    # Allowed to not set these as we can pick up IAM roles instead
     s3_access_key_id = Unicode(
         help="S3/AWS access key ID", allow_none=True, default_value=None
     ).tag(config=True, env="JPYNB_S3_ACCESS_KEY_ID")
@@ -68,18 +76,15 @@ class BookstoreSettings(LoggingConfigurable):
 
 
 def validate_bookstore(settings: BookstoreSettings):
-    """Ensure that bookstore settings are valid to appropriately set up the application.
+    """Validate bookstore configuration settings.
     
     Parameters
     ----------
     settings: bookstore.bookstore_config.BookstoreSettings
-        The instantiated Settings object to be validated.
+        The instantiated `Settings` object to be validated.
     """
-
     general_settings = [settings.s3_bucket != "", settings.s3_endpoint_url != ""]
-
     archive_settings = [settings.workspace_prefix != ""]
-
     published_settings = [settings.published_prefix != ""]
 
     validation_checks = {

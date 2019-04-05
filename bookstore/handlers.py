@@ -1,22 +1,27 @@
+"""Handlers for Bookstore API"""
 import json
 
 import aiobotocore
-
-from notebook.base.handlers import APIHandler, path_regex
+from notebook.base.handlers import APIHandler
+from notebook.base.handlers import path_regex
 from notebook.utils import url_path_join
 from tornado import web
 
-from ._version import __version__, version_info
-from .bookstore_config import BookstoreSettings, validate_bookstore
-from .s3_paths import s3_path, s3_key, s3_display_path
+from ._version import __version__
+from .bookstore_config import BookstoreSettings
+from .bookstore_config import validate_bookstore
+from .s3_paths import s3_path
+from .s3_paths import s3_key
+from .s3_paths import s3_display_path
 
 
 version = __version__
 
 
 class BookstoreVersionHandler(APIHandler):
-    """Returns the version of bookstore currently running. Used mostly to lay foundations
-    for this package though frontends can use this endpoint for feature detection.
+    """Handler responsible for Bookstore version information
+
+    Used to lay foundations for the bookstore package. Though, frontends can use this endpoint for feature detection.
     """
 
     @web.authenticated
@@ -32,21 +37,38 @@ class BookstoreVersionHandler(APIHandler):
         )
 
 
-# NOTE: We need to ensure that publishing is not configured if bookstore settings are not
-# set. Because of how the APIHandlers cannot be configurable, all we can do is reach into settings
-# For applications this will mean checking the config and then applying it in
+# TODO: Add a check. Note: We need to ensure that publishing is not configured if bookstore settings are not
+#       set. Because of how the APIHandlers cannot be configurable, all we can do is reach into settings
+#       For applications this will mean checking the config and then applying it in
 
 
 class BookstorePublishHandler(APIHandler):
     """Publish a notebook to the publish path"""
 
     def initialize(self):
-        # create an easy helper to get at our bookstore settings quickly
+        """Initialize a helper to get bookstore settings and session information quickly"""
         self.bookstore_settings = BookstoreSettings(config=self.config)
-
         self.session = aiobotocore.get_session()
 
+    @web.authenticated
+    async def put(self, path=''):
+        """Publish a notebook on a given path.
+
+        The payload directly matches the contents API for PUT.
+        """
+        self.log.info("Attempt publishing to %s", path)
+
+        if path == '' or path == '/':
+            raise web.HTTPError(400, "Must provide a path for publishing")
+
+        model = self.get_json_body()
+        if model:
+            await self._publish(model, path.lstrip('/'))
+        else:
+            raise web.HTTPError(400, "Cannot publish an empty model")
+
     async def _publish(self, model, path):
+        """Publish notebook model to the path"""
         if model['type'] != 'notebook':
             raise web.HTTPError(400, "bookstore only publishes notebooks")
         content = model['content']
@@ -62,6 +84,7 @@ class BookstorePublishHandler(APIHandler):
                 self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
             ),
         )
+
         async with self.session.create_client(
             's3',
             aws_secret_access_key=self.bookstore_settings.s3_secret_access_key,
@@ -84,22 +107,6 @@ class BookstorePublishHandler(APIHandler):
 
         resp_str = json.dumps(resp_content)
         self.finish(resp_str)
-
-    @web.authenticated
-    async def put(self, path=''):
-        """Publish a notebook on a given path. The payload for this directly matches that of the contents API for PUT.
-        """
-        self.log.info("About to publish %s", path)
-
-        if path == '' or path == '/':
-            raise web.HTTPError(400, "Must have a path to publish to")
-
-        model = self.get_json_body()
-
-        if model:
-            await self._publish(model, path.lstrip('/'))
-        else:
-            raise web.HTTPError(400, "Cannot publish empty model")
 
 
 def load_jupyter_server_extension(nb_app):

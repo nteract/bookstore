@@ -1,5 +1,8 @@
-bookstore.archive module
-========================
+Archiving
+=========
+
+``bookstore.archive``
+---------------------
 
 .. automodule:: bookstore.archive
     :members:
