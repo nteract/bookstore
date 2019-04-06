@@ -10,6 +10,18 @@ Distributed under the terms of the Modified BSD License.
     <meta http-equiv="Content-Language" content="en" />
 
     <title>Clone Landing page</title>
+    <script>
+      window.onload = function() {
+        var button = document.getElementById("mybutton");
+        button.onclick = function(event) {
+          var post_json = {
+            s3_bucket: "{{ s3_bucket }}",
+            s3_key: "{{ s3_key }}"
+          };
+          console.log(post_json);
+        };
+      };
+    </script>
   </head>
 
   <body>
@@ -17,5 +29,8 @@ Distributed under the terms of the Modified BSD License.
       This is a placeholder for the cloning landing page for the file
       {{ s3_key }} at {{ s3_bucket }}.
     </p>
+    <button id="mybutton" onclick="alert('did not get replaced')">
+      confirm clone
+    </button>
   </body>
 </html>
