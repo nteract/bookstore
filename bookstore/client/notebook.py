@@ -19,6 +19,7 @@
 # ```
 
 import os
+import re
 
 import requests
 
@@ -30,7 +31,9 @@ from notebook.notebookapp import list_running_servers
 
 
 def extract_kernel_id(connection_file):
-    return os.path.basename(connection_file).lstrip('kernel-').rstrip('.json')
+    connection_filename = os.path.basename(connection_file)
+    kernel_id = re.sub(r"kernel-(.*)\.json", r"\1", connection_filename)
+    return kernel_id
 
 
 class LiveNotebookRecord(NamedTuple):
@@ -154,24 +157,16 @@ class NotebookClient:
         return resp.json()
 
 
-def python_compat_session(session):
-    deepcopy(session)
-
-
 class NotebookClientCollection:
     nb_client_gen = lambda: (NotebookClient(x) for x in list_running_servers())
     sessions = {x.url: x.sessions for x in nb_client_gen()}
 
     @classmethod
     def current_server(cls):
+        current_kernel_id = extract_kernel_id(get_ipython().parent.parent.connection_file)
         for server_url, session_dict in cls.sessions.items():
             for session_id, session in session_dict.items():
-                python_compat_session(session)
-                if NotebookSession(**session).kernel.id == extract_kernel_id(
-                    get_ipython().parent.parent.connection_file
-                ):
-                    #                 if session['kernel']['id'] == extract_kernel_id(get_ipython().parent.parent.connection_file):
-
+                if NotebookSession(**session).kernel.id == current_kernel_id:
                     return next(
                         client for client in cls.nb_client_gen() if client.url == server_url
                     )
@@ -190,4 +185,4 @@ class CurrentNotebookClient(NotebookClient):
 
     @property
     def kernel_id(self):
-        return os.path.basename(self.connection_file).lstrip('kernel-').rstrip('.json')
+        return extract_kernel_id(self.connection_file)
