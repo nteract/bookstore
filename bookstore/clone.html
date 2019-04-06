@@ -18,7 +18,27 @@ Distributed under the terms of the Modified BSD License.
             s3_bucket: "{{ s3_bucket }}",
             s3_key: "{{ s3_key }}"
           };
-          console.log(post_json);
+          var url = "{{ base_uri }}/api/bookstore/cloned/";
+          var r = document.cookie.match("\\b" + "_xsrf" + "=([^;]*)\\b");
+          var xsrf_token = r ? r[1] : undefined;
+          var xhr = new XMLHttpRequest();
+          xhr.onload = function(e) {
+            if (xhr.readyState === 4) {
+              if (xhr.status === 200) {
+                console.log(xhr.responseText);
+              } else {
+                console.error(xhr);
+              }
+            }
+          };
+          xhr.onerror = function(e) {
+            console.error(xhr.statusText);
+          };
+
+          xhr.open("POST", url, true);
+          xhr.withCredentials = true;
+          xhr.setRequestHeader("X-XSRFToken", xsrf_token);
+          xhr.send(post_json);
         };
       };
     </script>

@@ -68,7 +68,9 @@ class BookstoreCloneHandler(IPythonHandler):
         if file_key == '' or file_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
         self.set_header('Content-Type', 'text/html')
-        template_params = {"s3_bucket": s3_bucket, "s3_key": file_key}
+        base_uri = f"{self.request.protocol}://{self.request.host}"
+        template_params = {"s3_bucket": s3_bucket, "s3_key": file_key, "base_uri": base_uri}
+
         self.write(self.render_template('clone.html', **template_params))
 
     @web.authenticated
