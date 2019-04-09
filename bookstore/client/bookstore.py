@@ -14,7 +14,9 @@ class BookstoreClient(CurrentNotebookClient):
         api_endpoint = "/api/bookstore/published/"
         return f"{self.url}{api_endpoint}"
 
-    def publish(self):
+    def publish(self, path=None):
+        if path is None:
+            path = self.notebook['path']
         nb_json = self.get_contents(self.notebook['path'])['content']
         req = {
             "json": {"type": "notebook", "content": nb_json},
@@ -42,4 +44,3 @@ class BookstoreClient(CurrentNotebookClient):
         target_url = f"{self.clone_endpoint}"
         resp = requests.post(target_url, **req)
         return resp
-
