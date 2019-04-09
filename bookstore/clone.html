@@ -22,11 +22,13 @@ Distributed under the terms of the Modified BSD License.
           var r = document.cookie.match("\\b" + "_xsrf" + "=([^;]*)\\b");
           var xsrf_token = r ? r[1] : undefined;
           var xhr = new XMLHttpRequest();
-          xhr.responseType = 'json'
+          xhr.responseType = "json";
           xhr.onload = function(e) {
             if (xhr.readyState === 4) {
               if (xhr.status === 201) {
-                window.location.href = `{{ base_uri }}/tree/${xhr.response.path}`
+                window.location.href = `{{ base_uri }}{{ default_url_base }}/${
+                  xhr.response.path
+                }`;
               } else {
                 console.error(xhr);
               }

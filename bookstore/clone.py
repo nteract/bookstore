@@ -69,19 +69,26 @@ class BookstoreCloneHandler(IPythonHandler):
             raise web.HTTPError(400, "Must have a key to clone from")
         self.set_header('Content-Type', 'text/html')
         base_uri = f"{self.request.protocol}://{self.request.host}"
-        template_params = {"s3_bucket": s3_bucket, "s3_key": file_key, "base_uri": base_uri}
+        template_params = {
+            "s3_bucket": s3_bucket,
+            "s3_key": file_key,
+            "base_uri": base_uri,
+            "default_url_base": self.default_url,
+        }
 
         self.write(self.render_template('clone.html', **template_params))
 
     @web.authenticated
     async def post(self):
         """Clone a notebook to a given path.
-        
-        The payload for this should match that of the contents API for POST.
-        
-        Also, you could … *not* do that while still prototyping.
-        That's ok! 
-        But this all should go away.
+
+        The payload type for the request should be 
+        {
+          "s3_bucket": string,
+          "s3_key": string,
+          "target_path"?: string
+        }
+        The response payload should match the standard Jupyter contents API POST response.
         """
         model = self.get_json_body()
         s3_bucket = model.get("s3_bucket", "")
