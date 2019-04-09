@@ -94,7 +94,7 @@ class BookstoreCloneHandler(IPythonHandler):
         if file_key == '' or file_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
         model = await self._clone(s3_bucket, file_key)
-        self.set_header('Content-Type', 'text/html')
+        self.set_header('Content-Type', 'application/json')
         path = self.contents_manager.increment_filename(target_path)
         model['name'] = os.path.basename(os.path.relpath(path))
         model['path'] = os.path.relpath(path)
