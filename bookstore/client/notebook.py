@@ -34,9 +34,9 @@ def extract_kernel_id(connection_file):
 
 
 class LiveNotebookRecord(NamedTuple):
-    """Representation of live notebook server
+    """Representation of live notebook server.
 
-    This is a realization of the object returned by
+    This is a record of an object returned by
     `notebook.notebookapp.list_running_servers()`.
     """
 
@@ -88,9 +88,40 @@ class NotebookClient:
         self.url = self.nb_record.url.rstrip(
             "/"
         )  # So that we can have full API endpoints without double //
+        self.setup_auth()
+        self.setup_request_sessions()
+
+    def setup_auth(self):
+        """ Sets up token access for authorizing requests to notebook server.
+
+        This sets the notebook token as self.token and the xsrf_token as self.xsrf_token.
+        """
         self.token = self.nb_record.token
-        sessions_temp = self.get_sessions()
-        self.sessions = {session['kernel']['id']: session for session in sessions_temp}
+        first = requests.get(f"{self.url}/login")
+        self.xsrf_token = first.cookies.get("_xsrf", "")
+
+    def setup_request_sessions(self):
+        """ Sets up a requests.Session object for sharing headers across API requests.
+        """
+        self.req_session = requests.Session()
+        self.req_session.headers.update(self.headers)
+
+    @property
+    def sessions(self):
+        """Current notebook sessions. Reissues request on each call.
+        """
+        return {session['kernel']['id']: session for session in self.get_sessions()}
+
+    @property
+    def headers(self):
+        """Default headers to be shared across requests.
+        """
+        headers = {
+            'Authorization': f'token {self.token}',
+            'X-XSRFToken': self.xsrf_token,
+            "Content-Type": "application/json",
+        }
+        return headers
 
     @property
     def sessions_endpoint(self):
@@ -99,8 +130,7 @@ class NotebookClient:
 
     def get_sessions(self):
         target_url = f"{self.sessions_endpoint}"
-        headers = {'Authorization': f'token {self.token}'}
-        resp = requests.get(target_url, headers=headers)
+        resp = self.req_session.get(target_url)
         return resp.json()
 
     @property
@@ -110,8 +140,7 @@ class NotebookClient:
 
     def get_kernels(self):
         target_url = f"{self.sessions_endpoint}"
-        headers = {'Authorization': f'token {self.token}'}
-        resp = requests.get(target_url, headers=headers)
+        resp = self.req_session.get(target_url)
         return resp.json()
 
     @property
@@ -121,8 +150,7 @@ class NotebookClient:
 
     def get_contents(self, path):
         target_url = f"{self.contents_endpoint}{path}"
-        headers = {'Authorization': f'token {self.token}'}
-        resp = requests.get(target_url, headers=headers)
+        resp = self.req_session.get(target_url)
         return resp.json()
 
 
