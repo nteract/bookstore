@@ -18,14 +18,11 @@ class BookstoreClient(CurrentNotebookClient):
         if path is None:
             path = self.notebook['path']
         nb_json = self.get_contents(self.notebook['path'])['content']
-        req = {
-            "json": {"type": "notebook", "content": nb_json},
-            "headers": {"Content-Type": "application/json", 'Authorization': f'token {self.token}'},
-        }
+        json_body = {"type": "notebook", "content": nb_json}
 
         target_url = f"{self.publish_endpoint}{self.notebook['path']}"
 
-        resp = requests.put(target_url, **req)
+        resp = self.req_session.put(target_url, json=json_body)
         return resp
 
     @property
@@ -35,12 +32,7 @@ class BookstoreClient(CurrentNotebookClient):
 
     def clone(self, s3_bucket="", s3_key="", target_path=""):
         s3_bucket = s3_bucket or self.default_bucket
-        req_dict = {"s3_bucket": s3_bucket, "s3_key": s3_key, "target_path": target_path}
-        req = {
-            "json": req_dict,
-            "headers": {"Content-Type": "application/json", 'Authorization': f'token {self.token}'},
-        }
-
+        json_body = {"s3_bucket": s3_bucket, "s3_key": s3_key, "target_path": target_path}
         target_url = f"{self.clone_endpoint}"
-        resp = requests.post(target_url, **req)
+        resp = self.req_session.post(target_url, json=json_body)
         return resp
