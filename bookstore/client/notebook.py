@@ -142,9 +142,15 @@ class NotebookClient:
         return f"{self.url}{api_endpoint}"
 
     def get_kernels(self):
-        target_url = f"{self.sessions_endpoint}"
+        target_url = f"{self.kernels_endpoint}"
         resp = self.req_session.get(target_url)
         return resp.json()
+    
+    
+    @property
+    def kernels(self):
+        return self.get_kernels()
+
 
     @property
     def contents_endpoint(self):
@@ -176,8 +182,8 @@ class CurrentNotebookClient(NotebookClient):
     def __init__(self):
         self.nb_client = NotebookClientCollection.current_server()
         super().__init__(self.nb_client.nb_config)
-        self.session = self.sessions[self.kernel_id]
         self.notebook = NotebookSession(**self.session).notebook
+        self.session = NotebookSession(**self.sessions[self.kernel_id])
 
     @property
     def connection_file(self):
