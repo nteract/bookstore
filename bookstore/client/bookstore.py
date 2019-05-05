@@ -16,11 +16,11 @@ class BookstoreClient(CurrentNotebookClient):
 
     def publish(self, path=None):
         if path is None:
-            path = self.notebook['path']
-        nb_json = self.get_contents(self.notebook['path'])['content']
+            path = self.session.path
+        nb_json = self.get_contents(self.session.path)['content']
         json_body = {"type": "notebook", "content": nb_json}
 
-        target_url = f"{self.publish_endpoint}{self.notebook['path']}"
+        target_url = f"{self.publish_endpoint}{self.session.path}"
 
         resp = self.req_session.put(target_url, json=json_body)
         return resp
