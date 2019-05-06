@@ -1,45 +1,18 @@
 const child_process = require("child_process");
 const { genToken } = require("./token");
 const { sleep } = require("./sleep");
+const { url_path_join } = require("./utils");
 
 // "Polyfill" XMLHttpRequest for rxjs' ajax to use
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const { ajax } = require("rxjs/ajax");
 
-let url_path_join = function(...pieces) {
-  // """Join components of url into a relative url
-  // Use to prevent double slash when joining subpath. This will leave the
-  // initial and final / in place
-  // """
-  initial = pieces[0].startsWith("/");
-  final = pieces[pieces.length - 1].endsWith("/");
-  const hi = [];
-  for (s of pieces) {
-    if (s === "") {
-      continue;
-    }
-    let clean = s.replace(/(^[ /]+)|([/]+$)/g, "");
-    hi.push(clean);
-  }
-  result = hi.join("/");
-  if (initial) {
-    result = "/" + result;
-  }
-  if (final) {
-    result = result + "/";
-  }
-  if (result == "//") {
-    result = "/";
-  }
-  return result;
-};
 class JupyterServer {
   constructor(config = {}) {
     this.port = config.port || 9988;
     this.ip = config.ip || "127.0.0.1";
     this.scheme = config.scheme || "http";
     this.token = null;
-    // this.baseUrl = config.baseUrl || "";
     this.baseUrl = config.baseUrl || "mybaseUrl/ipynb/";
 
     // Launch the server from the directory of this script by default
@@ -182,6 +155,5 @@ class JupyterServer {
 }
 
 module.exports = {
-  JupyterServer,
-  url_path_join
+  JupyterServer
 };

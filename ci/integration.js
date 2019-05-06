@@ -5,7 +5,8 @@ const fs = require("fs");
 const _ = require("lodash");
 
 const s3 = require("./s3");
-const { url_path_join, JupyterServer } = require("./jupyter");
+const { JupyterServer } = require("./jupyter");
+const { url_path_join } = require("./utils");
 
 const { sleep } = require("./sleep");
 
