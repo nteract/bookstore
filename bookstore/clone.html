@@ -12,6 +12,13 @@ Distributed under the terms of the Modified BSD License.
     <title>Clone Landing page</title>
     <script>
       window.onload = function() {
+        var getCookieByName = function(name) {
+          // originally from https://github.com/jupyter/notebook/blob/master/notebook/static/base/js/utils.js#L800-L804
+          // from tornado docs: http://www.tornadoweb.org/en/stable/guide/security.html
+          var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+          return r ? r[1] : undefined;
+        };
+
         var button = document.getElementById("mybutton");
         button.onclick = function(event) {
           var post_json = {
@@ -19,8 +26,7 @@ Distributed under the terms of the Modified BSD License.
             s3_key: "{{ s3_key }}"
           };
           var clone_url = "{{ base_uri }}/api/bookstore/cloned/";
-          var r = document.cookie.match("\\b" + "_xsrf" + "=([^;]*)\\b");
-          var xsrf_token = r ? r[1] : undefined;
+          var xsrf_token = getCookieByName("_xsrf");
           var xhr = new XMLHttpRequest();
           xhr.responseType = "json";
           xhr.onload = function(e) {
