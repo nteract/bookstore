@@ -1,3 +1,6 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
 # Example configuration for Black.
 
 # NOTE: you have to use single-quoted strings in TOML for regular expressions.
