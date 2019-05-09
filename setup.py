@@ -73,16 +73,13 @@ setup(
         'notebook',
         's3fs',
         'tornado >= 5.1.1',
-        'aiobotocore>=0.10.0',
+        'aiobotocore==0.10.2',
         'aioboto3',
+        'boto3==1.9.91',
+        'botocore<1.12.92,>=1.12.91',
     ],
     extras_require={
-        'docs': [
-            'sphinx',
-            'recommonmark',
-            'm2r',
-            'sphinxcontrib-napoleon',
-        ],
+        'docs': ['sphinx', 'recommonmark', 'm2r', 'sphinxcontrib-napoleon'],
         'test': [
             'codecov',
             'coverage',
@@ -92,7 +89,7 @@ setup(
             'pytest-cov',
             'pytest-mock',
             'black',
-        ]
+        ],
     },
     data_files=data_files,
     entry_points={},
