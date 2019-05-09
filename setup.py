@@ -77,6 +77,12 @@ setup(
         'aioboto3',
     ],
     extras_require={
+        'docs': [
+            'sphinx',
+            'recommonmark',
+            'm2r',
+            'sphinxcontrib-napoleon',
+        ],
         'test': [
             'codecov',
             'coverage',
@@ -91,7 +97,7 @@ setup(
     data_files=data_files,
     entry_points={},
     project_urls={
-        'Documentation': 'https://github.com/nteract/bookstore/#todo',
+        'Documentation': 'https://bookstore.readthedocs.io',
         'Funding': 'https://nteract.io',
         'Source': 'https://github.com/nteract/bookstore/',
         'Tracker': 'https://github.com/nteract/bookstore/issues',
