@@ -1,4 +1,4 @@
-sphinx
+sphinx>=2.0
 recommonmark
 m2r
 sphinxcontrib-napoleon
