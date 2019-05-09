@@ -184,11 +184,10 @@ class NotebookClient:
         resp = self.req_session.get(target_url)
         return resp.json()
 
-    def get_kernels(self):
-        target_url = f"{self.kernels_endpoint}"
-        headers = {'Authorization': f'token {self.token}'}
-        resp = requests.get(target_url, headers=headers)
-        return resp.json()
+    @property
+    def contents_endpoint(self):
+        api_endpoint = "/api/contents/"
+        return f"{self.url}{api_endpoint}"
 
     def get_contents(self, path):
         target_url = f"{self.contents_endpoint}{path}"
