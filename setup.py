@@ -73,10 +73,10 @@ setup(
         'notebook',
         's3fs',
         'tornado >= 5.1.1',
-        'aiobotocore==0.10.2',
+        'aiobotocore',
         'aioboto3',
-        'boto3==1.9.91',
-        'botocore<1.12.92,>=1.12.91',
+        'boto3',
+        'botocore',
     ],
     extras_require={
         'docs': ['sphinx', 'recommonmark', 'm2r', 'sphinxcontrib-napoleon'],
