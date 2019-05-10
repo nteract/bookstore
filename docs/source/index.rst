@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-``bookstore``: Notebook storage and publishing workflows for the masses
-=======================================================================
+bookstore
+=========
 
-Release v\ |release| (:doc:`What's new? <reference/changelog>`).
+Release v\ |release| (:doc:`What's new? <project/changelog>`).
 
 **bookstore** provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks.
 
