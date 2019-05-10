@@ -6,4 +6,5 @@ Project
 
    contributing
    code_of_conduct
-   releaseing
+   local_ci
+   releasing
