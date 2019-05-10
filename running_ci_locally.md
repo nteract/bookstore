@@ -23,10 +23,9 @@ To run the ci tests locally, you will need to have a few things set up:
 1. Open two terminals with the current working directory as the root `bookstore`
    directory.
 
-2. In one terminal run `ci/local.sh`. This will start up minio.
+2. In one terminal run `yarn test:server`. This will start up minio.
 
-3. In the other terminal run `node ci/integration.js`. This will run the
-   integration tests
+3. In the other terminal run `yarn test`. This will run the integration tests.
 
 ## Interactive python tests
 
@@ -43,7 +42,7 @@ It's often difficult to judge whether what is being served makes sense from a UI
 without being able to investigate it directly. At the same time we'll need to access it as an
 API to ensure that the responses are well-behaved from an API standpoint. By using python to
 query a live server and a browser to visit the landing page, we can rapidly iterate between
-the API and UI contexts from the same live server's endpoint. 
+the API and UI contexts from the same live server's endpoint.
 
 We provide examples of `jupyter notebook` commands needed in that file as well for both
 accessing the `nteract-notebooks` S3 bucket as well as the Minio provided `bookstore` bucket

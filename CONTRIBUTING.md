@@ -61,7 +61,7 @@ Good commit messages serve at least three important purposes:
 
 Structure your commit message like this:
 
-```
+```text
 > Short (50 chars or less) summary of changes
 >
 > More detailed explanatory text, if necessary.  Wrap it to about 72
@@ -79,7 +79,8 @@ Structure your commit message like this:
 >     single space, with blank lines in between, but conventions vary here
 >
 ```
-*Source: http://git-scm.com/book/ch5-2.html*
+
+*Source:* https://git-scm.com/book/ch5-2.html
 
 ### DO
 

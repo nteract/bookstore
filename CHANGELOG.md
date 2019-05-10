@@ -6,11 +6,11 @@
 
 ### Significant changes
 
-Validation information is now exposed as a dict at the /api/bookstore endpoint.
+Validation information is now exposed as a dict at the `/api/bookstore` endpoint.
 
 This allows us to distinguish whether different features have been enabled on bookstore.
 
-The structure now is 
+The structure for 2.3.0 is:
 
 ```python
     validation_checks = {
@@ -19,6 +19,7 @@ The structure now is
         "publish_valid": all(published_settings),
     }
 ```
+
 ## Releases prior to 2.3.0
 
 [2.2.1 (2019-02-03)](https://github.com/nteract/bookstore/releases/tag/2.2.1)
