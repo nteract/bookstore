@@ -1,18 +1,16 @@
 Configuration
 =============
 
-Bookstore settings (``jupyter_notebook_config.py``)
----------------------------------------------------
-
-``BookstoreSettings`` can store commonly used settings. These settings include:
+Commonly used configuration settings can be stored in ``BookstoreSettings`` in the
+``jupyter_notebook_config.py`` file. These settings include:
 
     - workspace location
     - published storage location
     - S3 bucket information
     - AWS credentials for S3
 
-Example configuration for ``BookstoreSettings``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example configuration
+---------------------
 
 Here's an example of ``BookstoreSettings`` in the ``~/.jupyter/jupyter_notebook_config.py`` file:
 
