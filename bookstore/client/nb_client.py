@@ -178,16 +178,6 @@ class NotebookClient:
         api_endpoint = "/api/contents/"
         return f"{self.url}{api_endpoint}"
 
-    def get_sessions(self):
-        target_url = f"{self.sessions_endpoint}"
-        resp = self.req_session.get(target_url)
-        return resp.json()
-
-    @property
-    def contents_endpoint(self):
-        api_endpoint = "/api/contents/"
-        return f"{self.url}{api_endpoint}"
-
     def get_contents(self, path):
         target_url = f"{self.contents_endpoint}{path}"
         resp = self.req_session.get(target_url)
