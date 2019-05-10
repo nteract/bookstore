@@ -1,33 +1,31 @@
-# # Building a Notebook client
-#
-# We want to test our bookstore endpoints, but it's no fun having to do this in an insecure fashion. Better would be to have some security in place.
-#
-#
-# ## Example notebook config
-#
-#
-# ```
-# [{'base_url': '/',
-#   'hostname': 'localhost',
-#   'notebook_dir': '/Users/mpacer/jupyter/eg_notebooks',
-#   'password': False,
-#   'pid': 96033,
-#   'port': 8888,
-#   'secure': False,
-#   'token': '',
-#   'url': 'http://localhost:8888/'}]
-# ```
+"""Client to test bookstore endpoints from within a notebook.
 
+
+TODO: (Clarify) We want to test our bookstore endpoints, but it's no fun having
+to do this in an insecure fashion. Better would be to have some security in
+place.
+
+Example
+-------
+
+[{'base_url': '/',
+  'hostname': 'localhost',
+  'notebook_dir': '/Users/mpacer/jupyter/eg_notebooks',
+  'password': False,
+  'pid': 96033,
+  'port': 8888,
+  'secure': False,
+  'token': '',
+  'url': 'http://localhost:8888/'}]
+"""
 import os
 import re
 import json
-
-import requests
-
 from copy import deepcopy
 from typing import NamedTuple
 
-
+import requests
+from IPython import get_ipython
 from notebook.notebookapp import list_running_servers
 
 
@@ -106,6 +104,8 @@ class NotebookSession:  # (NamedTuple):
 
 
 class NotebookClient:
+    """Client used to interact with bookstore from within a running notebook UI"""
+
     def __init__(self, nb_config):
         self.nb_config = nb_config
         self.nb_record = LiveNotebookRecord(**self.nb_config)
@@ -185,11 +185,16 @@ class NotebookClient:
 
 
 class NotebookClientCollection:
+    """Representation of a collection of notebook clients"""
+
+    # TODO: refactor from lambda to a def
     nb_client_gen = lambda: (NotebookClient(x) for x in list_running_servers())
     sessions = {x.url: x.sessions for x in nb_client_gen()}
 
     @classmethod
     def current_server(cls):
+        """class method for current notebook server"""
+
         current_kernel_id = extract_kernel_id(get_ipython().parent.parent.connection_file)
         for server_url, session_dict in cls.sessions.items():
             for session_id, session in session_dict.items():
@@ -200,6 +205,8 @@ class NotebookClientCollection:
 
 
 class CurrentNotebookClient(NotebookClient):
+    """Represents the currently active notebook client"""
+
     def __init__(self):
         self.nb_client = NotebookClientCollection.current_server()
         super().__init__(self.nb_client.nb_config)
