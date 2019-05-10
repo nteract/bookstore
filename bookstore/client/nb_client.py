@@ -135,8 +135,7 @@ class NotebookClient:
         """Current notebook sessions. Reissues request on each call.
         """
         return {
-            session['kernel']['id']: NotebookSession(**session)
-            for session in self.get_sessions()
+            session['kernel']['id']: NotebookSession(**session) for session in self.get_sessions()
         }
 
     @property

@@ -41,4 +41,3 @@ class BookstoreClient(CurrentNotebookClient):
         # TODO: Add a check for success
         resp = self.req_session.post(target_url, json=json_body)
         return resp
-
