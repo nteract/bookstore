@@ -4,11 +4,13 @@
 [![Build Status](https://travis-ci.org/nteract/bookstore.svg?branch=master)](https://travis-ci.org/nteract/bookstore)
 [![CircleCI](https://circleci.com/gh/nteract/bookstore.svg?style=svg)](https://circleci.com/gh/nteract/bookstore)
 
-**bookstore** :books: provides tooling and workflow recommendations for storing :cd: , scheduling :calendar:, and publishing :book: notebooks.
+**bookstore** :books: provides tooling and workflow recommendations for storing :cd:, scheduling :calendar:, and publishing :book: notebooks.
 
-Note: Supports installation on Jupyter servers running Python 3.6 and above. Your notebooks can still be run in Python 2 or Python 3.
+The full documentation is hosted on [ReadTheDocs](https://bookstore.readthedocs.io).
 
-## Automatic Notebook Versioning
+## How does bookstore work
+
+### Automatic Notebook Versioning
 
 Every *save* of a notebook creates an *immutable copy* of the notebook on object storage.
 
@@ -20,7 +22,7 @@ Include diagram for versioning
 
 -->
 
-## Storage Paths
+### Storage Paths
 
 All notebooks are archived to a single versioned S3 bucket with specific prefixes denoting the lifecycle of the notebook:
 
@@ -30,31 +32,38 @@ All notebooks are archived to a single versioned S3 bucket with specific prefixe
 Each notebook path is a namespace that an external service ties into the schedule. We archive off versions, keeping the path intact (until a user changes them).
 
 | Prefix                                  | Intent                 |
-| --------------------------------------- | ---------------------- |
+|-----------------------------------------|------------------------|
 | `/workspace/kylek/notebooks/mine.ipynb` | Notebook in “draft”    |
 | `/published/kylek/notebooks/mine.ipynb` | Current published copy |
 
 Scheduled notebooks will also be referred to by the notebook key. In addition, we'll need to be able to surface version IDs as well.
 
-## Transitioning to this Storage Plan
+### Transitioning to this Storage Plan
 
-Since most people are on a regular filesystem, we'll start with writing to the `/workspace` prefix as Archival Storage (writing on save using a `post_save_hook` for a Jupyter contents manager).
+Since most people are on a regular filesystem, we'll start with writing to the
+`/workspace` prefix as Archival Storage (writing on save using a `post_save_hook`
+for a Jupyter contents manager).
 
----
+### Publishing
 
-## Publishing
+The bookstore publishing endpoint is a `serverextension` to the classic Jupyter
+server. This means you will need to explicitly enable the `serverextension`
+to use the endpoint.
 
-The bookstore publishing endpoint is a serverextension to the classic Jupyter server. 
+To do so, run:
 
-This means if you are developing this you will need to explicitly enable it to use the endpoint. 
+    jupyter serverextension enable --py bookstore
 
-To do so you run: `jupyter serverextension enable --py bookstore`. 
+To enable it only for the current environment, run:
 
-If you wish to enable it only for your current environment, run: `jupyter serverextension enable --py bookstore --sys-prefix`.
+    jupyter serverextension enable --py bookstore --sys-prefix
 
 ## Installation
 
 **bookstore** requires Python 3.6 or higher.
+
+Note: Supports installation on Jupyter servers running Python 3.6 and above.
+Your notebooks can still be run in Python 2 or Python 3.
 
 1. Clone this repo.
 2. At the repo's root, enter in the Terminal: `python3 -m pip install .` (Tip: don't forget the dot at the end of the command)
