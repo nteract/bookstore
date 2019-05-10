@@ -21,6 +21,7 @@ class ArchiveRecord(NamedTuple):
 
     Example
     -------
+
     An archive record (`filepath`, `content`, `queued_time`) contains:
 
     - a `filepath` to the record
@@ -43,6 +44,7 @@ class BookstoreContentsArchiver(FileContentsManager):
 
     Example
     -------
+
     - Bookstore settings combine with the parent Jupyter application settings.
     - A session is created for the current event loop.
     - To write to a particular path on S3, acquire a lock.
@@ -52,6 +54,7 @@ class BookstoreContentsArchiver(FileContentsManager):
 
     Attributes
     ----------
+
     path_locks : dict
         Dictionary of paths to storage and the lock associated with a path.
     path_lock_ready: asyncio mutex lock
@@ -90,6 +93,7 @@ class BookstoreContentsArchiver(FileContentsManager):
 
         Parameters
         ----------
+
         record : ArchiveRecord
             A notebook and where it should be written to storage
         """
@@ -134,6 +138,7 @@ class BookstoreContentsArchiver(FileContentsManager):
 
         Parameters
         ----------
+
         model : str
             The type of file
         path : str
