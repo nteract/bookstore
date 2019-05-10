@@ -15,35 +15,20 @@ class BookstoreSettings(LoggingConfigurable):
     Attributes
     ----------
 
-    storage directory locations
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     - workspace_prefix : str('workspace')
         the directory to use for user workspace storage
     - published_prefix : str('published')
         the directory to use for published notebook storage
-
-    S3 authentication
-    ~~~~~~~~~~~~~~~~~
-
     - s3_access_key_id : str, optional
         environment variable ``JPYNB_S3_ACCESS_KEY_ID``
     - s3_secret_access_key : str, optional
         environment variable ``JPYNB_S3_SECRET_ACCESS_KEY``
-
-    Additional S3
-    ~~~~~~~~~~~~~
-
     - s3_endpoint_url : str("https://s3.amazonaws.com")
         environment variable ``JPYNB_S3_ENDPOINT_URL``
     - s3_region_name : str("us-east-1")
         environment variable ``JPYNB_S3_REGION_NAME``
     - s3_bucket : str("")
         bucket name, environment variable ``JPYNB_S3_BUCKET``
-
-    Bookstore resources
-    ~~~~~~~~~~~~~~~~~~~
-
     - max_threads : int(16)
         Maximum threads from the threadpool available to do S3 read and writes
     """
@@ -77,7 +62,7 @@ class BookstoreSettings(LoggingConfigurable):
 
 def validate_bookstore(settings: BookstoreSettings):
     """Validate bookstore configuration settings.
-    
+
     Parameters
     ----------
     settings: bookstore.bookstore_config.BookstoreSettings
