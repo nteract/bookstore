@@ -219,4 +219,5 @@ class CurrentNotebookClient(NotebookClient):
 
     @property
     def kernel_id(self):
+        # TODO determine if extract kernel id is used more than once
         return extract_kernel_id(self.connection_file)
