@@ -75,8 +75,6 @@ setup(
         'tornado >= 5.1.1',
         'aiobotocore',
         'aioboto3',
-        'boto3',
-        'botocore',
     ],
     extras_require={
         'docs': [
