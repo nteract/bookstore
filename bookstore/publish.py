@@ -1,16 +1,22 @@
 import json
 
 import aiobotocore
+<<<<<<< HEAD
 
 from notebook.base.handlers import APIHandler
 from notebook.base.handlers import path_regex
+=======
+from notebook.base.handlers import APIHandler, path_regex
+from notebook.utils import url_path_join
+>>>>>>> remove default for path in function
 from tornado import web
 
-from .s3_paths import s3_path
-from .s3_paths import s3_key
-from .s3_paths import s3_display_path
 from .bookstore_config import BookstoreSettings
+<<<<<<< HEAD
 from .utils import url_path_join
+=======
+from .s3_paths import s3_display_path, s3_key, s3_path
+>>>>>>> remove default for path in function
 
 
 class BookstorePublishHandler(APIHandler):
@@ -22,7 +28,7 @@ class BookstorePublishHandler(APIHandler):
         self.session = aiobotocore.get_session()
 
     @web.authenticated
-    async def put(self, path=''):
+    async def put(self, path):
         """Publish a notebook on a given path.
 
         The payload directly matches the contents API for PUT.
