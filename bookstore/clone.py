@@ -46,13 +46,13 @@ class BookstoreCloneHandler(IPythonHandler):
 
         self.session = aiobotocore.get_session()
 
-    async def _clone(self, s3_bucket, file_key):
-        path = file_key
+    async def _clone(self, s3_bucket, s3_key_file):
 
         self.log.info(f"bucket: {s3_bucket}")
-        self.log.info(f"key: {file_key}")
-        full_s3_path = s3_path(s3_bucket, path)
+        self.log.info(f"key: {s3_key_file}")
+        full_s3_path = s3_path(s3_bucket, s3_key_file)
 
+        # TODO bookstore settings review https://github.com/nteract/bookstore/pull/75/files?file-filters%5B%5D=.py#r281830978
         async with self.session.create_client(
             's3',
             aws_secret_access_key=self.bookstore_settings.s3_secret_access_key,
@@ -60,10 +60,10 @@ class BookstoreCloneHandler(IPythonHandler):
             endpoint_url=self.bookstore_settings.s3_endpoint_url,
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
-            self.log.info("Processing published write of %s", path)
-            obj = await client.get_object(Bucket=s3_bucket, Key=file_key)
+            self.log.info("Processing published write of %s", s3_key_file)
+            obj = await client.get_object(Bucket=s3_bucket, Key=s3_key_file)
             content = await obj['Body'].read()
-            self.log.info("Done with published write of %s", path)
+            self.log.info("Done with published write of %s", s3_key_file)
 
         resp_content = {"s3_path": full_s3_path}
         model = {
@@ -131,16 +131,19 @@ class BookstoreCloneHandler(IPythonHandler):
         API POST response.
         """
         model = self.get_json_body()
+        # TODO Fail fast here if no s3 key
         s3_bucket = model.get("s3_bucket", "")
         # s3_paths module has an s3_key function; file_key avoids confusion
-        file_key = model.get("s3_key", "")
-        target_path = model.get("target_path", "") or os.path.basename(os.path.relpath(file_key))
+        s3_key_file = model.get("s3_key", "")
+        target_path = model.get("target_path", "") or os.path.basename(
+            os.path.relpath(s3_key_file)
+        )
 
-        self.log.info("About to clone from %s", file_key)
+        self.log.info("About to clone from %s", s3_key_file)
 
-        if file_key == '' or file_key == '/':
-            raise web.HTTPError(400, "Must have a key to clone from")
-        model = await self._clone(s3_bucket, file_key)
+        if s3_key_file == '' or s3_key_file == '/':
+            raise web.HTTPError(400, "Must have an S3 key to perform clone.")
+        model = await self._clone(s3_bucket, s3_key_file)
         self.set_header('Content-Type', 'application/json')
         path = self.contents_manager.increment_filename(target_path)
         model['name'] = os.path.basename(os.path.relpath(path))
