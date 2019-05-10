@@ -73,10 +73,18 @@ setup(
         'notebook',
         's3fs',
         'tornado >= 5.1.1',
-        'aiobotocore>=0.10.0',
+        'aiobotocore',
         'aioboto3',
     ],
     extras_require={
+        'docs': [
+            'sphinx>=2.0',
+            'recommonmark',
+            'm2r',
+            'sphinxcontrib-napoleon',
+            'boto3==1.9.91',
+            'botocore>=1.12.91,<1.12.92',
+        ],
         'test': [
             'codecov',
             'coverage',
@@ -86,12 +94,12 @@ setup(
             'pytest-cov',
             'pytest-mock',
             'black',
-        ]
+        ],
     },
     data_files=data_files,
     entry_points={},
     project_urls={
-        'Documentation': 'https://github.com/nteract/bookstore/#todo',
+        'Documentation': 'https://bookstore.readthedocs.io',
         'Funding': 'https://nteract.io',
         'Source': 'https://github.com/nteract/bookstore/',
         'Tracker': 'https://github.com/nteract/bookstore/issues',
