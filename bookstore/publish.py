@@ -48,12 +48,11 @@ class BookstorePublishHandler(APIHandler):
         """Publish notebook model to the path"""
         if model['type'] != 'notebook':
             raise web.HTTPError(400, "bookstore only publishes notebooks")
-        content = model['content']
 
         full_s3_path = s3_path(
             self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
         )
-        file_key = s3_key(self.bookstore_settings.published_prefix, path)
+        s3_key_file = s3_key(self.bookstore_settings.published_prefix, path)
 
         self.log.info(
             "Publishing to %s",
@@ -71,7 +70,9 @@ class BookstorePublishHandler(APIHandler):
         ) as client:
             self.log.info("Processing published write of %s", path)
             obj = await client.put_object(
-                Bucket=self.bookstore_settings.s3_bucket, Key=file_key, Body=json.dumps(content)
+                Bucket=self.bookstore_settings.s3_bucket,
+                Key=s3_key_file,
+                Body=json.dumps(model['content']),
             )
             self.log.info("Done with published write of %s", path)
 
