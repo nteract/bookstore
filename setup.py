@@ -79,7 +79,14 @@ setup(
         'botocore',
     ],
     extras_require={
-        'docs': ['sphinx', 'recommonmark', 'm2r', 'sphinxcontrib-napoleon'],
+        'docs': [
+            'sphinx>=2.0',
+            'recommonmark',
+            'm2r',
+            'sphinxcontrib-napoleon',
+            'boto3==1.9.91',
+            'botocore>=1.12.91,<1.12.92',
+        ],
         'test': [
             'codecov',
             'coverage',
