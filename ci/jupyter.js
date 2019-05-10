@@ -1,6 +1,7 @@
 const child_process = require("child_process");
 const { genToken } = require("./token");
 const { sleep } = require("./sleep");
+const { url_path_join } = require("./utils");
 
 // "Polyfill" XMLHttpRequest for rxjs' ajax to use
 global.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -12,6 +13,7 @@ class JupyterServer {
     this.ip = config.ip || "127.0.0.1";
     this.scheme = config.scheme || "http";
     this.token = null;
+    this.baseUrl = config.baseUrl || "mybaseUrl/ipynb/";
 
     // Launch the server from the directory of this script by default
     this.cwd = config.cwd || __dirname;
@@ -37,6 +39,7 @@ class JupyterServer {
         "--no-browser",
         `--NotebookApp.token=${this.token}`,
         `--NotebookApp.disable_check_xsrf=True`,
+        `--NotebookApp.base_url=${this.baseUrl}`,
         `--port=${this.port}`,
         `--ip=${this.ip}`,
         `--log-level=10`
@@ -77,8 +80,9 @@ class JupyterServer {
   async writeNotebook(path, notebook) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
+    const apiPath = "/api/contents/";
     const xhr = await ajax({
-      url: `${this.endpoint}/api/contents/${path}`,
+      url: url_path_join(this.endpoint, apiPath, path),
       responseType: "json",
       createXHR: () => new XMLHttpRequest(),
       method: "PUT",
@@ -94,12 +98,13 @@ class JupyterServer {
 
     return xhr;
   }
-  
+
   async publishNotebook(path, notebook) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
+    const apiPath = "/api/bookstore/published/";
     const xhr = await ajax({
-      url: `${this.endpoint}/api/bookstore/published/${path}`,
+      url: url_path_join(this.endpoint, apiPath, path),
       responseType: "json",
       createXHR: () => new XMLHttpRequest(),
       method: "PUT",
@@ -116,12 +121,36 @@ class JupyterServer {
     return xhr;
   }
 
+  populateCloneQuery(s3Bucket, s3Key) {
+    return url_path_join(
+      this.endpoint,
+      `/api/bookstore/cloned?s3_bucket=${s3Bucket}&s3_key=${s3Key}`
+    );
+  }
+  async cloneNotebook(s3Bucket, s3Key) {
+    // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
+    // rx-jupyter for writing a notebook to the contents API
+    const xhr = await ajax({
+      url: this.populateCloneQuery(s3Bucket, s3Key),
+      responseType: "text",
+      createXHR: () => new XMLHttpRequest(),
+      method: "GET",
+      headers: {
+        Authorization: `token ${this.token}`
+      }
+    }).toPromise();
+
+    return xhr;
+  }
   shutdown() {
     this.process.kill();
   }
 
   get endpoint() {
-    return `${this.scheme}://${this.ip}:${this.port}`;
+    return url_path_join(
+      `${this.scheme}://${this.ip}:${this.port}`,
+      this.baseUrl
+    );
   }
 }
 

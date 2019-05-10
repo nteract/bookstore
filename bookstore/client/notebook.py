@@ -19,6 +19,8 @@
 # ```
 
 import os
+import re
+import json
 
 import requests
 
@@ -30,7 +32,9 @@ from notebook.notebookapp import list_running_servers
 
 
 def extract_kernel_id(connection_file):
-    return os.path.basename(connection_file).lstrip('kernel-').rstrip('.json')
+    connection_filename = os.path.basename(connection_file)
+    kernel_id = re.sub(r"kernel-(.*)\.json", r"\1", connection_filename)
+    return kernel_id
 
 
 class LiveNotebookRecord(NamedTuple):
@@ -58,11 +62,21 @@ class KernelInfo:
     #     execution_state: str #'idle',
     #     connections: int # 0
     def __init__(self, *args, id, name, last_activity, execution_state, connections):
+        self.model = {
+            "id": id,
+            "name": name,
+            "last_activity": last_activity,
+            "execution_state": execution_state,
+            "connections": connections,
+        }
         self.id = id
         self.name = name
         self.last_activity = last_activity
         self.execution_state = execution_state
         self.connections = connections
+
+    def __repr__(self):
+        return json.dumps(self.model, indent=2)
 
 
 class NotebookSession:  # (NamedTuple):
@@ -71,14 +85,24 @@ class NotebookSession:  # (NamedTuple):
     #     name: str #'',
     #     type: str #'notebook',
     #     kernel: KernelInfo
-    #     notebook: dict # {'path': 'Untitled38.ipynb', 'name': ''}}}
+    #     notebook: dict # deprecated API {'path': 'Untitled38.ipynb', 'name': ''}}}
 
     def __init__(self, *args, path, name, type, kernel, notebook, **kwargs):
+        self.model = {
+            "path": path,
+            "name": name,
+            "type": type,
+            "kernel": kernel,
+            "notebook": notebook,
+        }
         self.path = path
         self.name = name
         self.type = type
         self.kernel = KernelInfo(**kernel)
         self.notebook = notebook
+
+    def __repr__(self):
+        return json.dumps(self.model, indent=2)
 
 
 class NotebookClient:
@@ -110,7 +134,9 @@ class NotebookClient:
     def sessions(self):
         """Current notebook sessions. Reissues request on each call.
         """
-        return {session['kernel']['id']: session for session in self.get_sessions()}
+        return {
+            session['kernel']['id']: NotebookSession(**session) for session in self.get_sessions()
+        }
 
     @property
     def headers(self):
@@ -139,9 +165,13 @@ class NotebookClient:
         return f"{self.url}{api_endpoint}"
 
     def get_kernels(self):
-        target_url = f"{self.sessions_endpoint}"
+        target_url = f"{self.kernels_endpoint}"
         resp = self.req_session.get(target_url)
         return resp.json()
+
+    @property
+    def kernels(self):
+        return self.get_kernels()
 
     @property
     def contents_endpoint(self):
@@ -154,24 +184,16 @@ class NotebookClient:
         return resp.json()
 
 
-def python_compat_session(session):
-    deepcopy(session)
-
-
 class NotebookClientCollection:
     nb_client_gen = lambda: (NotebookClient(x) for x in list_running_servers())
     sessions = {x.url: x.sessions for x in nb_client_gen()}
 
     @classmethod
     def current_server(cls):
+        current_kernel_id = extract_kernel_id(get_ipython().parent.parent.connection_file)
         for server_url, session_dict in cls.sessions.items():
             for session_id, session in session_dict.items():
-                python_compat_session(session)
-                if NotebookSession(**session).kernel.id == extract_kernel_id(
-                    get_ipython().parent.parent.connection_file
-                ):
-                    #                 if session['kernel']['id'] == extract_kernel_id(get_ipython().parent.parent.connection_file):
-
+                if session.kernel.id == current_kernel_id:
                     return next(
                         client for client in cls.nb_client_gen() if client.url == server_url
                     )
@@ -182,7 +204,6 @@ class CurrentNotebookClient(NotebookClient):
         self.nb_client = NotebookClientCollection.current_server()
         super().__init__(self.nb_client.nb_config)
         self.session = self.sessions[self.kernel_id]
-        self.notebook = NotebookSession(**self.session).notebook
 
     @property
     def connection_file(self):
@@ -190,4 +211,4 @@ class CurrentNotebookClient(NotebookClient):
 
     @property
     def kernel_id(self):
-        return os.path.basename(self.connection_file).lstrip('kernel-').rstrip('.json')
+        return extract_kernel_id(self.connection_file)
