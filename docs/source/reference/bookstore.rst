@@ -1,10 +1,12 @@
-bookstore Reference
-===================
+Reference
+=========
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    archive
    bookstore_config
    handlers
    s3_paths
+   nb_client
+   store_client

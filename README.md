@@ -90,3 +90,11 @@ c.BookstoreSettings.s3_bucket = "<bucket-name>"
 c.BookstoreSettings.s3_access_key_id = <AWS Access Key ID / IAM Access Key ID>
 c.BookstoreSettings.s3_secret_access_key = <AWS Secret Access Key / IAM Secret Access Key>
 ```
+
+## Developing
+
+If you are developing on bookstore you will want to run the ci tests locally and to make releases.
+
+Use [CONTRIBUTING.md](./CONTRIBUTING.md) to learn more about contributing.
+Use [running_ci_locally.md](./running_ci_locally.md) to learn more about running ci tests locally. 
+Use [RELEASING.md](./RELEASING.md) to learn more about releasing bookstore. 

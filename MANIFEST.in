@@ -15,6 +15,7 @@ include *.md
 include *.toml
 
 include bookstore/_version.py
+include bookstore/clone.html
 include .coveragerc
 
 # Documentation

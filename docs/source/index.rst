@@ -6,6 +6,8 @@
 bookstore
 =========
 
+Release v\ |release| (:doc:`What's new? <changelog>`).
+
 **bookstore** provides tooling and workflow recommendations for storing, scheduling, and publishing notebooks.
 
 
@@ -20,6 +22,7 @@ Table of Contents
    usage
    reference/bookstore
    project/index
+   changelog
 
 
 Indices and tables

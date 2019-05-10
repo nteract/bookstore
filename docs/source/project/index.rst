@@ -1,10 +1,10 @@
-Project Documentation
-=====================
+Project
+=======
 
 .. toctree::
    :maxdepth: 1
 
    contributing
    code_of_conduct
+   local_ci
    releasing
-   changelog

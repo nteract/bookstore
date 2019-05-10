@@ -1,10 +1,12 @@
 Installation
 ============
 
-bookstore supports installation on Python 3.6 and above. Processes notebooks from Python 2 or Python 3.
+bookstore may be installed using Python 3.6 and above.
 
-Install from PyPI
------------------
+After installation, bookstore can process Python 2 or Python 3 notebooks.
+
+Install from PyPI (recommended)
+-------------------------------
 
 .. code-block:: bash
 

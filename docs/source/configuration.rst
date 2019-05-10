@@ -1,44 +1,38 @@
 Configuration
 =============
 
+Commonly used configuration settings can be stored in ``BookstoreSettings`` in the
+``jupyter_notebook_config.py`` file. These settings include:
 
-Bookstore settings in Jupyter configuration file
-------------------------------------------------
-
-``BookstoreSettings`` can store commonly used settings for
-bookstore. These settings include:
-
-    - the workspace and published storage location
+    - workspace location
+    - published storage location
     - S3 bucket information
-    - AWS credentials for S3 may also be addeds
+    - AWS credentials for S3
 
-Examples
-~~~~~~~~
+Example configuration
+---------------------
 
-What follows is an example of this in the ``~/.jupyter/jupyter_notebook_config.py`` file:
+Here's an example of ``BookstoreSettings`` in the ``~/.jupyter/jupyter_notebook_config.py`` file:
 
 .. code-block:: python
 
-    """jupyter config
-    # At ~/.jupyter/jupyter_notebook_config.py for user installs on macOS
-    # See https://jupyter.readthedocs.io/en/latest/projects/jupyter-directories.html for other places to plop this
+    """jupyter notebook configuration
+    The location for user installs on MacOS is ``~/.jupyter/jupyter_notebook_config.py``.
+    See https://jupyter.readthedocs.io/en/latest/projects/jupyter-directories.html for additional locations.
     """
     from bookstore import BookstoreContentsArchiver
 
 
     c.NotebookApp.contents_manager_class = BookstoreContentsArchiver
 
-    # All Bookstore settings are centralized on one config object so you don't have to configure it for each class
     c.BookstoreSettings.workspace_prefix = "/workspace/kylek/notebooks"
     c.BookstoreSettings.published_prefix = "/published/kylek/notebooks"
 
     c.BookstoreSettings.s3_bucket = "<bucket-name>"
 
-    # Note: if bookstore is used from an EC2 instance with the right IAM role, you don't
-    # have to specify these
+    # If bookstore uses an EC2 instance with a valid IAM role, there is no need to specify here
     c.BookstoreSettings.s3_access_key_id = <AWS Access Key ID / IAM Access Key ID>
     c.BookstoreSettings.s3_secret_access_key = <AWS Secret Access Key / IAM Secret Access Key>
 
 
-An example of using BookstoreSettings in the ``~/jupyter/jupyter_config.py`` file can be found in the root directory
-of bookstore's GitHub repo.
+The root directory of bookstore's GitHub repo contains an example of using ``BookstoreSettings``.

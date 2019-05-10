@@ -30,12 +30,9 @@ in the nteract world? Here's a quick rundown!
 
 5. Make the appropriate changes for the issue you are trying to address or the
    feature that you want to add.
-6. Confirm that unit tests and linting still pass successfully with:
-   
-       yarn test
-   
-   If tests fail, don't hesitate to ask for help.
-
+6. You can run python unit tests using `pytest`. Running integration tests
+   locally requires a more complicated setup. This setup is described in
+   [running_ci_locally.md](./running_ci_locally.md)
 7. Add and commit the changed files using `git add` and `git commit`.
 8. Push the changes to the remote repository using:
 
