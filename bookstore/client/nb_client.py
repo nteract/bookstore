@@ -18,9 +18,9 @@ Example
   'token': '',
   'url': 'http://localhost:8888/'}]
 """
+import json
 import os
 import re
-import json
 from copy import deepcopy
 from typing import NamedTuple
 
@@ -30,6 +30,7 @@ from notebook.notebookapp import list_running_servers
 
 
 def extract_kernel_id(connection_file):
+    # TODO should this revert to not using regex ?
     connection_filename = os.path.basename(connection_file)
     kernel_id = re.sub(r"kernel-(.*)\.json", r"\1", connection_filename)
     return kernel_id
@@ -81,21 +82,21 @@ class NotebookSession:  # (NamedTuple):
     #     id: str #'68d9c58f-c57d-4133-8b41-5ec2731b268d',
     #     path: str #'Untitled38.ipynb',
     #     name: str #'',
-    #     type: str #'notebook',
+    #     kind: str #'notebook',
     #     kernel: KernelInfo
     #     notebook: dict # deprecated API {'path': 'Untitled38.ipynb', 'name': ''}}}
 
-    def __init__(self, *args, path, name, type, kernel, notebook, **kwargs):
+    def __init__(self, *args, path, name, kind, kernel, notebook, **kwargs):
         self.model = {
             "path": path,
             "name": name,
-            "type": type,
+            "kind": kind,
             "kernel": kernel,
             "notebook": notebook,
         }
         self.path = path
         self.name = name
-        self.type = type
+        self.kind = kind
         self.kernel = KernelInfo(**kernel)
         self.notebook = notebook
 
