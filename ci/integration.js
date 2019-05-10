@@ -6,6 +6,7 @@ const _ = require("lodash");
 
 const s3 = require("./s3");
 const { JupyterServer } = require("./jupyter");
+const { url_path_join } = require("./utils");
 
 const { sleep } = require("./sleep");
 
@@ -105,7 +106,7 @@ const main = async () => {
     }
   }
 
-  async function comparePublishedNotebooks(filepath, originalNotebook){
+  async function comparePublishedNotebooks(filepath, originalNotebook) {
     /***** Check published notebook from S3 prefix *****/
     const rawNotebook = await s3Client.getObject(
       bucketName,
@@ -127,7 +128,6 @@ const main = async () => {
     }
 
     console.log("Notebook on S3 matches what we sent");
-
   }
 
   const originalNotebook = {
@@ -168,10 +168,7 @@ const main = async () => {
     originalNotebook
   );
 
-  await jupyterServer.publishNotebook(
-    "ci-published.ipynb",
-    originalNotebook
-  )
+  await jupyterServer.publishNotebook("ci-published.ipynb", originalNotebook);
 
   await comparePublishedNotebooks("ci-published.ipynb", originalNotebook);
 
@@ -201,6 +198,44 @@ const main = async () => {
     });
     await sleep(100);
   }
+
+  function cloneQueryCheck(s3Key, expectedQueryString) {
+    const populatedQueryString = jupyterServer.populateCloneQuery(
+      bucketName,
+      s3Key
+    );
+    if (!_.isEqual(populatedQueryString, expectedQueryString)) {
+      console.error("created");
+      console.error(populatedQueryString);
+      console.error("expected");
+      console.error(expectedQueryString);
+      throw new Error("Query was not formed properly");
+    }
+    console.log(`Query matched ${expectedQueryString}`);
+  }
+
+  function checkCloneResponse(res, expected) {
+    const content = res.response;
+    if (!content.includes(expected)) {
+      console.error("Response is ill-formed:");
+      console.error(content);
+      console.error("It is expected to contain:");
+      console.error(expected);
+      throw new Error("Ill-formed response.");
+    }
+    console.log(`Clone endpoint for ${expected} reached successfully!`);
+  }
+
+  const publishedPath = "ci-published/ci-published.ipynb";
+  cloneQueryCheck(
+    publishedPath,
+    url_path_join(
+      jupyterServer.endpoint,
+      `api/bookstore/cloned?s3_bucket=${bucketName}&s3_key=${publishedPath}`
+    )
+  );
+  const cloneRes = await jupyterServer.cloneNotebook(bucketName, publishedPath);
+  checkCloneResponse(cloneRes, publishedPath);
 
   // Wait for minio to have the notebook
   // Future iterations of this script should poll to get the notebook
