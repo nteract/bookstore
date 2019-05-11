@@ -21,3 +21,23 @@ No dot before alpha/beta/rc. Use dot before `.dev`. Examples::
 version_info = (2, 3, 0, "", "dev")
 
 __version__ = ".".join(map(str, version_info[:3])) + ".".join(version_info[3:])
+
+
+def _check_version(bookstore_version, log):
+    """Check version and log status"""
+    if not bookstore_version:
+        log.warning(
+            f"Bookstore has no version header, which means it is likely < 2.0. Expected {__version__}"
+        )
+        return
+    elif bookstore_version[:1].isdigit() is False:
+        log.warning(f"Invalid version format. Expected {__version__}")
+        return
+    else:
+        if bookstore_version[:1] < '2':
+            log.warning(
+                f"{bookstore_version} is the deprecated bookstore project for Openstack. Expected {__version__}"
+            )
+            return
+        else:
+            log.debug(f"Bookstore version is {bookstore_version}.")
