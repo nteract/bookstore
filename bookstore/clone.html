@@ -25,14 +25,13 @@ Distributed under the terms of the Modified BSD License.
             s3_bucket: "{{ s3_bucket }}",
             s3_key: "{{ s3_key }}"
           };
-          var clone_url = "{{ base_uri }}/api/bookstore/cloned/";
           var xsrf_token = getCookieByName("_xsrf");
           var xhr = new XMLHttpRequest();
           xhr.responseType = "json";
           xhr.onload = function(e) {
             if (xhr.readyState === 4) {
               if (xhr.status === 201) {
-                window.location.href = `{{ base_uri }}{{ default_url_base }}/${
+                window.location.href = `{{ redirect_contents_url }}/${
                   xhr.response.path
                 }`;
               } else {
@@ -44,7 +43,7 @@ Distributed under the terms of the Modified BSD License.
             console.error(xhr.statusText);
           };
 
-          xhr.open("POST", clone_url, true);
+          xhr.open("POST", "{{ clone_api_url }}", true);
           xhr.withCredentials = true;
           xhr.setRequestHeader("X-XSRFToken", xsrf_token);
           xhr.setRequestHeader(

@@ -3,6 +3,7 @@ import os
 
 import aiobotocore
 
+from notebook.utils import url_path_join
 from notebook.base.handlers import IPythonHandler
 from tornado import web
 from jinja2 import FileSystemLoader
@@ -69,11 +70,13 @@ class BookstoreCloneHandler(IPythonHandler):
             raise web.HTTPError(400, "Must have a key to clone from")
         self.set_header('Content-Type', 'text/html')
         base_uri = f"{self.request.protocol}://{self.request.host}"
+        clone_api_url = url_path_join(base_uri, self.base_url, "/api/bookstore/cloned")
+        redirect_contents_url = url_path_join(base_uri, self.default_url)
         template_params = {
             "s3_bucket": s3_bucket,
             "s3_key": file_key,
-            "base_uri": base_uri,
-            "default_url_base": self.default_url,
+            "clone_api_url": clone_api_url,
+            "redirect_contents_url": redirect_contents_url,
         }
 
         self.write(self.render_template('clone.html', **template_params))
