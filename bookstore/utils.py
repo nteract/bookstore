@@ -1,7 +1,13 @@
+"""Utility and helper functions."""
+
+
 def url_path_join(*pieces):
-    """Join components of url into a relative url
+    """Join components into a relative url.
+    
     Use to prevent double slash when joining subpath. This will leave the
-    initial and final / in place
+    initial and final / in place.
+    
+    Code based on Jupyter notebook `url_path_join`.
     """
     initial = pieces[0].startswith('/')
     final = pieces[-1].endswith('/')
