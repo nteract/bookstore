@@ -4,13 +4,13 @@ import aiobotocore
 
 from notebook.base.handlers import APIHandler
 from notebook.base.handlers import path_regex
-from notebook.utils import url_path_join
 from tornado import web
 
 from .s3_paths import s3_path
 from .s3_paths import s3_key
 from .s3_paths import s3_display_path
 from .bookstore_config import BookstoreSettings
+from .utils import url_path_join
 
 
 class BookstorePublishHandler(APIHandler):

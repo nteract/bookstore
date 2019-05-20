@@ -3,7 +3,7 @@ import json
 
 from notebook.base.handlers import APIHandler
 from notebook.base.handlers import path_regex
-from notebook.utils import url_path_join
+from .utils import url_path_join
 from tornado import web
 
 from ._version import __version__
