@@ -3,7 +3,6 @@ import os
 
 import aiobotocore
 
-from notebook.utils import url_path_join
 from notebook.base.handlers import IPythonHandler
 from tornado import web
 from jinja2 import FileSystemLoader
@@ -11,7 +10,7 @@ from jinja2 import FileSystemLoader
 from . import PACKAGE_DIR
 from .s3_paths import s3_path
 from .bookstore_config import BookstoreSettings
-
+from .utils import url_path_join
 
 BOOKSTORE_FILE_LOADER = FileSystemLoader(PACKAGE_DIR)
 
