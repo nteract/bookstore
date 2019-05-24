@@ -1,0 +1,205 @@
+openapi: 3.0.1
+servers:
+  - url: http://localhost:8888
+    description: Local Server
+info:
+  title: Bookstore public API 
+  description: Bookstore API docs
+  termsOfService: http://swagger.io/terms/
+  license:
+    name: BSD 3-clause
+    url: https://github.com/nteract/bookstore/blob/master/LICENSE 
+  version: 2.3.0.dev0
+externalDocs:
+  description: Find out more about Bookstore
+  url: https://bookstore.readthedocs.io/en/latest/ 
+paths:
+  /api/bookstore:
+    get:
+      tags:
+      - info
+      summary: Info about bookstore
+      responses:
+        200:
+          description: Successfully requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionInfo'
+  /api/bookstore/cloned:
+    get:
+      tags:
+      - clone
+      summary: Landing page for initiating cloning.
+      description: This serves a simple html page that allows avoiding xsrf issues on a jupyter server.
+      parameters:
+      - name: s3_bucket
+        in: query
+        description: S3_bucket being targeted
+        required: true
+        style: form
+        schema:
+          type: string
+      - name: s3_key
+        in: query
+        description: S3 object key being requested
+        required: true
+        style: form
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            text/html:
+              schema:
+                type: string
+        400:
+          description: Must have a key to clone from
+          content: {}
+    post:
+      tags:
+      - clone
+      summary: Trigger clone from s3
+      requestBody:
+        description: Information about which notebook to clone from s3 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/S3CloneFile'
+        required: true
+      responses:
+        200:
+          description: Successfully cloned
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Contents'
+        400:
+          description: Must have a key to clone from
+          content: {}
+  /api/bookstore/published/{path}:
+    put: 
+      tags:
+      - publish
+      parameters:
+        - in: path
+          name: path
+          required: true
+          schema:
+            type: string
+          description: Path to publish to, it will be prefixed by the preconfigured published bucket.
+      summary: Publish a notebook to s3
+      requestBody:
+        description: Information about the notebook contents to publish to s3 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contents'
+        required: true
+      
+      responses:
+        200:
+          description: Successfully published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/S3PublishFile'
+
+components:
+  schemas:
+    S3CloneFile:
+      type: object
+      required: 
+        - s3_bucket
+        - s3_key
+      properties:
+        s3_bucket: 
+          type: string
+        s3_key:
+          type: string
+        target_path:
+          type: string
+    S3PublishFile:
+      type: object
+      required:
+        - s3path
+      properties:
+        s3path:
+          type: string
+        versionID:
+          type: string
+    Contents:
+      description: "A contents object.  The content and format keys may be null if content is not contained.  If type is 'file', then the mimetype will be null."
+      type: object
+      required:
+        - type
+        - name
+        - path
+        - writable
+        - created
+        - last_modified
+        - mimetype
+        - format
+        - content
+      properties:
+        name:
+          type: string
+          description: "Name of file or directory, equivalent to the last part of the path"
+        path:
+          type: string
+          description: Full path for file or directory
+        type:
+          type: string
+          description: Type of content
+          enum:
+            - directory
+            - file
+            - notebook
+        writable:
+          type: boolean
+          description: indicates whether the requester has permission to edit the file
+        created:
+          type: string
+          description: Creation timestamp
+          format: date-time
+        last_modified:
+          type: string
+          description: Last modified timestamp
+          format: date-time
+        size:
+          type: integer
+          description: "The size of the file or notebook in bytes. If no size is provided, defaults to null."
+        mimetype:
+          type: string
+          description: "The mimetype of a file.  If content is not null, and type is 'file', this will contain the mimetype of the file, otherwise this will be null."
+        content:
+          type: string
+          description: "The content, if requested (otherwise null).  Will be an array if type is 'directory'"
+        format:
+          type: string
+          description: Format of content (one of null, 'text', 'base64', 'json')
+    ValidationInfo:
+      type: object
+      required:
+        - bookstore_validation
+        - archive_validation
+        - published_validation
+      properties:
+        bookstore_validation:
+          type: boolean
+        archive_validation:
+          type: boolean
+        published_validation: 
+          type: boolean
+    VersionInfo:
+      type: object
+      required:
+        - s3path
+      properties:
+        bookstore:
+          type: boolean
+        version:
+          type: string
+        validation: 
+          $ref: '#/components/schemas/ValidationInfo'
