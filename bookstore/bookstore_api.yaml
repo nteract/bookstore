@@ -11,6 +11,18 @@ externalDocs:
   description: Find out more about Bookstore
   url: https://bookstore.readthedocs.io/en/latest/ 
 paths:
+  /api/bookstore:
+    get:
+      tags:
+      - info
+      summary: Info about bookstore
+      responses:
+        200:
+          description: Successfully requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionInfo'
   /api/bookstore/cloned:
     get:
       tags:
@@ -164,3 +176,27 @@ components:
         format:
           type: string
           description: Format of content (one of null, 'text', 'base64', 'json')
+    ValidationInfo:
+      type: object
+      required:
+        - bookstore_validation
+        - archive_validation
+        - published_validation
+      properties:
+        bookstore_validation:
+          type: boolean
+        archive_validation:
+          type: boolean
+        published_validation: 
+          type: boolean
+    VersionInfo:
+      type: object
+      required:
+        - s3path
+      properties:
+        bookstore:
+          type: boolean
+        version:
+          type: string
+        validation: 
+          $ref: '#/components/schemas/ValidationInfo'
