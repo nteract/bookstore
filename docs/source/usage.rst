@@ -43,8 +43,8 @@ this, bookstore allows users to set workspace and published storage paths. For e
 - ``/workspace`` - where users edit and store notebooks
 - ``/published`` - notebooks to be shared to an organization
 
-Bookstore archives versions by keeping the path intact (until a user changes them). For example, the prefixes that could
-be associated with storage types:
+Bookstore archives notebook versions by keeping the path intact (until a user changes them). For example, the prefixes
+that could be associated with storage types:
 
 - Notebook in "draft" form: ``/workspace/kylek/notebooks/mine.ipynb``
 - Most recent published copy of a notebook: ``/published/kylek/notebooks/mine.ipynb``
@@ -63,7 +63,7 @@ How to Publish a notebook
 -------------------------
 
 To publish a notebook, Bookstore uses a publishing endpoint which is a ``serverextension`` to the classic Jupyter
-server. If you wish to publish notebook, explicitly enable bookstore as a server extension to use the endpoint. By
+server. If you wish to publish notebooks, explicitly enable bookstore as a server extension to use the endpoint. By
 default, publishing is not enabled.
 
 To enable the extension globally, run::
