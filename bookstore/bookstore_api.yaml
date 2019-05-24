@@ -1,4 +1,7 @@
 openapi: 3.0.1
+servers:
+  - url: http://localhost:8888
+    description: Local Server
 info:
   title: Bookstore public API 
   description: Bookstore API docs
