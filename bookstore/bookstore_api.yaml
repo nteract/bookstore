@@ -63,6 +63,34 @@ paths:
         400:
           description: Must have a key to clone from
           content: {}
+  /api/bookstore/published/{path}:
+    put: 
+      tags:
+      - publish
+      parameters:
+        - in: path
+          name: path
+          required: true
+          schema:
+            type: string
+          description: Path to publish to, it will be prefixed by the preconfigured published bucket.
+      summary: Publish a notebook to s3
+      requestBody:
+        description: Information about the notebook contents to publish to s3 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contents'
+        required: true
+      
+      responses:
+        200:
+          description: Successfully published.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/S3PublishFile'
+
 components:
   schemas:
     S3CloneFile:
@@ -76,6 +104,15 @@ components:
         s3_key:
           type: string
         target_path:
+          type: string
+    S3PublishFile:
+      type: object
+      required:
+        - s3path
+      properties:
+        s3path:
+          type: string
+        versionID:
           type: string
     Contents:
       description: "A contents object.  The content and format keys may be null if content is not contained.  If type is 'file', then the mimetype will be null."
