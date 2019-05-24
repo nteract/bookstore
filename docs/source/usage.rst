@@ -1,47 +1,75 @@
 Usage
 =====
 
-Automatic Notebook Versioning
------------------------------
+Data scientists and notebook users may develop locally on their system or save their notebooks to off-site or cloud
+storage. Additionally, they will often create a notebook and then over time make changes and update it. As
+they work, it's helpful to be able to **store versions** of a notebook. When making changes to the content and
+calculations over time, a data scientist using Bookstore can now request different versions from the remote storage,
+such as S3, and **clone** the notebook to their local system.
 
-Every *save* of a notebook creates an *immutable copy* of the notebook on object storage.
+                                             *store*
 
-To simplify implementation, we currently rely on S3 as the object store, using
+Data scientist saves to Local System ------------------> Remote Data Store (i.e. S3) Workspace
+
+                                             *clone*
+
+User requests a notebook to use locally <-------------- Remote Data Store (i.e. S3) Workspace
+
+
+After some time working with a notebook, the data scientist may want to save or share a polished notebook version with
+others. By **publishing a notebook**, the data scientist can display and share work that others can use at a later time.
+
+How to store and clone versions
+-------------------------------
+
+Bookstore uses automatic notebook version management and specific storage paths when storing a notebook.
+
+Automatic Notebook Version Management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Every *save* of a notebook creates an *immutable copy* of the notebook on object storage. Initially, Bookstore
+supports S3 for object storage.
+
+To simplify implementation and management of versions, we currently rely on S3 as the object store using
 `versioned buckets <https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html>`_.
 
 Storage Paths
--------------
+~~~~~~~~~~~~~
 
-All notebooks are archived to a single versioned S3 bucket with specific **prefixes** denoting the lifecycle of
-the notebook. For example:
+All notebooks are archived to a single versioned S3 bucket using specific **prefixes** to denote a user's workspace
+and an organization's publication of a user's notebook. This captures the lifecycle of the notebook on storage. To do
+this, bookstore allows users to set workspace and published storage paths. For example:
 
-- ``/workspace`` - where users edit
-- ``/published`` - public notebooks (to an organization)
+- ``/workspace`` - where users edit and store notebooks
+- ``/published`` - notebooks to be shared to an organization
 
-Each notebook path is a namespace that an external service ties into the schedule. We archive off versions,
-keeping the path intact (until a user changes them). For example, the prefixes that could be associated with
-storage types:
+Bookstore archives versions by keeping the path intact (until a user changes them). For example, the prefixes that could
+be associated with storage types:
 
 - Notebook in "draft" form: ``/workspace/kylek/notebooks/mine.ipynb``
 - Most recent published copy of a notebook: ``/published/kylek/notebooks/mine.ipynb``
 
-Scheduled notebooks will also be referred to by the notebook ``key``. In addition, we'll need to be able to surface
-version IDs as well.
+When scheduling execution of notebooks, each notebook path is a namespace that an external service can access. This
+helps when working with parameterized notebooks, such as with Papermill. Scheduled notebooks may also be referred to
+by the notebook ``key``. In addition, Bookstore can find version IDs as well.
 
-Transitioning to this Storage Plan
-----------------------------------
+Easing the Transition to Bookstore's Storage Plan
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since most people are on a regular filesystem, we'll start with writing to the `/workspace` prefix as Archival
-Storage (writing on save using a ``post_save_hook`` for a Jupyter contents manager).
+Since many people use a regular filesystem, we'll start with writing to the `/workspace` prefix as Archival
+Storage (more specifically, writing on save using a ``post_save_hook`` for the Jupyter contents manager).
 
-Publishing
-----------
+How to Publish a notebook
+-------------------------
 
-The bookstore publishing endpoint is a ``serverextension`` to the classic Jupyter server. This means if you are
-developing this you will need to explicitly enable it to use the endpoint.
+To publish a notebook, Bookstore uses a publishing endpoint which is a ``serverextension`` to the classic Jupyter
+server. If you wish to publish notebook, explicitly enable bookstore as a server extension to use the endpoint. By
+default, publishing is not enabled.
 
-To do so you run: ``jupyter serverextension enable --py bookstore``.
+To enable the extension globally, run::
 
-If you wish to enable it only for your current environment, run:
+    jupyter serverextension enable --py bookstore
 
-``jupyter serverextension enable --py bookstore --sys-prefix``.
+If you wish to enable it only for your current environment, run::
+
+    jupyter serverextension enable --py bookstore --sys-prefix
