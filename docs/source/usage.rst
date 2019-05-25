@@ -15,11 +15,8 @@ now request different versions from the remote storage, such as S3, and
 
     User saves to Local System ------------------> Remote Data Store (i.e. S3)
 
-<<<<<<< HEAD
+
     *clone*
-=======
-User requests a notebook to use locally <-------------- Remote Data Store (i.e. S3)
->>>>>>> f234a893759e3ccdddb7c620ac520a07df769116
 
     User requests a notebook to use locally <-------------- Remote Data Store (i.e. S3)
 
