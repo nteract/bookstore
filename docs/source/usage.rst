@@ -13,7 +13,7 @@ Data scientist saves to Local System ------------------> Remote Data Store (i.e.
 
                                              *clone*
 
-User requests a notebook to use locally <-------------- Remote Data Store (i.e. S3) Workspace
+User requests a notebook to use locally <-------------- Remote Data Store (i.e. S3)
 
 
 After some time working with a notebook, the data scientist may want to save or share a polished notebook version with
