@@ -36,4 +36,4 @@ Here's an example of ``BookstoreSettings`` in the ``~/.jupyter/jupyter_notebook_
 
 
 The root directory of bookstore's GitHub repo contains an example,
-``jupyter_config.py.example`, of using ``BookstoreSettings``.
+``jupyter_config.py.example``, of using ``BookstoreSettings``.
