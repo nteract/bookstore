@@ -35,4 +35,6 @@ Here's an example of ``BookstoreSettings`` in the ``~/.jupyter/jupyter_notebook_
     c.BookstoreSettings.s3_secret_access_key = <AWS Secret Access Key / IAM Secret Access Key>
 
 
-The root directory of bookstore's GitHub repo contains an example of using ``BookstoreSettings``.
+The root directory of bookstore's GitHub repo contains an example config
+called ``jupyter_config.py.example`` that shows how to configure
+``BookstoreSettings``.
