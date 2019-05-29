@@ -60,13 +60,17 @@ class BookstoreCloneHandler(IPythonHandler):
     async def get(self):
         """Open a page that will allow you to clone a notebook from a specific bucket.
         """
-        s3_bucket = self.get_argument("s3_bucket", "")
-        # s3_paths module has an s3_key function; file_key avoids confusion
-        file_key = self.get_argument("s3_key", "")
-        self.log.info("About to clone from %s", file_key)
+        s3_bucket = self.get_argument("s3_bucket")
+        if s3_bucket == '' or s3_bucket == "/":
+            raise web.HTTPError(400, "Must have a bucket to clone from")
 
-        if file_key == '' or file_key == '/':
+        # s3_paths module has an s3_key function; s3_object_key avoids confusion
+        s3_object_key = self.get_argument("s3_key")
+        if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
+
+        self.log.info("Setting up cloning landing page from %s", s3_object_key)
+
         self.set_header('Content-Type', 'text/html')
         base_uri = f"{self.request.protocol}://{self.request.host}"
         clone_api_url = url_path_join(base_uri, self.base_url, "/api/bookstore/cloned")
