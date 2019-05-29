@@ -104,7 +104,6 @@ class JupyterServer {
     // rx-jupyter for writing a notebook to the contents API
     const apiPath = "/api/bookstore/published/";
     const xhr = await ajax({
-      // TODO: Resolve https://github.com/nteract/bookstore/pull/75#discussion_r280785802
       url: url_path_join(this.endpoint, apiPath, path),
       responseType: "json",
       createXHR: () => new XMLHttpRequest(),
