@@ -71,18 +71,22 @@ class BookstoreCloneHandler(IPythonHandler):
 
         self.log.info("Setting up cloning landing page from %s", s3_object_key)
 
+        template_params = self.construct_template_params(s3_bucket, s3_object_key)
         self.set_header('Content-Type', 'text/html')
+        self.write(self.render_template('clone.html', **template_params))
+
+    def construct_template_params(self, s3_bucket, s3_object_key):
         base_uri = f"{self.request.protocol}://{self.request.host}"
         clone_api_url = url_path_join(base_uri, self.base_url, "/api/bookstore/cloned")
         redirect_contents_url = url_path_join(base_uri, self.default_url)
         template_params = {
             "s3_bucket": s3_bucket,
-            "s3_key": file_key,
+            "s3_key": s3_object_key,
             "clone_api_url": clone_api_url,
             "redirect_contents_url": redirect_contents_url,
         }
+        return template_params
 
-        self.write(self.render_template('clone.html', **template_params))
 
     @web.authenticated
     async def post(self):
