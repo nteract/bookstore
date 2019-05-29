@@ -9,6 +9,7 @@ from jinja2 import Environment
 
 from ..clone import BookstoreCloneHandler
 
+
 def handler(uri='/api/bookstore/cloned'):
     mock_application = Mock(spec=Application, ui_methods={}, ui_modules={}, settings={})
     payload_request = HTTPRequest(method='GET', uri=uri, headers=None, body=None, connection=Mock())
@@ -24,7 +25,9 @@ class TestCloneHandler(AsyncTestCase):
             spec=Application, ui_methods={}, ui_modules={}, settings={'jinja2_env': Environment()}
         )
 
-    def get_handler(self, uri):
+    def get_handler(self, uri, app=None):
+        if app is None:
+            app = self.mock_application
         connection = Mock(context=Mock(protocol="https"))
         payload_request = HTTPRequest(
             method='GET',
@@ -33,7 +36,7 @@ class TestCloneHandler(AsyncTestCase):
             body=None,
             connection=connection,
         )
-        return BookstoreCloneHandler(self.mock_application, payload_request)
+        return BookstoreCloneHandler(app, payload_request)
 
     @gen_test
     async def test_get_no_param(self):
@@ -72,3 +75,26 @@ class TestCloneHandler(AsyncTestCase):
         )
         assert expected == output
 
+    def test_gen_template_params_base_url(self):
+        base_url_list = ['/my_base_url', '/my_base_url/', 'my_base_url/', 'my_base_url']
+        expected = {
+            's3_bucket': 'hello',
+            's3_key': 'my_key',
+            'clone_api_url': 'https://localhost:8888/my_base_url/api/bookstore/cloned',
+            'redirect_contents_url': 'https://localhost:8888',
+        }
+        for base_url in base_url_list:
+            mock_app = Mock(
+                spec=Application,
+                ui_methods={},
+                ui_modules={},
+                settings={'jinja2_env': Environment(), "base_url": base_url},
+            )
+
+            success_handler = self.get_handler(
+                '/api/bookstore/cloned?s3_bucket=hello&s3_key=my_key', app=mock_app
+            )
+            output = success_handler.construct_template_params(
+                s3_bucket="hello", s3_object_key="my_key"
+            )
+            assert expected == output
