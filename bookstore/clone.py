@@ -29,11 +29,15 @@ class BookstoreCloneHandler(IPythonHandler):
     get(self)
         Checks for valid storage settings and render a UI for clone options.
     construct_template_params(self, s3_bucket, s3_object_key)
-
+        Helper to populate Jinja template for cloning option page.
     post(self)
         Clone a notebook from the location specified by the payload.
     get_template(self, name)
         Loads a Jinja template and its related settings.
+
+    See also
+    --------
+    `Jupyter Notebook reference on Custom Handlers <https://jupyter-notebook.readthedocs.io/en/stable/extending/handlers.html#registering-custom-handlers>`_
     """
 
     def initialize(self):
