@@ -10,14 +10,6 @@ from jinja2 import Environment
 from ..clone import BookstoreCloneHandler
 
 
-def handler(uri='/api/bookstore/cloned'):
-    mock_application = Mock(spec=Application, ui_methods={}, ui_modules={}, settings={})
-    payload_request = HTTPRequest(method='GET', uri=uri, headers=None, body=None, connection=Mock())
-
-    handler = BookstoreCloneHandler(mock_application, payload_request)
-    return handler
-
-
 class TestCloneHandler(AsyncTestCase):
     def setUp(self):
         super().setUp()
