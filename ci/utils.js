@@ -7,12 +7,12 @@ const url_path_join = function(...pieces) {
   //
   // They will be readded in between words, and at the beginning and end if they were
   // """
-  initial = pieces[0].startsWith("/");
-  final = pieces[pieces.length - 1].endsWith("/");
-  const hi = pieces
+  const initial = pieces[0].startsWith("/");
+  const final = pieces[pieces.length - 1].endsWith("/");
+  const result = pieces
     .filter(el => el !== "")
-    .map(el => el.replace(/(^[ /]+)|([/]+$)/g, "")); //[];
-  result = hi.join("/");
+    .map(el => el.replace(/(^[ /]+)|([/]+$)/g, ""))
+    .join("/");
   if (initial) {
     result = "/" + result;
   }
