@@ -1,11 +1,14 @@
+import json
+
 from unittest.mock import Mock
 
 import pytest
+
+from jinja2 import Environment
 from tornado.testing import AsyncTestCase, gen_test
 from tornado.web import Application, HTTPError
 from tornado.httpserver import HTTPRequest
 
-from jinja2 import Environment
 
 from ..clone import BookstoreCloneHandler
 
@@ -27,6 +30,15 @@ class TestCloneHandler(AsyncTestCase):
             headers={"Host": "localhost:8888"},
             body=None,
             connection=connection,
+        )
+        return BookstoreCloneHandler(app, payload_request)
+
+    def post_handler(self, body_dict, app=None):
+        if app is None:
+            app = self.mock_application
+        body = json.dumps(body_dict).encode('utf-8')
+        payload_request = HTTPRequest(
+            method='POST', uri="/api/bookstore/cloned", headers=None, body=body, connection=Mock()
         )
         return BookstoreCloneHandler(app, payload_request)
 
@@ -90,3 +102,25 @@ class TestCloneHandler(AsyncTestCase):
                 s3_bucket="hello", s3_object_key="my_key"
             )
             assert expected == output
+
+    @gen_test
+    async def test_post_no_body(self):
+        post_body_dict = {}
+        empty_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_handler.post()
+
+    @gen_test
+    async def test_post_empty_bucket(self):
+        post_body_dict = {"s3_key": "my_key", "s3_bucket": ""}
+        empty_bucket_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_bucket_handler.post()
+
+    @gen_test
+    async def test_post_empty_key(self):
+        post_body_dict = {"s3_key": "", "s3_bucket": "my_bucket"}
+        empty_key_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_key_handler.post()
+
