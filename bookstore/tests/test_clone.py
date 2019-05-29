@@ -36,3 +36,19 @@ class TestCloneHandler(AsyncTestCase):
         with pytest.raises(HTTPError):
             await empty_handler.get()
 
+    @gen_test
+    async def test_get_no_bucket(self):
+        no_bucket_handler = self.get_handler('/api/bookstore/cloned?s3_bucket=&s3_key=hi')
+        with pytest.raises(HTTPError):
+            await no_bucket_handler.get()
+
+    @gen_test
+    async def test_get_no_object_key(self):
+        no_object_key_handler = self.get_handler('/api/bookstore/cloned?s3_bucket=hello&s3_key=')
+        with pytest.raises(HTTPError):
+            await no_object_key_handler.get()
+
+    @gen_test
+    async def test_get_success(self):
+        success_handler = self.get_handler('/api/bookstore/cloned?s3_bucket=hello&s3_key=my_key')
+        await success_handler.get()
