@@ -25,8 +25,13 @@ class TestCloneHandler(AsyncTestCase):
         )
 
     def get_handler(self, uri):
+        connection = Mock(context=Mock(protocol="https"))
         payload_request = HTTPRequest(
-            method='GET', uri=uri, headers=None, body=None, connection=Mock()
+            method='GET',
+            uri=uri,
+            headers={"Host": "localhost:8888"},
+            body=None,
+            connection=connection,
         )
         return BookstoreCloneHandler(self.mock_application, payload_request)
 
@@ -52,3 +57,18 @@ class TestCloneHandler(AsyncTestCase):
     async def test_get_success(self):
         success_handler = self.get_handler('/api/bookstore/cloned?s3_bucket=hello&s3_key=my_key')
         await success_handler.get()
+
+    def test_gen_template_params(self):
+        success_handler = self.get_handler('/api/bookstore/cloned?s3_bucket=hello&s3_key=my_key')
+        expected = {
+            's3_bucket': 'hello',
+            's3_key': 'my_key',
+            'clone_api_url': 'https://localhost:8888/api/bookstore/cloned',
+            'redirect_contents_url': 'https://localhost:8888',
+        }
+        success_handler = self.get_handler('/api/bookstore/cloned?s3_bucket=hello&s3_key=my_key')
+        output = success_handler.construct_template_params(
+            s3_bucket="hello", s3_object_key="my_key"
+        )
+        assert expected == output
+
