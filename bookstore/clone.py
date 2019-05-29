@@ -5,6 +5,8 @@ import os
 from copy import deepcopy
 
 import aiobotocore
+
+from botocore.exceptions import ClientError
 from jinja2 import FileSystemLoader
 from notebook.base.handlers import IPythonHandler, APIHandler
 from tornado import web
@@ -132,7 +134,12 @@ class BookstoreCloneAPIHandler(APIHandler):
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
             self.log.info("Processing published write of %s", path)
-            obj = await client.get_object(Bucket=s3_bucket, Key=s3_object_key)
+            try:
+                obj = await client.get_object(Bucket=s3_bucket, Key=s3_object_key)
+            except ClientError as e:
+                status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
+                raise web.HTTPError(status_code, e.args[0])
+
             content = await obj['Body'].read()
             self.log.info("Done with published write of %s", path)
 
