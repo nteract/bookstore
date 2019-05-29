@@ -8,5 +8,6 @@ Reference
    archive
    handlers
    s3_paths
+   clone
    nb_client
    store_client
