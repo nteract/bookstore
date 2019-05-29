@@ -17,7 +17,6 @@ import sys
 
 import m2r
 
-
 sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
@@ -46,6 +45,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
+    'sphinxcontrib.openapi',
     'm2r',
 ]
 

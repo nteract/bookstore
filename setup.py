@@ -10,13 +10,12 @@ https://github.com/pypa/sampleproject
 """
 from __future__ import print_function
 
-from io import open
 import os
-from os import path
 import sys
+from io import open
+from os import path
 
 from setuptools import setup
-
 
 v = sys.version_info
 
@@ -83,6 +82,7 @@ setup(
             'recommonmark',
             'm2r',
             'sphinxcontrib-napoleon',
+            'sphinxcontrib-openapi',
             'boto3==1.9.91',
             'botocore>=1.12.91,<1.12.92',
         ],

@@ -20,6 +20,7 @@ Table of Contents
    installation
    configuration
    usage
+   openapi
    reference/bookstore
    project/index
    changelog
