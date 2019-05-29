@@ -143,3 +143,10 @@ class TestCloneAPIHandler(AsyncTestCase):
         empty_key_handler = self.post_handler(post_body_dict)
         with pytest.raises(HTTPError):
             await empty_key_handler.post()
+
+    @gen_test
+    async def test_post_nonsense_params(self):
+        post_body_dict = {"s3_key": "my_key", "s3_bucket": "my_bucket"}
+        success_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await success_handler.post()
