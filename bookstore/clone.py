@@ -2,6 +2,8 @@
 import json
 import os
 
+from copy import deepcopy
+
 import aiobotocore
 from jinja2 import FileSystemLoader
 from notebook.base.handlers import IPythonHandler, APIHandler
@@ -182,9 +184,18 @@ class BookstoreCloneAPIHandler(APIHandler):
         if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
         model = await self._clone(s3_bucket, s3_object_key)
+        model, path = self.build_post_model_response(model, target_path)
+        self.contents_manager.save(model, path)
         self.set_header('Content-Type', 'application/json')
+        self.finish(model)
+
+    def build_post_model_response(self, model, target_path):
+        """Helper that takes constructs a Jupyter Contents API compliant model.
+
+        If the file at target_path already exists, this increments the file name.
+        """
+        model = deepcopy(model)
         path = self.contents_manager.increment_filename(target_path)
         model['name'] = os.path.basename(os.path.relpath(path))
         model['path'] = os.path.relpath(path)
-        self.contents_manager.save(model, path)
-        self.finish(model)
+        return model, path
