@@ -149,4 +149,5 @@ class BookstoreCloneHandler(IPythonHandler):
         self.finish(model)
 
     def get_template(self, name):
+        """Loads a Jinja template by name."""
         return BOOKSTORE_FILE_LOADER.load(self.settings['jinja2_env'], name)
