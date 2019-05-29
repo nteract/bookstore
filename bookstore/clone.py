@@ -115,12 +115,14 @@ class BookstoreCloneHandler(IPythonHandler):
 
         Clone a notebook to the path specified in the payload.
 
-        The payload type for the request should be
-        {
-          "s3_bucket": string,
-          "s3_key": string,
-          "target_path"?: string
-        }
+        The payload type for the request should be::
+
+            {
+            "s3_bucket": string,
+            "s3_key": string,
+            "target_path"?: string
+            }
+
         The response payload should match the standard Jupyter contents
         API POST response.
         """
