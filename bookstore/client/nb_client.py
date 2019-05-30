@@ -30,7 +30,7 @@ from notebook.notebookapp import list_running_servers
 
 
 def extract_kernel_id(connection_file):
-    # TODO should this revert to not using regex ?
+    # regex is used as a more robust approach than lstrip
     connection_filename = os.path.basename(connection_file)
     kernel_id = re.sub(r"kernel-(.*)\.json", r"\1", connection_filename)
     return kernel_id
