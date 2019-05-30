@@ -1,4 +1,5 @@
-Bookstore REST API
-==================
+REST API
+========
+
 
 .. openapi:: bookstore_api.yaml
