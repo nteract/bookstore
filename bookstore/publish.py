@@ -5,6 +5,9 @@ from notebook.base.handlers import APIHandler, path_regex
 from tornado import web
 
 from .bookstore_config import BookstoreSettings
+from .s3_paths import s3_path
+from .s3_paths import s3_key
+from .s3_paths import s3_display_path
 from .utils import url_path_join
 
 
@@ -37,16 +40,21 @@ class BookstorePublishHandler(APIHandler):
         """Publish notebook model to the path"""
         if model['type'] != 'notebook':
             raise web.HTTPError(400, "bookstore only publishes notebooks")
+        content = model['content']
 
         full_s3_path = s3_path(
-            self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
+            self.bookstore_settings.s3_bucket,
+            self.bookstore_settings.published_prefix,
+            path,
         )
-        s3_key_file = s3_key(self.bookstore_settings.published_prefix, path)
+        file_key = s3_key(self.bookstore_settings.published_prefix, path)
 
         self.log.info(
             "Publishing to %s",
             s3_display_path(
-                self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
+                self.bookstore_settings.s3_bucket,
+                self.bookstore_settings.published_prefix,
+                path,
             ),
         )
 
@@ -60,7 +68,7 @@ class BookstorePublishHandler(APIHandler):
             self.log.info("Processing published write of %s", path)
             obj = await client.put_object(
                 Bucket=self.bookstore_settings.s3_bucket,
-                Key=s3_key_file,
+                Key=file_key,
                 Body=json.dumps(model['content']),
             )
             self.log.info("Done with published write of %s", path)
