@@ -45,7 +45,7 @@ class BookstorePublishHandler(APIHandler):
         full_s3_path = s3_path(
             self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
         )
-        file_key = s3_key(self.bookstore_settings.published_prefix, path)
+        s3_object_key = s3_key(self.bookstore_settings.published_prefix, path)
 
         self.log.info(
             "Publishing to %s",
@@ -64,7 +64,7 @@ class BookstorePublishHandler(APIHandler):
             self.log.info("Processing published write of %s", path)
             obj = await client.put_object(
                 Bucket=self.bookstore_settings.s3_bucket,
-                Key=file_key,
+                Key=s3_object_key,
                 Body=json.dumps(model['content']),
             )
             self.log.info("Done with published write of %s", path)
