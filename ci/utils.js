@@ -9,7 +9,7 @@ const url_path_join = function(...pieces) {
   // """
   const initial = pieces[0].startsWith("/");
   const final = pieces[pieces.length - 1].endsWith("/");
-  const result = pieces
+  let result = pieces
     .filter(el => el !== "")
     .map(el => el.replace(/(^[ /]+)|([/]+$)/g, ""))
     .join("/");
