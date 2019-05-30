@@ -43,18 +43,14 @@ class BookstorePublishHandler(APIHandler):
         content = model['content']
 
         full_s3_path = s3_path(
-            self.bookstore_settings.s3_bucket,
-            self.bookstore_settings.published_prefix,
-            path,
+            self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
         )
         file_key = s3_key(self.bookstore_settings.published_prefix, path)
 
         self.log.info(
             "Publishing to %s",
             s3_display_path(
-                self.bookstore_settings.s3_bucket,
-                self.bookstore_settings.published_prefix,
-                path,
+                self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
             ),
         )
 
