@@ -27,9 +27,7 @@ jupyter notebook --NotebookApp.allow_origin="*" --NotebookApp.disable_check_xsrf
 Additional examples
 -------------------
 
-
-
-
+See the docstring under the ``if __name__`` statement below.
 """
 import nbformat
 import pprint
