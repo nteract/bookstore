@@ -14,7 +14,6 @@ class BookstoreClient(CurrentNotebookClient):
 
     @property
     def publish_endpoint(self):
-        # TODO: refactor to /api/bookstore/publish/ ?
         api_endpoint = "/api/bookstore/published/"
         return f"{self.url}{api_endpoint}"
 
@@ -32,7 +31,6 @@ class BookstoreClient(CurrentNotebookClient):
 
     @property
     def clone_endpoint(self):
-        # TODO: refactor to /api/bookstore/clone/ ?
         api_endpoint = "/api/bookstore/cloned/"
         return f"{self.url}{api_endpoint}"
 
