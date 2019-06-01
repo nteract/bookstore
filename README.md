@@ -96,5 +96,6 @@ c.BookstoreSettings.s3_secret_access_key = <AWS Secret Access Key / IAM Secret A
 If you are developing on bookstore you will want to run the ci tests locally and to make releases.
 
 Use [CONTRIBUTING.md](./CONTRIBUTING.md) to learn more about contributing.
-Use [running_ci_locally.md](./running_ci_locally.md) to learn more about running ci tests locally. 
-Use [RELEASING.md](./RELEASING.md) to learn more about releasing bookstore. 
+Use [running_ci_locally.md](./running_ci_locally.md) to learn more about running ci tests locally.
+Use [running_python_tests.md](./running_python_tests.md) to learn about running tests locally.
+Use [RELEASING.md](./RELEASING.md) to learn more about releasing bookstore.

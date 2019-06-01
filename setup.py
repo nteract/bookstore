@@ -95,6 +95,7 @@ setup(
             'pytest-cov',
             'pytest-mock',
             'black',
+            'tox',
         ],
     },
     data_files=data_files,
