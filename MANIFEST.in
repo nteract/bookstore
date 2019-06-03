@@ -6,9 +6,10 @@ recursive-include bookstore *.keep
 recursive-include bookstore *.txt
 
 include setup.py
-include requirements.txt
-include requirements-dev.txt
-include README.rst
+include requirements*.txt
+include tox.ini
+include pytest.ini
+include README.md
 include LICENSE
 include MANIFEST.in
 include *.md
@@ -16,13 +17,12 @@ include *.toml
 
 include bookstore/_version.py
 include bookstore/clone.html
-include .coveragerc
 
 # Documentation
 graft docs
 # exclude build files
 prune docs/_build
-# exclude sample notebooks for binder
-prune binder/
 # Scripts
 graft scripts
+# Test env
+prune .tox
