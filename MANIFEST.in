@@ -5,15 +5,24 @@ recursive-include bookstore *.yaml
 recursive-include bookstore *.keep
 recursive-include bookstore *.txt
 
+recursive-include ci *.js
+recursive-include ci *.py
+recursive-include ci *.sh
+
 include setup.py
 include requirements*.txt
 include tox.ini
 include pytest.ini
+include mypy.ini
 include README.md
 include LICENSE
 include MANIFEST.in
 include *.md
 include *.toml
+include *.example
+include *.json
+include *.yaml
+include *.yml
 
 include bookstore/_version.py
 include bookstore/clone.html
@@ -26,3 +35,7 @@ prune docs/_build
 graft scripts
 # Test env
 prune .tox
+prune .flake8
+prune .circleci
+prune .readthedocs.yml
+prune .precommit-config.yaml
