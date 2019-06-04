@@ -25,5 +25,3 @@ install:
   - pip install tox
 script:
   - tox -e $TOXENV
-after_success:
-  - codecov
