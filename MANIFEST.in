@@ -14,6 +14,7 @@ include requirements*.txt
 include tox.ini
 include pytest.ini
 include mypy.ini
+include .coveragerc
 include README.md
 include LICENSE
 include MANIFEST.in
