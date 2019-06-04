@@ -25,7 +25,7 @@ tox -e py36  # or py37
 
 This will run the tests and display coverage information.
 
-## Runlinters
+## Run linters
 
 ```bash
 tox -e flake8
