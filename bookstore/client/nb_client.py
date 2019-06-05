@@ -18,9 +18,9 @@ Example
   'token': '',
   'url': 'http://localhost:8888/'}]
 """
+import json
 import os
 import re
-import json
 from copy import deepcopy
 from typing import NamedTuple
 
@@ -30,6 +30,7 @@ from notebook.notebookapp import list_running_servers
 
 
 def extract_kernel_id(connection_file):
+    # regex is used as a more robust approach than lstrip
     connection_filename = os.path.basename(connection_file)
     kernel_id = re.sub(r"kernel-(.*)\.json", r"\1", connection_filename)
     return kernel_id
@@ -218,4 +219,5 @@ class CurrentNotebookClient(NotebookClient):
 
     @property
     def kernel_id(self):
+        # TODO determine if extract kernel id is used more than once
         return extract_kernel_id(self.connection_file)

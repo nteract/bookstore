@@ -1,4 +1,4 @@
-const url_path_join = function(...pieces) {
+const url_path_join = function (...pieces) {
   // """Join components of url into a relative url
   // Use to prevent double slash when joining subpaths.
   // This will leave the initial and final / in place

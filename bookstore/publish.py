@@ -1,15 +1,13 @@
 import json
 
 import aiobotocore
-
-from notebook.base.handlers import APIHandler
-from notebook.base.handlers import path_regex
+from notebook.base.handlers import APIHandler, path_regex
 from tornado import web
 
+from .bookstore_config import BookstoreSettings
 from .s3_paths import s3_path
 from .s3_paths import s3_key
 from .s3_paths import s3_display_path
-from .bookstore_config import BookstoreSettings
 from .utils import url_path_join
 
 
@@ -22,7 +20,7 @@ class BookstorePublishHandler(APIHandler):
         self.session = aiobotocore.get_session()
 
     @web.authenticated
-    async def put(self, path=''):
+    async def put(self, path):
         """Publish a notebook on a given path.
 
         The payload directly matches the contents API for PUT.
@@ -47,7 +45,7 @@ class BookstorePublishHandler(APIHandler):
         full_s3_path = s3_path(
             self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
         )
-        file_key = s3_key(self.bookstore_settings.published_prefix, path)
+        s3_object_key = s3_key(self.bookstore_settings.published_prefix, path)
 
         self.log.info(
             "Publishing to %s",
@@ -65,7 +63,9 @@ class BookstorePublishHandler(APIHandler):
         ) as client:
             self.log.info("Processing published write of %s", path)
             obj = await client.put_object(
-                Bucket=self.bookstore_settings.s3_bucket, Key=file_key, Body=json.dumps(content)
+                Bucket=self.bookstore_settings.s3_bucket,
+                Key=s3_object_key,
+                Body=json.dumps(model['content']),
             )
             self.log.info("Done with published write of %s", path)
 
