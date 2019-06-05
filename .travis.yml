@@ -1,38 +1,27 @@
-dist: xenial
 language: python
 sudo: false
-cache:
-  - pip
-install:
-  - pip install --upgrade pip
-  - pip install --upgrade -r requirements-dev.txt
-  - pip install --upgrade -r requirements.txt
-  - pip freeze
-  - pip install .
-script:
-  - $TEST_CMD
-after_success:
-  - codecov
 matrix:
   include:
-    - name: "mypy"
-      python: 3.6
-      env:
-        - TEST_CMD="mypy bookstore --ignore-missing-imports"
-    - name: "black"
-      python: 3.6
-      env:
-        - TEST_CMD="black --check --verbose ."
-    - name: "flake8"
-      python: 3.6
-      env:
-        - TEST_CMD="flake8 bookstore"
-    - name: "py36"
-      python: 3.6
-      env:
-        - TEST_CMD="pytest -v --maxfail=2 bookstore/tests"
-    - name: "py37"
-      python: 3.7
-      env:
-        - TEST_CMD="pytest -v --maxfail=2 bookstore/tests"
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 3.7
+      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
+      sudo: required  # required for Python 3.7 (travis-ci/travis-ci#9069)
+      env: TOXENV=py37
+    - python: 3.6
+      env: TOXENV=flake8
+    - python: 3.6
+      env: TOXENV=black
+    - python: 3.6
+      env: TOXENV=mypy
+    - python: 3.6
+      env: TOXENV=dist
+    - python: 3.6
+      env: TOXENV=docs
+    - python: 3.6
+      env: TOXENV=manifest
 
+install:
+  - pip install tox
+script:
+  - tox -e $TOXENV

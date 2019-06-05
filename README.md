@@ -3,6 +3,7 @@
 [![Documentation Status](https://readthedocs.org/projects/bookstore/badge/?version=latest)](https://bookstore.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/nteract/bookstore.svg?branch=master)](https://travis-ci.org/nteract/bookstore)
 [![CircleCI](https://circleci.com/gh/nteract/bookstore.svg?style=svg)](https://circleci.com/gh/nteract/bookstore)
+[![Codecov](https://codecov.io/gh/nteract/bookstore/branch/master/graph/badge.svg)](https://codecov.io/gh/codecov/example-python)
 
 **bookstore** :books: provides tooling and workflow recommendations for storing :cd:, scheduling :calendar:, and publishing :book: notebooks.
 
