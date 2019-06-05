@@ -3,16 +3,16 @@ servers:
   - url: http://localhost:8888
     description: Local Server
 info:
-  title: Bookstore public API
+  title: Bookstore public API 
   description: Bookstore API docs
   termsOfService: http://swagger.io/terms/
   license:
     name: BSD 3-clause
-    url: https://github.com/nteract/bookstore/blob/master/LICENSE
+    url: https://github.com/nteract/bookstore/blob/master/LICENSE 
   version: 2.3.0.dev0
 externalDocs:
   description: Find out more about Bookstore
-  url: https://bookstore.readthedocs.io/en/latest/
+  url: https://bookstore.readthedocs.io/en/latest/ 
 paths:
   /api/bookstore:
     get:
@@ -62,7 +62,7 @@ paths:
       - clone
       summary: Trigger clone from s3
       requestBody:
-        description: Information about which notebook to clone from s3
+        description: Information about which notebook to clone from s3 
         content:
           application/json:
             schema:
@@ -72,14 +72,14 @@ paths:
         200:
           description: Successfully cloned
           content:
-            application/json:
+            application/json: 
               schema:
                 $ref: '#/components/schemas/Contents'
         400:
           description: Must have a key to clone from
           content: {}
   /api/bookstore/published/{path}:
-    put:
+    put: 
       tags:
       - publish
       parameters:
@@ -91,13 +91,13 @@ paths:
           description: Path to publish to, it will be prefixed by the preconfigured published bucket.
       summary: Publish a notebook to s3
       requestBody:
-        description: Information about the notebook contents to publish to s3
+        description: Information about the notebook contents to publish to s3 
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Contents'
         required: true
-
+      
       responses:
         200:
           description: Successfully published.
@@ -110,11 +110,11 @@ components:
   schemas:
     S3CloneFile:
       type: object
-      required:
+      required: 
         - s3_bucket
         - s3_key
       properties:
-        s3_bucket:
+        s3_bucket: 
           type: string
         s3_key:
           type: string
@@ -190,7 +190,7 @@ components:
           type: boolean
         archive_validation:
           type: boolean
-        published_validation:
+        published_validation: 
           type: boolean
     VersionInfo:
       type: object
@@ -201,5 +201,5 @@ components:
           type: boolean
         version:
           type: string
-        validation:
+        validation: 
           $ref: '#/components/schemas/ValidationInfo'
