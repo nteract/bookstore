@@ -58,7 +58,7 @@ class TestCloneHandler(AsyncTestCase):
         expected = {
             's3_bucket': 'hello',
             's3_key': 'my_key',
-            'clone_api_url': 'https://localhost:8888/bookstore/clone',
+            'clone_api_url': 'https://localhost:8888/api/bookstore/clone',
             'redirect_contents_url': 'https://localhost:8888',
         }
         success_handler = self.get_handler('/bookstore/clone?s3_bucket=hello&s3_key=my_key')
@@ -72,7 +72,7 @@ class TestCloneHandler(AsyncTestCase):
         expected = {
             's3_bucket': 'hello',
             's3_key': 'my_key',
-            'clone_api_url': 'https://localhost:8888/my_base_url/bookstore/clone',
+            'clone_api_url': 'https://localhost:8888/my_base_url/api/bookstore/clone',
             'redirect_contents_url': 'https://localhost:8888',
         }
         for base_url in base_url_list:
@@ -84,7 +84,7 @@ class TestCloneHandler(AsyncTestCase):
             )
 
             success_handler = self.get_handler(
-                '/api/bookstore/clone?s3_bucket=hello&s3_key=my_key', app=mock_app
+                '/bookstore/clone?s3_bucket=hello&s3_key=my_key', app=mock_app
             )
             output = success_handler.construct_template_params(
                 s3_bucket="hello", s3_object_key="my_key"

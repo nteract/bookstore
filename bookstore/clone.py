@@ -16,7 +16,7 @@ BOOKSTORE_FILE_LOADER = FileSystemLoader(PACKAGE_DIR)
 
 
 class BookstoreCloneHandler(IPythonHandler):
-    """Handle notebook clone from storage.
+    """Prepares and provides clone options page, populating UI with clone option parameters.
 
     Provides handling for ``GET`` requests when cloning a notebook
     from storage (S3). Launches a user interface with cloning options.
@@ -47,15 +47,18 @@ class BookstoreCloneHandler(IPythonHandler):
 
         Renders an options page that will allow you to clone a notebook
         from a specific bucket via the Bookstore cloning API.
+
+        s3_bucket is the bucket you wish to clone from.
+        s3_key is the object key that you wish to clone.
         """
         s3_bucket = self.get_argument("s3_bucket")
         if s3_bucket == '' or s3_bucket == "/":
-            raise web.HTTPError(400, "Must have a bucket to clone from")
+            raise web.HTTPError(400, "Requires an S3 bucket in order to clone")
 
         # s3_paths module has an s3_key function; s3_object_key avoids confusion
         s3_object_key = self.get_argument("s3_key")
         if s3_object_key == '' or s3_object_key == '/':
-            raise web.HTTPError(400, "Must have a key to clone from")
+            raise web.HTTPError(400, "Requires an S3 object key in order to clone")
 
         self.log.info("Setting up cloning landing page from %s", s3_object_key)
 
@@ -73,7 +76,7 @@ class BookstoreCloneHandler(IPythonHandler):
             Template parameters in a dictionary
         """
         base_uri = f"{self.request.protocol}://{self.request.host}"
-        clone_api_url = url_path_join(base_uri, self.base_url, "/api/bookstore/cloned")
+        clone_api_url = url_path_join(base_uri, self.base_url, "/api/bookstore/clone")
         redirect_contents_url = url_path_join(base_uri, self.default_url)
         template_params = {
             "s3_bucket": s3_bucket,
