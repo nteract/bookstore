@@ -18,9 +18,8 @@ BOOKSTORE_FILE_LOADER = FileSystemLoader(PACKAGE_DIR)
 class BookstoreCloneHandler(IPythonHandler):
     """Handle notebook clone from storage.
 
-    Provides API handling for ``GET`` and ``POST`` when cloning a notebook
-    from storage (S3). Launches a user interface cloning options page when
-    ``GET`` is sent.
+    Provides handling for ``GET`` requests when cloning a notebook
+    from storage (S3). Launches a user interface with cloning options.
 
     Methods
     -------
@@ -30,8 +29,6 @@ class BookstoreCloneHandler(IPythonHandler):
         Checks for valid storage settings and render a UI for clone options.
     construct_template_params(self, s3_bucket, s3_object_key)
         Helper to populate Jinja template for cloning option page.
-    post(self)
-        Clone a notebook from the location specified by the payload.
     get_template(self, name)
         Loads a Jinja template and its related settings.
 
@@ -46,10 +43,10 @@ class BookstoreCloneHandler(IPythonHandler):
 
     @web.authenticated
     async def get(self):
-        """GET /api/bookstore/cloned
+        """GET /bookstore/clone?s3_bucket=<your_s3_bucket>&s3_key=<your_s3_key>
 
         Renders an options page that will allow you to clone a notebook
-        from a specific bucket.
+        from a specific bucket via the Bookstore cloning API.
         """
         s3_bucket = self.get_argument("s3_bucket")
         if s3_bucket == '' or s3_bucket == "/":
@@ -87,22 +84,15 @@ class BookstoreCloneHandler(IPythonHandler):
 class BookstoreCloneAPIHandler(APIHandler):
     """Handle notebook clone from storage.
 
-    Provides API handling for ``GET`` and ``POST`` when cloning a notebook
-    from storage (S3). Launches a user interface cloning options page when
-    ``GET`` is sent.
+    Provides API handling for ``POST`` when cloning a notebook
+    from storage (S3).
 
     Methods
     -------
     initialize(self)
         Helper to access bookstore settings.
-    get(self)
-        Checks for valid storage settings and render a UI for clone options.
-    construct_template_params(self, s3_bucket, s3_object_key)
-        Helper to populate Jinja template for cloning option page.
     post(self)
         Clone a notebook from the location specified by the payload.
-    get_template(self, name)
-        Loads a Jinja template and its related settings.
 
     See also
     --------
