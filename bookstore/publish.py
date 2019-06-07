@@ -23,6 +23,8 @@ class BookstorePublishHandler(APIHandler):
     async def put(self, path):
         """Publish a notebook on a given path.
 
+        PUT /api/bookstore/publish
+
         The payload directly matches the contents API for PUT.
         """
         self.log.info("Attempt publishing to %s", path)

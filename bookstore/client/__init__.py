@@ -1,1 +1,1 @@
-from .bookstore import BookstoreClient
+from .store_client import BookstoreClient
