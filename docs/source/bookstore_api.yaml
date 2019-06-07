@@ -57,7 +57,7 @@ paths:
         400:
           description: Must have a key to clone from
           content: {}
-  /api/bookstore/cloned:
+  /api/bookstore/clone:
     post:
       tags:
       - clone
@@ -79,7 +79,7 @@ paths:
         400:
           description: Must have a key to clone from
           content: {}
-  /api/bookstore/published/{path}:
+  /api/bookstore/publish/{path}:
     put: 
       tags:
       - publish

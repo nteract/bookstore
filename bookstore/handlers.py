@@ -67,7 +67,7 @@ def load_jupyter_server_extension(nb_app):
             host_pattern,
             [
                 (
-                    url_path_join(base_bookstore_api_pattern, r"/published%s" % path_regex),
+                    url_path_join(base_bookstore_api_pattern, r"/publish%s" % path_regex),
                     BookstorePublishHandler,
                 )
             ],
@@ -76,10 +76,7 @@ def load_jupyter_server_extension(nb_app):
     web_app.add_handlers(
         host_pattern,
         [
-            (
-                url_path_join(base_bookstore_api_pattern, r"/cloned(?:/?)*"),
-                BookstoreCloneAPIHandler,
-            ),
+            (url_path_join(base_bookstore_api_pattern, r"/clone(?:/?)*"), BookstoreCloneAPIHandler),
             (url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"), BookstoreCloneHandler),
         ],
     )

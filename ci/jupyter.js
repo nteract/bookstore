@@ -102,7 +102,7 @@ class JupyterServer {
   async publishNotebook(path, notebook) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
-    const apiPath = "/api/bookstore/published/";
+    const apiPath = "/api/bookstore/publish/";
     const xhr = await ajax({
       url: url_path_join(this.endpoint, apiPath, path),
       responseType: "json",

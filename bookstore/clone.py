@@ -139,7 +139,7 @@ class BookstoreCloneAPIHandler(APIHandler):
 
     @web.authenticated
     async def post(self):
-        """POST /api/bookstore/cloned
+        """POST /api/bookstore/clone
 
         Clone a notebook to the path specified in the payload.
 
