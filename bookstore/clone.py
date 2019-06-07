@@ -64,7 +64,14 @@ class BookstoreCloneHandler(IPythonHandler):
         self.write(self.render_template('clone.html', **template_params))
 
     def construct_template_params(self, s3_bucket, s3_object_key):
-        """Helper that takes valid S3 parameters and populates UI template"""
+        """Helper that takes valid S3 parameters and populates UI template
+        
+        Returns
+        --------
+        
+        dict
+            Template parameters in a dictionary
+        """
         base_uri = f"{self.request.protocol}://{self.request.host}"
         clone_api_url = url_path_join(base_uri, self.base_url, "/api/bookstore/cloned")
         redirect_contents_url = url_path_join(base_uri, self.default_url)
