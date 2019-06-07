@@ -137,8 +137,7 @@ class NotebookClient:
         """Current notebook sessions. Reissues request on each call.
         """
         return {
-            session['kernel']['id']: NotebookSession(**session)
-            for session in self.get_sessions()
+            session['kernel']['id']: NotebookSession(**session) for session in self.get_sessions()
         }
 
     @property
@@ -203,9 +202,7 @@ class NotebookClientCollection:
             for session_id, session in session_dict.items():
                 if session.kernel.id == current_kernel_id:
                     return next(
-                        client
-                        for client in cls.nb_client_gen()
-                        if client.url == server_url
+                        client for client in cls.nb_client_gen() if client.url == server_url
                     )
 
 
