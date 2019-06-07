@@ -84,7 +84,7 @@ class BookstoreCloneHandler(IPythonHandler):
 class BookstoreCloneAPIHandler(APIHandler):
     """Handle notebook clone from storage.
 
-    Provides API handling for ``POST`` when cloning a notebook
+    Provides API handling for ``POST`` and clones a notebook
     from storage (S3).
 
     Methods
