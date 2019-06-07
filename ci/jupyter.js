@@ -124,7 +124,7 @@ class JupyterServer {
   populateCloneQuery(s3Bucket, s3Key) {
     return url_path_join(
       this.endpoint,
-      `/api/bookstore/cloned?s3_bucket=${s3Bucket}&s3_key=${s3Key}`
+      `/bookstore/clone?s3_bucket=${s3Bucket}&s3_key=${s3Key}`
     );
   }
   async cloneNotebook(s3Bucket, s3Key) {
