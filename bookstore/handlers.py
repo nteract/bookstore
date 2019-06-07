@@ -10,7 +10,7 @@ from ._version import __version__
 from .bookstore_config import BookstoreSettings
 from .bookstore_config import validate_bookstore
 from .publish import BookstorePublishHandler
-from .clone import BookstoreCloneHandler
+from .clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
 
 
 version = __version__
@@ -45,8 +45,9 @@ def load_jupyter_server_extension(nb_app):
     host_pattern = '.*$'
 
     # Always enable the version handler
-    base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
-    web_app.add_handlers(host_pattern, [(base_bookstore_pattern, BookstoreVersionHandler)])
+    base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/bookstore')
+    base_bookstore_api_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
+    web_app.add_handlers(host_pattern, [(base_bookstore_api_pattern, BookstoreVersionHandler)])
     bookstore_settings = BookstoreSettings(parent=nb_app)
     web_app.settings['bookstore'] = {
         "version": version,
@@ -66,7 +67,7 @@ def load_jupyter_server_extension(nb_app):
             host_pattern,
             [
                 (
-                    url_path_join(base_bookstore_pattern, r"/published%s" % path_regex),
+                    url_path_join(base_bookstore_api_pattern, r"/published%s" % path_regex),
                     BookstorePublishHandler,
                 )
             ],
@@ -74,5 +75,11 @@ def load_jupyter_server_extension(nb_app):
 
     web_app.add_handlers(
         host_pattern,
-        [(url_path_join(base_bookstore_pattern, r"/cloned(?:/?)*"), BookstoreCloneHandler)],
+        [
+            (
+                url_path_join(base_bookstore_api_pattern, r"/cloned(?:/?)*"),
+                BookstoreCloneAPIHandler,
+            ),
+            (url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"), BookstoreCloneHandler),
+        ],
     )
