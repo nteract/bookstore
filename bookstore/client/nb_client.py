@@ -30,6 +30,7 @@ from notebook.notebookapp import list_running_servers
 
 
 def extract_kernel_id(connection_file):
+    """Get the kernel id string from a file"""
     # regex is used as a more robust approach than lstrip
     connection_filename = os.path.basename(connection_file)
     kernel_id = re.sub(r"kernel-(.*)\.json", r"\1", connection_filename)
@@ -136,7 +137,8 @@ class NotebookClient:
         """Current notebook sessions. Reissues request on each call.
         """
         return {
-            session['kernel']['id']: NotebookSession(**session) for session in self.get_sessions()
+            session['kernel']['id']: NotebookSession(**session)
+            for session in self.get_sessions()
         }
 
     @property
@@ -201,7 +203,9 @@ class NotebookClientCollection:
             for session_id, session in session_dict.items():
                 if session.kernel.id == current_kernel_id:
                     return next(
-                        client for client in cls.nb_client_gen() if client.url == server_url
+                        client
+                        for client in cls.nb_client_gen()
+                        if client.url == server_url
                     )
 
 
@@ -219,5 +223,4 @@ class CurrentNotebookClient(NotebookClient):
 
     @property
     def kernel_id(self):
-        # TODO determine if extract kernel id is used more than once
         return extract_kernel_id(self.connection_file)
