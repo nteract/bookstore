@@ -84,6 +84,7 @@ setup(
             'mock',
             'mypy==0.660',
             'pytest>=3.3',
+            'pytest-asyncio',
             'pytest-cov',
             'pytest-mock',
             'black',
