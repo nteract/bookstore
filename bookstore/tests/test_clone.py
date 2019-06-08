@@ -10,7 +10,7 @@ from tornado.web import Application, HTTPError
 from tornado.httpserver import HTTPRequest
 
 
-from ..clone import BookstoreCloneHandler
+from ..clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
 
 
 class TestCloneHandler(AsyncTestCase):
@@ -30,15 +30,6 @@ class TestCloneHandler(AsyncTestCase):
             headers={"Host": "localhost:8888"},
             body=None,
             connection=connection,
-        )
-        return BookstoreCloneHandler(app, payload_request)
-
-    def post_handler(self, body_dict, app=None):
-        if app is None:
-            app = self.mock_application
-        body = json.dumps(body_dict).encode('utf-8')
-        payload_request = HTTPRequest(
-            method='POST', uri="/api/bookstore/cloned", headers=None, body=body, connection=Mock()
         )
         return BookstoreCloneHandler(app, payload_request)
 
@@ -103,6 +94,23 @@ class TestCloneHandler(AsyncTestCase):
             )
             assert expected == output
 
+
+class TestCloneAPIHandler(AsyncTestCase):
+    def setUp(self):
+        super().setUp()
+        self.mock_application = Mock(
+            spec=Application, ui_methods={}, ui_modules={}, settings={'jinja2_env': Environment()}
+        )
+
+    def post_handler(self, body_dict, app=None):
+        if app is None:
+            app = self.mock_application
+        body = json.dumps(body_dict).encode('utf-8')
+        payload_request = HTTPRequest(
+            method='POST', uri="/api/bookstore/cloned", headers=None, body=body, connection=Mock()
+        )
+        return BookstoreCloneAPIHandler(app, payload_request)
+
     @gen_test
     async def test_post_no_body(self):
         post_body_dict = {}
@@ -123,4 +131,3 @@ class TestCloneHandler(AsyncTestCase):
         empty_key_handler = self.post_handler(post_body_dict)
         with pytest.raises(HTTPError):
             await empty_key_handler.post()
-
