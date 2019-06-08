@@ -77,15 +77,7 @@ setup(
         'aioboto3',
     ],
     extras_require={
-        'docs': [
-            'sphinx>=2.0',
-            'recommonmark',
-            'm2r',
-            'sphinxcontrib-napoleon',
-            'sphinxcontrib-openapi',
-            'boto3==1.9.91',
-            'botocore>=1.12.91,<1.12.92',
-        ],
+        'docs': ['sphinx', 'm2r', 'sphinxcontrib-napoleon', 'sphinxcontrib-openapi'],
         'test': [
             'codecov',
             'coverage',
