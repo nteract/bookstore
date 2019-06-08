@@ -6,5 +6,3 @@ Bookstore Client
 
 .. automodule:: bookstore.client.store_client
     :members:
-    :undoc-members:
-    :show-inheritance:

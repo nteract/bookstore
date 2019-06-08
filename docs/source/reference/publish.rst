@@ -4,6 +4,6 @@ Publishing
 The ``publish`` module
 ----------------------
 
-.. automodule:: bookstore.clone
+.. automodule:: bookstore.publish
     :members:
     :show-inheritance:

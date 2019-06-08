@@ -6,5 +6,3 @@ Notebook Client
 
 .. automodule:: bookstore.client.nb_client
     :members:
-    :undoc-members:
-    :show-inheritance:
