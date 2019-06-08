@@ -9,5 +9,6 @@ Reference
    handlers
    s3_paths
    clone
+   publish
    nb_client
    store_client
