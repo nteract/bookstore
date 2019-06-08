@@ -1,10 +1,49 @@
 Notebook Client
 ===============
 
-``bookstore.client.nb_client``
-------------------------------
+The ``bookstore.client.nb_client`` module
+-----------------------------------------
 
-.. automodule:: bookstore.client.nb_client
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. module:: bookstore.client.nb_client
+
+``NotebookClient``
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: NotebookClient
+   :members:
+
+``NotebookClientCollection``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: NotebookClientCollection
+   :members:
+
+``CurrentNotebookClient``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: CurrentNotebookClient
+   :members:
+
+
+``LiveNotebookRecord``
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: LiveNotebookRecord
+   :members:
+
+``KernelInfo``
+~~~~~~~~~~~~~~
+
+.. autoclass:: KernelInfo
+   :members:
+
+``NotebookSession``
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: NotebookSession
+   :members:
+
+Helper Function
+~~~~~~~~~~~~~~~
+
+.. autofunction:: extract_kernel_id
