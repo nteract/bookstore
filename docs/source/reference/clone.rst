@@ -6,10 +6,10 @@ The ``clone`` module
 
 .. module:: bookstore.clone
 
-``BookstoreContentsArchiver``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``BookstoreCloneHandler``
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: BookstoreContentsArchiver
+.. autoclass:: BookstoreCloneHandler
    :members:
 
 ``BookstoreCloneAPIHandler``
