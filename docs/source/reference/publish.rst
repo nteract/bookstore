@@ -10,5 +10,10 @@ The ``publish`` module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: BookstorePublishHandler
-    :members:
-    :show-inheritance:
+
+Methods
+^^^^^^^
+
+.. automethod:: BookstorePublishHandler.initialize
+
+.. automethod:: BookstorePublishHandler.post

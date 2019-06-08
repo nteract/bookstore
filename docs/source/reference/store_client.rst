@@ -1,8 +1,14 @@
 Bookstore Client
 ================
 
-``bookstore.client.store_client``
----------------------------------
+The ``bookstore.client.store_client`` module
+--------------------------------------------
 
-.. automodule:: bookstore.client.store_client
-    :members:
+.. module:: bookstore.client.store_client
+
+``BookstoreClient``
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: BookstoreClient
+   :members:
+   :show-inheritance:
