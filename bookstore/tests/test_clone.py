@@ -1,13 +1,17 @@
+import json
+
 from unittest.mock import Mock
 
 import pytest
+
+from jinja2 import Environment
 from tornado.testing import AsyncTestCase, gen_test
 from tornado.web import Application, HTTPError
 from tornado.httpserver import HTTPRequest
+from traitlets.config import Config
 
-from jinja2 import Environment
 
-from ..clone import BookstoreCloneHandler
+from ..clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
 
 
 class TestCloneHandler(AsyncTestCase):
@@ -90,3 +94,68 @@ class TestCloneHandler(AsyncTestCase):
                 s3_bucket="hello", s3_object_key="my_key"
             )
             assert expected == output
+
+
+class TestCloneAPIHandler(AsyncTestCase):
+    def setUp(self):
+        super().setUp()
+        mock_settings = {
+            "BookstoreSettings": {
+                "s3_access_key_id": "mock_id",
+                "s3_secret_access_key": "mock_access",
+            }
+        }
+        config = Config(mock_settings)
+
+        self.mock_application = Mock(
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            settings={'jinja2_env': Environment(), "config": config},
+        )
+
+    def post_handler(self, body_dict, app=None):
+        if app is None:
+            app = self.mock_application
+        body = json.dumps(body_dict).encode('utf-8')
+        payload_request = HTTPRequest(
+            method='POST', uri="/api/bookstore/cloned", headers=None, body=body, connection=Mock()
+        )
+        return BookstoreCloneAPIHandler(app, payload_request)
+
+    @gen_test
+    async def test_post_no_body(self):
+        post_body_dict = {}
+        empty_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_handler.post()
+
+    @gen_test
+    async def test_post_empty_bucket(self):
+        post_body_dict = {"s3_key": "my_key", "s3_bucket": ""}
+        empty_bucket_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_bucket_handler.post()
+
+    @gen_test
+    async def test_post_empty_key(self):
+        post_body_dict = {"s3_key": "", "s3_bucket": "my_bucket"}
+        empty_key_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_key_handler.post()
+
+    @gen_test
+    async def test_post_nonsense_params(self):
+        post_body_dict = {"s3_key": "my_key", "s3_bucket": "my_bucket"}
+        success_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await success_handler.post()
+
+    @gen_test
+    async def test_private_clone_nonsense_params(self):
+        s3_bucket = "my_key"
+        s3_object_key = "my_bucket"
+        post_body_dict = {"s3_key": s3_object_key, "s3_bucket": s3_bucket}
+        success_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await success_handler._clone(s3_bucket, s3_object_key)
