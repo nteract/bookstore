@@ -4,6 +4,16 @@ Cloning
 The ``clone`` module
 --------------------
 
-.. automodule:: bookstore.clone
-    :members:
-    :show-inheritance:
+.. module:: bookstore.clone
+
+``BookstoreContentsArchiver``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: BookstoreContentsArchiver
+   :members:
+
+``BookstoreCloneAPIHandler``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass: BookstoreCloneAPIHandler
+   :members:

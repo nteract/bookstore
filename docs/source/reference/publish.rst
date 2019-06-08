@@ -4,6 +4,11 @@ Publishing
 The ``publish`` module
 ----------------------
 
-.. automodule:: bookstore.publish
+.. module:: bookstore.publish
+
+``BookstorePublishHandler``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: BookstorePublishHandler
     :members:
     :show-inheritance:
