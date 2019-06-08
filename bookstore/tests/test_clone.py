@@ -8,6 +8,7 @@ from jinja2 import Environment
 from tornado.testing import AsyncTestCase, gen_test
 from tornado.web import Application, HTTPError
 from tornado.httpserver import HTTPRequest
+from traitlets.config import Config
 
 
 from ..clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
@@ -98,8 +99,19 @@ class TestCloneHandler(AsyncTestCase):
 class TestCloneAPIHandler(AsyncTestCase):
     def setUp(self):
         super().setUp()
+        mock_settings = {
+            "BookstoreSettings": {
+                "s3_access_key_id": "mock_id",
+                "s3_secret_access_key": "mock_access",
+            }
+        }
+        config = Config(mock_settings)
+
         self.mock_application = Mock(
-            spec=Application, ui_methods={}, ui_modules={}, settings={'jinja2_env': Environment()}
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            settings={'jinja2_env': Environment(), "config": config},
         )
 
     def post_handler(self, body_dict, app=None):
