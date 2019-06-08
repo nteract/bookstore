@@ -1,8 +1,8 @@
-Cloning
-=======
+Publishing
+==========
 
-The ``clone`` module
---------------------
+The ``publish`` module
+----------------------
 
 .. automodule:: bookstore.clone
     :members:

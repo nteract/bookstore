@@ -21,7 +21,7 @@ Table of Contents
    configuration
    usage
    openapi
-   reference/bookstore
+   reference/index
    project/index
    changelog
 
