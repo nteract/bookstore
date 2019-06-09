@@ -1,5 +1,9 @@
+import asyncio
 import pytest
 
+from bookstore.publish import BookstorePublishHandler
 
-def test_hello():
-    assert 1000
+
+def test_create_publish_handler_no_params():
+    with pytest.raises(TypeError):
+        assert BookstorePublishHandler()
