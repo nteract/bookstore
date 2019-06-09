@@ -1,6 +1,6 @@
 """Tests for archive"""
+import asyncio
 import pytest
-from pytest import skip
 
 from bookstore.archive import ArchiveRecord, BookstoreContentsArchiver
 
@@ -14,7 +14,7 @@ def test_create_contentsarchiver_invalid_args_count():
         BookstoreContentsArchiver(42, True, 'hello')
 
 
-@pytest.mark.skip
+@pytest.mark.asyncio
 async def test_archive_failure_on_no_lock():
     archiver = BookstoreContentsArchiver()
     assert archiver
