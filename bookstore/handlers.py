@@ -24,20 +24,14 @@ class BookstoreVersionHandler(APIHandler):
 
     @web.authenticated
     def get(self):
-        self.finish(
-            json.dumps(
-                {
-                    "bookstore": True,
-                    "version": self.settings['bookstore']["version"],
-                    "validation": self.settings['bookstore']["validation"],
-                }
-            )
-        )
+        self.finish(json.dumps(self.build_response_dict()))
 
-
-# TODO: Add a check. Note: We need to ensure that publishing is not configured if bookstore settings are not
-#       set. Because of how the APIHandlers cannot be configurable, all we can do is reach into settings
-#       For applications this will mean checking the config and then applying it in
+    def build_response_dict(self):
+        return {
+            "bookstore": True,
+            "version": self.settings['bookstore']["version"],
+            "validation": self.settings['bookstore']["validation"],
+        }
 
 
 def load_jupyter_server_extension(nb_app):
