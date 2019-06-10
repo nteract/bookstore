@@ -1,5 +1,5 @@
 """Configuration settings for bookstore."""
-from traitlets import Int, Unicode
+from traitlets import Integer, Unicode
 from traitlets.config import LoggingConfigurable
 
 
@@ -57,7 +57,7 @@ class BookstoreSettings(LoggingConfigurable):
         config=True, env="JPYNB_S3_BUCKET"
     )
 
-    max_threads = Int(
+    max_threads = Integer(
         16, help="Maximum number of threads for the threadpool allocated for S3 read/writes"
     ).tag(config=True)
 
