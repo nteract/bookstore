@@ -137,3 +137,12 @@ class TestCloneAPIHandler(AsyncTestCase):
         get_handler = self.get_handler('/api/bookstore/')
         setattr(get_handler, '_transforms', [])
         get_handler.get()
+
+    def test_build_response(self):
+        empty_handler = self.get_handler('/api/bookstore/')
+        expected = {
+            'bookstore': True,
+            'validation': {'archive_valid': True, 'bookstore_valid': False, 'publish_valid': True},
+            'version': '2.3.0.dev',
+        }
+        assert empty_handler.build_response_dict() == expected
