@@ -20,21 +20,34 @@ class BookstoreVersionHandler(APIHandler):
     """Handler responsible for Bookstore version information
 
     Used to lay foundations for the bookstore package. Though, frontends can use this endpoint for feature detection.
+
+    Methods
+    -------
+    get(self)
+        Provides version info and feature availability based on serverside settings.
+    build_response_dict(self)
+        Helper to populate response.
     """
 
     @web.authenticated
     def get(self):
+        """GET /api/bookstore/
+
+        Returns version info and validation info for various bookstore features.
+        """
         self.finish(json.dumps(self.build_response_dict()))
 
     def build_response_dict(self):
+        """Helper for building the version handler's response before serialization."""
         return {
-            "bookstore": True,
+            "bookstore": True,  # TODO: Should we remove this; isn't it equivalent to the endpoint responding?
             "version": self.settings['bookstore']["version"],
             "validation": self.settings['bookstore']["validation"],
         }
 
 
 def build_settings_dict(validation):
+    """Helper for building the settings info that will be assigned to the web_app."""
     return {"version": version, "validation": validation}
 
 
