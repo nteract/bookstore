@@ -69,13 +69,16 @@ def test_collect_handlers_only_version():
     handlers = collect_handlers(log, '/', validation)
     assert expected == handlers
 
-@pytest.fixture
-def bookstore_settings():
+@pytest.fixture(scope="class")
+def bookstore_settings(request):
     mock_settings = {
         "BookstoreSettings": {"s3_access_key_id": "mock_id", "s3_secret_access_key": "mock_access"}
     }
     config = Config(mock_settings)
-    return BookstoreSettings(config=config)
+    bookstore_settings = BookstoreSettings(config=config)
+    if request.cls is not None:
+        request.cls.bookstore_settings = bookstore_settings
+    return bookstore_settings
 
 
 def test_build_settings_dict(bookstore_settings):
