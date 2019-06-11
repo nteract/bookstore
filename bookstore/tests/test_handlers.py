@@ -118,3 +118,22 @@ class TestCloneAPIHandler(AsyncTestCase):
             connection=connection,
         )
         return BookstoreVersionHandler(app, payload_request)
+
+    def test_get(self):
+        """This is a simple test of the get API at /api/bookstore
+
+        The most notable feature is the need to set _transforms on the handler.
+
+        The default value of handler()._transforms is `None`.
+        This is iterated over when handler().flush() is called, raising a TypeError.
+        
+        In normal usage, the application assigns this when it creates a handler delegate.
+
+        Because our mock application does not do this 
+        As a result this raises an error when self.finish() (and therefore self.flush()) is called.
+
+        At runtime on a live Jupyter server, application.transforms == [].
+        """
+        get_handler = self.get_handler('/api/bookstore/')
+        setattr(get_handler, '_transforms', [])
+        get_handler.get()
