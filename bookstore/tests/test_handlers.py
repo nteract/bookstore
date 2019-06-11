@@ -1,4 +1,6 @@
 """Tests for handlers"""
+from unittest.mock import Mock
+
 import pytest
 import logging
 from unittest.mock import Mock
@@ -8,7 +10,9 @@ from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
 from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
 from bookstore.publish import BookstorePublishAPIHandler
 from notebook.base.handlers import path_regex
-from tornado.web import Application
+from tornado.testing import AsyncTestCase
+from tornado.web import Application, HTTPError
+from tornado.httpserver import HTTPRequest
 from traitlets.config import Config
 
 log = logging.getLogger('test_handlers')
@@ -87,3 +91,30 @@ def test_build_settings_dict(bookstore_settings):
         'version': '2.3.0.dev',
     }
     assert expected == build_settings_dict(bookstore_settings)
+
+
+@pytest.mark.usefixtures("bookstore_settings")
+class TestCloneAPIHandler(AsyncTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.mock_application = Mock(
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            settings={"bookstore": build_settings_dict(self.bookstore_settings)},
+            transforms=[],
+        )
+
+    def get_handler(self, uri, app=None):
+        if app is None:
+            app = self.mock_application
+        connection = Mock(context=Mock(protocol="https"))
+        payload_request = HTTPRequest(
+            method='GET',
+            uri=uri,
+            headers={"Host": "localhost:8888"},
+            body=None,
+            connection=connection,
+        )
+        return BookstoreVersionHandler(app, payload_request)
