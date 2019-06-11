@@ -34,6 +34,10 @@ class BookstoreVersionHandler(APIHandler):
         }
 
 
+def build_settings_dict(bookstore_settings):
+    return {"version": version, "validation": validate_bookstore(bookstore_settings)}
+
+
 def load_jupyter_server_extension(nb_app):
     web_app = nb_app.web_app
     host_pattern = '.*$'
