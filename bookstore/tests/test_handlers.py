@@ -13,6 +13,7 @@ from traitlets.config import Config
 
 log = logging.getLogger('test_handlers')
 
+from traitlets.config import Config
 
 def test_handlers():
     pass
