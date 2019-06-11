@@ -34,8 +34,8 @@ class BookstoreVersionHandler(APIHandler):
         }
 
 
-def build_settings_dict(bookstore_settings):
-    return {"version": version, "validation": validate_bookstore(bookstore_settings)}
+def build_settings_dict(validation):
+    return {"version": version, "validation": validation}
 
 
 def load_jupyter_server_extension(nb_app):
@@ -46,7 +46,7 @@ def load_jupyter_server_extension(nb_app):
 
     bookstore_settings = BookstoreSettings(parent=nb_app)
     validation = validate_bookstore(bookstore_settings)
-    web_app.settings['bookstore'] = {"version": version, "validation": validation}
+    web_app.settings['bookstore'] = build_settings_dict(validation)
     handlers = collect_handlers(nb_app.log, base_url, validation)
     web_app.add_handlers(host_pattern, handlers)
 

@@ -3,7 +3,7 @@ import pytest
 import logging
 from unittest.mock import Mock
 
-from bookstore.handlers import collect_handlers, BookstoreVersionHandler
+from bookstore.handlers import collect_handlers, build_settings_dict, BookstoreVersionHandler
 from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
 from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
 from bookstore.publish import BookstorePublishAPIHandler
@@ -60,7 +60,6 @@ def test_collect_handlers_no_publish():
     handlers = collect_handlers(log, '/', validation)
     assert expected == handlers
 
-
 def test_collect_handlers_only_version():
     expected = [('/api/bookstore', BookstoreVersionHandler)]
     web_app = Application()
@@ -69,3 +68,19 @@ def test_collect_handlers_only_version():
     validation = validate_bookstore(bookstore_settings)
     handlers = collect_handlers(log, '/', validation)
     assert expected == handlers
+
+@pytest.fixture
+def bookstore_settings():
+    mock_settings = {
+        "BookstoreSettings": {"s3_access_key_id": "mock_id", "s3_secret_access_key": "mock_access"}
+    }
+    config = Config(mock_settings)
+    return BookstoreSettings(config=config)
+
+
+def test_build_settings_dict(bookstore_settings):
+    expected = {
+        'validation': {'archive_valid': True, 'bookstore_valid': False, 'publish_valid': True},
+        'version': '2.3.0.dev',
+    }
+    assert expected == build_settings_dict(bookstore_settings)
