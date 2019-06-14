@@ -76,8 +76,8 @@ def validate_bookstore(settings: BookstoreSettings):
         Existence of settings by category (general, archive, publish)
     """
     general_settings = [settings.s3_bucket != "", settings.s3_endpoint_url != ""]
-    archive_settings = [settings.workspace_prefix != ""]
-    published_settings = [settings.published_prefix != ""]
+    archive_settings = [*general_settings, settings.workspace_prefix != ""]
+    published_settings = [*general_settings, settings.published_prefix != ""]
 
     validation_checks = {
         "bookstore_valid": all(general_settings),
