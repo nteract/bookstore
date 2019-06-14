@@ -1,5 +1,5 @@
 """Configuration settings for bookstore."""
-from traitlets import Integer, Unicode
+from traitlets import Integer, Unicode, Bool
 from traitlets.config import LoggingConfigurable
 
 
@@ -39,6 +39,7 @@ class BookstoreSettings(LoggingConfigurable):
         config=True
     )
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
+    enable_cloning = Bool(True, help="Explicitly enable or disable cloning.").tag(config=True)
 
     s3_access_key_id = Unicode(
         help="S3/AWS access key ID", allow_none=True, default_value=None
@@ -78,10 +79,12 @@ def validate_bookstore(settings: BookstoreSettings):
     general_settings = [settings.s3_bucket != "", settings.s3_endpoint_url != ""]
     archive_settings = [*general_settings, settings.workspace_prefix != ""]
     published_settings = [*general_settings, settings.published_prefix != ""]
+    cloning_settings = [settings.enable_cloning]
 
     validation_checks = {
         "bookstore_valid": all(general_settings),
         "archive_valid": all(archive_settings),
         "publish_valid": all(published_settings),
+        "cloning_valid": all(cloning_settings),
     }
     return validation_checks
