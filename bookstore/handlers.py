@@ -44,39 +44,63 @@ def load_jupyter_server_extension(nb_app):
     web_app = nb_app.web_app
     host_pattern = '.*$'
 
-    # Always enable the version handler
-    base_bookstore_pattern = url_path_join(web_app.settings['base_url'], '/bookstore')
-    base_bookstore_api_pattern = url_path_join(web_app.settings['base_url'], '/api/bookstore')
-    web_app.add_handlers(host_pattern, [(base_bookstore_api_pattern, BookstoreVersionHandler)])
+    base_url = web_app.settings['base_url']
+
     bookstore_settings = BookstoreSettings(parent=nb_app)
-    web_app.settings['bookstore'] = {
-        "version": version,
-        "validation": validate_bookstore(bookstore_settings),
-    }
+    validation = validate_bookstore(bookstore_settings)
+    web_app.settings['bookstore'] = {"version": version, "validation": validation}
+    handlers = collect_handlers(nb_app.log, base_url, validation)
+    web_app.add_handlers(host_pattern, handlers)
 
-    check_published = [
-        web_app.settings['bookstore']['validation'].get("bookstore_valid"),
-        web_app.settings['bookstore']['validation'].get("publish_valid"),
-    ]
 
-    if not all(check_published):
-        nb_app.log.info("[bookstore] Not enabling bookstore publishing, endpoint not configured")
-    else:
-        nb_app.log.info(f"[bookstore] Enabling bookstore publishing, version: {version}")
-        web_app.add_handlers(
-            host_pattern,
-            [
-                (
-                    url_path_join(base_bookstore_api_pattern, r"/publish%s" % path_regex),
-                    BookstorePublishHandler,
-                )
-            ],
+def collect_handlers(log, base_url, validation):
+    """Utility that collects bookstore endpoints & handlers to be added to the webapp.
+
+    This uses bookstore feature validation to determine which endpoints should be enabled.
+    It returns all valid pairs of endpoint patterns and handler classes. 
+
+    Parameters
+    ----------
+    log : logging.Logger
+      Log (usually from the NotebookApp) for logging endpoint changes.
+    base_url: str
+      The base_url to which we append routes.
+    validation: dict
+       Validation dictionary for determining which endpoints to enable.
+
+    Returns
+    --------
+    
+    List[Tuple[str, tornado.web.RequestHandler]]
+      List of pairs of endpoint patterns and the handler used to handle requests at that endpoint.
+    """
+    base_bookstore_pattern = url_path_join(base_url, '/bookstore')
+    base_bookstore_api_pattern = url_path_join(base_url, '/api/bookstore')
+
+    handlers = []
+    # Always enable the version handler for the API
+    handlers.append((base_bookstore_api_pattern, BookstoreVersionHandler))
+
+    if validation['publish_valid']:
+        log.info(f"[bookstore] Enabling bookstore publishing, version: {version}")
+        handlers.append(
+            (
+                url_path_join(base_bookstore_api_pattern, r"/publish%s" % path_regex),
+                BookstorePublishHandler,
+            )
         )
+    else:
+        log.info("[bookstore] Publishing disabled. s3_bucket or endpoint are not configured.")
 
-    web_app.add_handlers(
-        host_pattern,
-        [
-            (url_path_join(base_bookstore_api_pattern, r"/clone(?:/?)*"), BookstoreCloneAPIHandler),
-            (url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"), BookstoreCloneHandler),
-        ],
-    )
+    if validation['cloning_valid']:
+        log.info(f"[bookstore] Enabling bookstore cloning, version: {version}")
+        handlers.append(
+            (url_path_join(base_bookstore_api_pattern, r"/clone(?:/?)*"), BookstoreCloneAPIHandler)
+        ),
+        handlers.append(
+            (url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"), BookstoreCloneHandler)
+        )
+    else:
+        log.info(f"[bookstore] bookstore cloning disabled, version: {version}")
+
+    return handlers
