@@ -49,14 +49,15 @@ def load_jupyter_server_extension(nb_app):
     bookstore_settings = BookstoreSettings(parent=nb_app)
     validation = validate_bookstore(bookstore_settings)
     web_app.settings['bookstore'] = {"version": version, "validation": validation}
-    handlers = build_handlers(nb_app.log, base_url, validation)
+    handlers = collect_handlers(nb_app.log, base_url, validation)
     web_app.add_handlers(host_pattern, handlers)
 
 
-def build_handlers(log, base_url, validation):
-    """Utility for determinine which handlers should be added to the webapp.
+def collect_handlers(log, base_url, validation):
+    """Utility that collects bookstore endpoints & handlers to be added to the webapp.
 
-    This returns each endpoint path and its associated handler.
+    This uses bookstore feature validation to determine which endpoints should be enabled.
+    It returns all valid pairs of endpoint patterns and handler classes. 
 
     Parameters
     ----------
@@ -71,7 +72,7 @@ def build_handlers(log, base_url, validation):
     --------
     
     List[Tuple[str, tornado.web.RequestHandler]]
-        Template parameters in a dictionary
+      List of pairs of endpoint patterns and the handler used to handle requests at that endpoint.
     """
     base_bookstore_pattern = url_path_join(base_url, '/bookstore')
     base_bookstore_api_pattern = url_path_join(base_url, '/api/bookstore')
@@ -89,9 +90,7 @@ def build_handlers(log, base_url, validation):
             )
         )
     else:
-        log.info(
-            "[bookstore] Publishing disabled. s3_bucket or endpoint are not configured."
-        )
+        log.info("[bookstore] Publishing disabled. s3_bucket or endpoint are not configured.")
 
     if validation['cloning_valid']:
         log.info(f"[bookstore] Enabling bookstore cloning, version: {version}")
