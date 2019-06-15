@@ -3,6 +3,7 @@ import pytest
 from bookstore.client.nb_client import (
     NotebookSession,
     KernelInfo,
+    extract_kernel_id,
 )
 
 
@@ -60,3 +61,21 @@ def test_notebook_session_class(notebook_session, session_dict):
     assert notebook_session.kernel == KernelInfo(**session_dict["kernel"])
     assert notebook_session.notebook == session_dict["notebook"]
     assert notebook_session == NotebookSession(**session_dict)
+
+
+@pytest.mark.parametrize(
+    "connection_file, expected_kernel_id",
+    [
+        (
+            "kernel-f92b7c8b-0858-4d10-903c-b0631540fb36.json",
+            "f92b7c8b-0858-4d10-903c-b0631540fb36",
+        ),
+        (
+            "kernel-ee2b7c8b-0858-4d10-903c-b0631540fb36.json",
+            "ee2b7c8b-0858-4d10-903c-b0631540fb36",
+        ),
+    ],
+)
+def test_extract_kernel_id(connection_file, expected_kernel_id):
+    assert expected_kernel_id == extract_kernel_id(connection_file)
+
