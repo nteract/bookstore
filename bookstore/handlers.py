@@ -56,7 +56,7 @@ def load_jupyter_server_extension(nb_app):
 def build_handlers(log, base_url, validation):
     """Utility for determinine which handlers should be added to the webapp.
 
-    This returns both the paths that are to be added as well as 
+    This returns each endpoint path and its associated handler.
 
     Parameters
     ----------
@@ -77,7 +77,7 @@ def build_handlers(log, base_url, validation):
     base_bookstore_api_pattern = url_path_join(base_url, '/api/bookstore')
 
     handlers = []
-    # Always enable the version handler
+    # Always enable the version handler for the API
     handlers.append((base_bookstore_api_pattern, BookstoreVersionHandler))
 
     if validation['publish_valid']:
@@ -90,7 +90,7 @@ def build_handlers(log, base_url, validation):
         )
     else:
         log.info(
-            "[bookstore] Not enabling bookstore publishing, s3_bucket or endpoint not configured"
+            "[bookstore] Publishing disabled. s3_bucket or endpoint are not configured."
         )
 
     if validation['cloning_valid']:
@@ -102,6 +102,6 @@ def build_handlers(log, base_url, validation):
             (url_path_join(base_bookstore_pattern, r"/clone(?:/?)*"), BookstoreCloneHandler)
         )
     else:
-        log.info(f"[bookstore] Not enabling bookstore cloning, version: {version}")
+        log.info(f"[bookstore] bookstore cloning disabled, version: {version}")
 
     return handlers

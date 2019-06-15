@@ -39,7 +39,7 @@ class BookstoreSettings(LoggingConfigurable):
         config=True
     )
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
-    enable_cloning = Bool(True, help="Explicitly enable or disable cloning.").tag(config=True)
+    enable_cloning = Bool(True, help="Enable cloning.").tag(config=True)
 
     s3_access_key_id = Unicode(
         help="S3/AWS access key ID", allow_none=True, default_value=None

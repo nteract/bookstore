@@ -1,14 +1,12 @@
 """Tests for handlers"""
 import pytest
 import logging
-
 from unittest.mock import Mock
 
 from bookstore.handlers import build_handlers, BookstoreVersionHandler
 from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
 from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
 from bookstore.publish import BookstorePublishHandler
-
 from notebook.base.handlers import path_regex
 from tornado.web import Application
 from traitlets.config import Config
