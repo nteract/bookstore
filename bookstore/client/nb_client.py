@@ -78,6 +78,17 @@ class KernelInfo:
     def __repr__(self):
         return json.dumps(self.model, indent=2)
 
+    def __eq__(self, other):
+        if isinstance(other, KernelInfo):
+            cmp_attrs = [
+                self.id == other.id,
+                self.name == other.name,
+                self.last_activity == other.last_activity,
+                self.execution_state == other.execution_state,
+                self.connections == other.connections,
+            ]
+            return all(cmp_attrs)
+
 
 class NotebookSession:  # (NamedTuple):
     #     id: str #'68d9c58f-c57d-4133-8b41-5ec2731b268d',
@@ -85,9 +96,9 @@ class NotebookSession:  # (NamedTuple):
     #     name: str #'',
     #     type: str #'notebook',
     #     kernel: KernelInfo
-    #     notebook: dict # deprecated API {'path': 'Untitled38.ipynb', 'name': ''}}}
+    #     notebook: dict # deprecated API {'path': 'Untitled38.ipynb', 'name': ''}
 
-    def __init__(self, *args, path, name, type, kernel, notebook, **kwargs):
+    def __init__(self, *args, path, name, type, kernel, notebook={}, **kwargs):
         self.model = {
             "path": path,
             "name": name,
