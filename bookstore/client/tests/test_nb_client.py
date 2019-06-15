@@ -49,6 +49,7 @@ def test_kernel_info_class(kernel_info_dict, kernel_info):
     assert kernel_info.last_activity == kernel_info_dict["last_activity"]
     assert kernel_info.execution_state == kernel_info_dict['execution_state']
     assert kernel_info.connections == kernel_info_dict["connections"]
+    assert kernel_info == KernelInfo(**kernel_info_dict)
 
 
 def test_notebook_session_class(notebook_session, session_dict):
@@ -58,4 +59,4 @@ def test_notebook_session_class(notebook_session, session_dict):
     assert notebook_session.type == session_dict['type']
     assert notebook_session.kernel == KernelInfo(**session_dict["kernel"])
     assert notebook_session.notebook == session_dict["notebook"]
-
+    assert notebook_session == NotebookSession(**session_dict)

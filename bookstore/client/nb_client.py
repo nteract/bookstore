@@ -88,6 +88,8 @@ class KernelInfo:
                 self.connections == other.connections,
             ]
             return all(cmp_attrs)
+        else:
+            return false
 
 
 class NotebookSession:  # (NamedTuple):
@@ -114,6 +116,20 @@ class NotebookSession:  # (NamedTuple):
 
     def __repr__(self):
         return json.dumps(self.model, indent=2)
+
+    def __eq__(self, other):
+        if isinstance(other, NotebookSession):
+            cmp_attrs = [
+                # self.id == other.id,
+                self.path == other.path,
+                self.name == other.name,
+                self.type == other.type,
+                self.kernel == other.kernel,
+                self.notebook == other.notebook,
+            ]
+            return all(cmp_attrs)
+        else:
+            return false
 
 
 class NotebookClient:
