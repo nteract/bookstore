@@ -4,7 +4,30 @@ from bookstore.client.nb_client import (
     NotebookSession,
     KernelInfo,
     extract_kernel_id,
+    LiveNotebookRecord,
 )
+
+
+@pytest.fixture
+def notebook_server_dict():
+    notebook_server_dict = {
+        "base_url": "/",
+        "hostname": "localhost",
+        "notebook_dir": "/Users/username",
+        "password": False,
+        "pid": 20981,
+        "port": 8888,
+        "secure": False,
+        "token": "e5814788aeef225172364fcdf1240b90729169a2ced375c7",
+        "url": "http://localhost:8888/",
+    }
+    return notebook_server_dict
+
+
+@pytest.fixture
+def notebook_server_record(notebook_server_dict):
+    notebook_server_record = LiveNotebookRecord(**notebook_server_dict)
+    return notebook_server_record
 
 
 @pytest.fixture(scope="module")
@@ -44,6 +67,19 @@ def notebook_session(session_dict):
     return notebook_session
 
 
+def test_notebook_server_record(notebook_server_record, notebook_server_dict):
+    assert notebook_server_record.base_url == notebook_server_dict['base_url']
+    assert notebook_server_record.hostname == notebook_server_dict["hostname"]
+    assert notebook_server_record.notebook_dir == notebook_server_dict["notebook_dir"]
+    assert notebook_server_record.password == notebook_server_dict['password']
+    assert notebook_server_record.pid == notebook_server_dict["pid"]
+    assert notebook_server_record.port == notebook_server_dict["port"]
+    assert notebook_server_record.secure == notebook_server_dict["secure"]
+    assert notebook_server_record.token == notebook_server_dict["token"]
+    assert notebook_server_record.url == notebook_server_dict["url"]
+    assert notebook_server_record == LiveNotebookRecord(**notebook_server_dict)
+
+
 def test_kernel_info_class(kernel_info_dict, kernel_info):
     assert kernel_info.id == kernel_info_dict['id']
     assert kernel_info.name == kernel_info_dict["name"]
@@ -78,4 +114,3 @@ def test_notebook_session_class(notebook_session, session_dict):
 )
 def test_extract_kernel_id(connection_file, expected_kernel_id):
     assert expected_kernel_id == extract_kernel_id(connection_file)
-
