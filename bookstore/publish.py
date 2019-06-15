@@ -11,7 +11,7 @@ from .s3_paths import s3_display_path
 from .utils import url_path_join
 
 
-class BookstorePublishHandler(APIHandler):
+class BookstorePublishAPIHandler(APIHandler):
     """Publish a notebook to the publish path"""
 
     def initialize(self):

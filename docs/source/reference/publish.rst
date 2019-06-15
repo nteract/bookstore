@@ -6,14 +6,14 @@ The ``publish`` module
 
 .. module:: bookstore.publish
 
-``BookstorePublishHandler``
+``BookstorePublishAPIHandler``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: BookstorePublishHandler
+.. autoclass:: BookstorePublishAPIHandler
 
 Methods
 ^^^^^^^
 
-.. automethod:: BookstorePublishHandler.initialize
+.. automethod:: BookstorePublishAPIHandler.initialize
 
-.. automethod:: BookstorePublishHandler.post
+.. automethod:: BookstorePublishAPIHandler.post
