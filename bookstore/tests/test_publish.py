@@ -45,3 +45,15 @@ class TestPublishAPIHandler(AsyncTestCase):
             connection=connection,
         )
         return BookstorePublishAPIHandler(app, payload_request)
+
+    @gen_test
+    async def test_put_no_path(self):
+        empty_handler = self.put_handler('/bookstore/publish/')
+        with pytest.raises(HTTPError):
+            await empty_handler.put('')
+
+    @gen_test
+    async def test_put_no_body(self):
+        empty_handler = self.put_handler('/bookstore/publish/hi')
+        with pytest.raises(HTTPError):
+            await empty_handler.put('hi')
