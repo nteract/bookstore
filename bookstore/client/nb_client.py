@@ -89,7 +89,7 @@ class KernelInfo:
             ]
             return all(cmp_attrs)
         else:
-            return false
+            return False
 
 
 class NotebookSession:  # (NamedTuple):
@@ -129,7 +129,7 @@ class NotebookSession:  # (NamedTuple):
             ]
             return all(cmp_attrs)
         else:
-            return false
+            return False
 
 
 class NotebookClient:
