@@ -2,6 +2,7 @@ import json
 
 import aiobotocore
 from notebook.base.handlers import APIHandler, path_regex
+from notebook.services.contents.handlers import validate_model
 from tornado import web
 
 from .bookstore_config import BookstoreSettings
@@ -33,17 +34,25 @@ class BookstorePublishAPIHandler(APIHandler):
             raise web.HTTPError(400, "Must provide a path for publishing")
 
         model = self.get_json_body()
+        self.validate_model(model)
+        content = model['content']
+
         if model:
-            await self._publish(model, path.lstrip('/'))
+            resp = await self._publish(content, path.lstrip('/'))
         else:
             raise web.HTTPError(400, "Cannot publish an empty model")
 
-    async def _publish(self, model, path):
-        """Publish notebook model to the path"""
+        self.finish(resp)
+
+    def validate_model(self, model):
+        """This is a helper that validates that the model meets the notebook Contents API.
+
+        It uses the validate_model method provided in the contents API handler.
+        """
         if model['type'] != 'notebook':
             raise web.HTTPError(400, "bookstore only publishes notebooks")
-        content = model['content']
 
+    def prepare_paths(self, path):
         full_s3_path = s3_path(
             self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
         )
@@ -55,6 +64,12 @@ class BookstorePublishAPIHandler(APIHandler):
                 self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
             ),
         )
+        return full_s3_path, s3_object_key
+
+    async def _publish(self, content, path):
+        """Publish notebook model to the path"""
+
+        full_s3_path, s3_object_key = self.prepare_paths(path)
 
         async with self.session.create_client(
             's3',
@@ -67,7 +82,7 @@ class BookstorePublishAPIHandler(APIHandler):
             obj = await client.put_object(
                 Bucket=self.bookstore_settings.s3_bucket,
                 Key=s3_object_key,
-                Body=json.dumps(model['content']),
+                Body=json.dumps(content),
             )
             self.log.info("Done with published write of %s", path)
 
@@ -79,4 +94,4 @@ class BookstorePublishAPIHandler(APIHandler):
             resp_content["versionID"] = obj['VersionId']
 
         resp_str = json.dumps(resp_content)
-        self.finish(resp_str)
+        return resp_str
