@@ -57,3 +57,11 @@ class TestPublishAPIHandler(AsyncTestCase):
         empty_handler = self.put_handler('/bookstore/publish/hi')
         with pytest.raises(HTTPError):
             await empty_handler.put('hi')
+
+    @gen_test
+    async def test_put_bad_body(self):
+        body_dict = {'content': 2}
+        empty_handler = self.put_handler('/bookstore/publish/hi', body_dict=body_dict)
+        with pytest.raises(HTTPError):
+            await empty_handler.put('hi')
+
