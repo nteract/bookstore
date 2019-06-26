@@ -24,11 +24,15 @@ class TestPublishAPIHandler(AsyncTestCase):
             "BookstoreSettings": {
                 "s3_access_key_id": "mock_id",
                 "s3_secret_access_key": "mock_access",
+                "s3_bucket": "my_bucket",
+                "published_prefix": "custom_prefix",
             }
         }
         config = Config(mock_settings)
 
-        self.mock_application = Mock(spec=Application, ui_methods={}, ui_modules={}, settings={})
+        self.mock_application = Mock(
+            spec=Application, ui_methods={}, ui_modules={}, settings={"config": config}
+        )
 
     def put_handler(self, uri, body_dict=None, app=None):
         if body_dict is None:
@@ -61,7 +65,12 @@ class TestPublishAPIHandler(AsyncTestCase):
     @gen_test
     async def test_put_bad_body(self):
         body_dict = {'content': 2}
-        empty_handler = self.put_handler('/bookstore/publish/hi', body_dict=body_dict)
+        bad_body_handler = self.put_handler('/bookstore/publish/hi', body_dict=body_dict)
         with pytest.raises(HTTPError):
-            await empty_handler.put('hi')
+            await bad_body_handler.put('hi')
 
+    def test_prepare_response(self):
+        expected = {"s3path": "my_bucket/custom_prefix/mylocal/path", "versionID": "eeeeAB"}
+        empty_handler = self.put_handler('/bookstore/publish/hi')
+        actual = empty_handler.prepare_response("mylocal/path", {"VersionId": "eeeeAB"})
+        assert actual == expected
