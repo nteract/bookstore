@@ -45,10 +45,14 @@ class BookstorePublishAPIHandler(APIHandler):
         self.finish(resp)
 
     def validate_model(self, model):
-        """This is a helper that validates that the model meets the notebook Contents API.
+        """This is a helper that validates that the model meets our expected structure.
 
-        It uses the validate_model method provided in the contents API handler.
+        Raises
+        ------
+        tornado.web.HTTPError
+            Your model does not validate correctly
         """
+        # TODO: This is far more lenient than our API docs would suggest. We should reconcile them.
         if model['type'] != 'notebook':
             raise web.HTTPError(400, "bookstore only publishes notebooks")
 
