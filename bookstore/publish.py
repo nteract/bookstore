@@ -35,13 +35,7 @@ class BookstorePublishAPIHandler(APIHandler):
 
         model = self.get_json_body()
         self.validate_model(model)
-        content = model['content']
-
-        if model:
-            resp = await self._publish(content, path.lstrip('/'))
-        else:
-            raise web.HTTPError(400, "Cannot publish an empty model")
-
+        resp = await self._publish(model['content'], path.lstrip('/'))
         self.finish(resp)
 
     def validate_model(self, model):
@@ -53,8 +47,10 @@ class BookstorePublishAPIHandler(APIHandler):
             Your model does not validate correctly
         """
         # TODO: This is far more lenient than our API docs would suggest. We should reconcile them.
-        if model['type'] != 'notebook':
-            raise web.HTTPError(400, "bookstore only publishes notebooks")
+        if not model:
+            raise web.HTTPError(400, "Bookstore cannot publish an empty model")
+        if model.get('type', "") != 'notebook':
+            raise web.HTTPError(400, "Bookstore only publishes notebooks")
 
     def prepare_paths(self, path):
         full_s3_path = s3_path(
