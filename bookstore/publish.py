@@ -36,6 +36,7 @@ class BookstorePublishAPIHandler(APIHandler):
         model = self.get_json_body()
         self.validate_model(model)
         resp = await self._publish(model['content'], path.lstrip('/'))
+        self.set_status(201)
         self.finish(resp)
 
     def validate_model(self, model):
@@ -52,10 +53,8 @@ class BookstorePublishAPIHandler(APIHandler):
         if model.get('type', "") != 'notebook':
             raise web.HTTPError(400, "Bookstore only publishes notebooks")
 
-    def prepare_paths(self, path):
-        full_s3_path = s3_path(
-            self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
-        )
+    async def _publish(self, content, path):
+        """Publish notebook model to the path"""
         s3_object_key = s3_key(self.bookstore_settings.published_prefix, path)
 
         self.log.info(
@@ -64,12 +63,6 @@ class BookstorePublishAPIHandler(APIHandler):
                 self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
             ),
         )
-        return full_s3_path, s3_object_key
-
-    async def _publish(self, content, path):
-        """Publish notebook model to the path"""
-
-        full_s3_path, s3_object_key = self.prepare_paths(path)
 
         async with self.session.create_client(
             's3',
@@ -86,12 +79,19 @@ class BookstorePublishAPIHandler(APIHandler):
             )
             self.log.info("Done with published write of %s", path)
 
-        self.set_status(201)
+        resp_content = self.prepare_response(path, obj)
+        resp_str = json.dumps(resp_content)
+        return resp_str
+
+    def prepare_response(self, path, obj):
+
+        full_s3_path = s3_path(
+            self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
+        )
 
         resp_content = {"s3path": full_s3_path}
 
         if 'VersionId' in obj:
             resp_content["versionID"] = obj['VersionId']
 
-        resp_str = json.dumps(resp_content)
-        return resp_str
+        return resp_content
