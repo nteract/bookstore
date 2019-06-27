@@ -40,7 +40,6 @@ class BookstorePublishAPIHandler(APIHandler):
         model = self.get_json_body()
         self.validate_model(model)
         resp = await self._publish(model['content'], path.lstrip('/'))
-        self.set_status(201)
         self.finish(resp)
 
     def validate_model(self, model):
@@ -103,6 +102,7 @@ class BookstorePublishAPIHandler(APIHandler):
             self.log.info("Done with published write of %s", path)
 
         resp_content = self.prepare_response(path, obj)
+        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
         return json.dumps(resp_content)
 
     def prepare_response(self, path, obj):

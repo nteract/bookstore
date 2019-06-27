@@ -150,7 +150,7 @@ class BookstoreCloneAPIHandler(APIHandler):
             "mimetype": "text/plain",
             "content": content.decode('utf-8'),
         }
-        self.set_status(201)
+        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
 
         if 'VersionId' in obj:
             resp_content["versionID"] = obj['VersionId']
