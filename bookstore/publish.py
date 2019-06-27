@@ -3,7 +3,8 @@ import json
 import aiobotocore
 
 from botocore.exceptions import ClientError
-from nbformat import ValidationError, validate as validate_nb
+from nbformat import ValidationError
+from nbformat import validate as validate_nb
 from notebook.base.handlers import APIHandler, path_regex
 from notebook.services.contents.handlers import validate_model
 from tornado import web
@@ -102,8 +103,7 @@ class BookstorePublishAPIHandler(APIHandler):
             self.log.info("Done with published write of %s", path)
 
         resp_content = self.prepare_response(path, obj)
-        resp_str = json.dumps(resp_content)
-        return resp_str
+        return json.dumps(resp_content)
 
     def prepare_response(self, path, obj):
 

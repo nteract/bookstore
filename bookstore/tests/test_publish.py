@@ -53,15 +53,15 @@ class TestPublishAPIHandler(AsyncTestCase):
 
     @gen_test
     async def test_put_no_path(self):
-        empty_handler = self.put_handler('/bookstore/publish/')
+        no_path_handler = self.put_handler('/bookstore/publish/')
         with pytest.raises(HTTPError):
-            await empty_handler.put('')
+            await no_path_handler.put('')
 
     @gen_test
     async def test_put_no_body(self):
-        empty_handler = self.put_handler('/bookstore/publish/hi')
+        no_body_handler = self.put_handler('/bookstore/publish/hi')
         with pytest.raises(HTTPError):
-            await empty_handler.put('hi')
+            await no_body_handler.put('hi')
 
     @gen_test
     async def test_put_s3_error(self):
