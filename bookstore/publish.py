@@ -43,7 +43,7 @@ class BookstorePublishAPIHandler(APIHandler):
         self.finish(resp)
 
     def validate_model(self, model):
-        """This is a helper that validates that the model meets our expected structure.
+        """Checks that the model given to the API handler meets bookstore's expected structure for a notebook.
 
         Pattern for surfacing nbformat validation errors originally written in
         https://github.com/jupyter/notebook/blob/a44a367c219b60a19bee003877d32c3ff1ce2412/notebook/services/contents/manager.py#L353-L355
