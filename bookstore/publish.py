@@ -1,6 +1,9 @@
 import json
 
 import aiobotocore
+
+
+from nbformat import ValidationError, validate as validate_nb
 from notebook.base.handlers import APIHandler, path_regex
 from notebook.services.contents.handlers import validate_model
 from tornado import web
@@ -42,16 +45,31 @@ class BookstorePublishAPIHandler(APIHandler):
     def validate_model(self, model):
         """This is a helper that validates that the model meets our expected structure.
 
+        Pattern for surfacing nbformat validation errors originally written in
+        https://github.com/jupyter/notebook/blob/a44a367c219b60a19bee003877d32c3ff1ce2412/notebook/services/contents/manager.py#L353-L355
+
         Raises
         ------
         tornado.web.HTTPError
             Your model does not validate correctly
         """
-        # TODO: This is far more lenient than our API docs would suggest. We should reconcile them.
         if not model:
             raise web.HTTPError(400, "Bookstore cannot publish an empty model")
         if model.get('type', "") != 'notebook':
             raise web.HTTPError(400, "Bookstore only publishes notebooks")
+
+        content = model.get('content', {})
+        if content == {}:
+            raise web.HTTPError(400, "Bookstore cannot publish empty contents")
+        try:
+            validate_nb(content)
+        except ValidationError as e:
+            raise web.HTTPError(
+                400,
+                "Bookstore cannot publish invalid notebook. "
+                "Validation errors are as follows: "
+                f"{e.message} {json.dumps(e.instance, indent=1, default=lambda obj: '<UNKNOWN>')}",
+            )
 
     async def _publish(self, content, path):
         """Publish notebook model to the path"""
