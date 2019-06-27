@@ -2,7 +2,7 @@ import json
 
 import aiobotocore
 
-
+from botocore.exceptions import ClientError
 from nbformat import ValidationError, validate as validate_nb
 from notebook.base.handlers import APIHandler, path_regex
 from notebook.services.contents.handlers import validate_model
@@ -90,11 +90,15 @@ class BookstorePublishAPIHandler(APIHandler):
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
             self.log.info("Processing published write of %s", path)
-            obj = await client.put_object(
-                Bucket=self.bookstore_settings.s3_bucket,
-                Key=s3_object_key,
-                Body=json.dumps(content),
-            )
+            try:
+                obj = await client.put_object(
+                    Bucket=self.bookstore_settings.s3_bucket,
+                    Key=s3_object_key,
+                    Body=json.dumps(content),
+                )
+            except ClientError as e:
+                status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
+                raise web.HTTPError(status_code, e.args[0])
             self.log.info("Done with published write of %s", path)
 
         resp_content = self.prepare_response(path, obj)
