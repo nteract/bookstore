@@ -19,9 +19,6 @@ log = logging.getLogger('test_handlers')
 
 from traitlets.config import Config
 
-def test_handlers():
-    pass
-
 
 def test_collect_handlers_all():
     expected = [
@@ -64,6 +61,7 @@ def test_collect_handlers_no_publish():
     handlers = collect_handlers(log, '/', validation)
     assert expected == handlers
 
+
 def test_collect_handlers_only_version():
     expected = [('/api/bookstore', BookstoreVersionHandler)]
     web_app = Application()
@@ -73,10 +71,15 @@ def test_collect_handlers_only_version():
     handlers = collect_handlers(log, '/', validation)
     assert expected == handlers
 
+
 @pytest.fixture(scope="class")
 def bookstore_settings(request):
     mock_settings = {
-        "BookstoreSettings": {"s3_access_key_id": "mock_id", "s3_secret_access_key": "mock_access"}
+        "BookstoreSettings": {
+            "s3_access_key_id": "mock_id",
+            "s3_secret_access_key": "mock_access",
+            "s3_bucket": "my_bucket",
+        }
     }
     config = Config(mock_settings)
     bookstore_settings = BookstoreSettings(config=config)
@@ -87,10 +90,16 @@ def bookstore_settings(request):
 
 def test_build_settings_dict(bookstore_settings):
     expected = {
-        'validation': {'archive_valid': True, 'bookstore_valid': False, 'publish_valid': True},
         'version': '2.3.0.dev',
+        'validation': {
+            'archive_valid': True,
+            'bookstore_valid': True,
+            'publish_valid': True,
+            'cloning_valid': True,
+        },
     }
-    assert expected == build_settings_dict(bookstore_settings)
+    validation = validate_bookstore(bookstore_settings)
+    assert expected == build_settings_dict(validation)
 
 
 @pytest.mark.usefixtures("bookstore_settings")
@@ -98,11 +107,12 @@ class TestCloneAPIHandler(AsyncTestCase):
     def setUp(self):
         super().setUp()
 
+        validation = validate_bookstore(self.bookstore_settings)
         self.mock_application = Mock(
             spec=Application,
             ui_methods={},
             ui_modules={},
-            settings={"bookstore": build_settings_dict(self.bookstore_settings)},
+            settings={"bookstore": build_settings_dict(validation)},
             transforms=[],
         )
 
@@ -142,7 +152,12 @@ class TestCloneAPIHandler(AsyncTestCase):
         empty_handler = self.get_handler('/api/bookstore/')
         expected = {
             'bookstore': True,
-            'validation': {'archive_valid': True, 'bookstore_valid': False, 'publish_valid': True},
             'version': '2.3.0.dev',
+            'validation': {
+                'archive_valid': True,
+                'bookstore_valid': True,
+                'publish_valid': True,
+                'cloning_valid': True,
+            },
         }
         assert empty_handler.build_response_dict() == expected
