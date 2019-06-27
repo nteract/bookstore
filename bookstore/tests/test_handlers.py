@@ -5,6 +5,7 @@ import pytest
 import logging
 from unittest.mock import Mock
 
+from bookstore._version import __version__
 from bookstore.handlers import collect_handlers, build_settings_dict, BookstoreVersionHandler
 from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
 from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
@@ -16,6 +17,7 @@ from tornado.httpserver import HTTPRequest
 from traitlets.config import Config
 
 log = logging.getLogger('test_handlers')
+version = __version__
 
 from traitlets.config import Config
 
@@ -90,13 +92,13 @@ def bookstore_settings(request):
 
 def test_build_settings_dict(bookstore_settings):
     expected = {
-        'version': '2.3.0.dev',
         'validation': {
             'archive_valid': True,
             'bookstore_valid': True,
             'publish_valid': True,
             'cloning_valid': True,
         },
+        'version': version,
     }
     validation = validate_bookstore(bookstore_settings)
     assert expected == build_settings_dict(validation)
@@ -152,12 +154,12 @@ class TestCloneAPIHandler(AsyncTestCase):
         empty_handler = self.get_handler('/api/bookstore/')
         expected = {
             'bookstore': True,
-            'version': '2.3.0.dev',
             'validation': {
                 'archive_valid': True,
                 'bookstore_valid': True,
                 'publish_valid': True,
                 'cloning_valid': True,
             },
+            'version': version,
         }
         assert empty_handler.build_response_dict() == expected
