@@ -197,15 +197,18 @@ components:
     ValidationInfo:
       type: object
       required:
-        - bookstore_validation
-        - archive_validation
-        - published_validation
+        - bookstore_valid
+        - archive_valid
+        - publish_valid
+        - cloning_valid
       properties:
-        bookstore_validation:
+        bookstore_valid:
           type: boolean
-        archive_validation:
+        archive_valid:
           type: boolean
-        published_validation: 
+        publish_valid: 
+          type: boolean
+        cloning_valid: 
           type: boolean
     VersionInfo:
       type: object
