@@ -40,15 +40,14 @@ class BookstoreVersionHandler(APIHandler):
     def build_response_dict(self):
         """Helper for building the version handler's response before serialization."""
         return {
-            "bookstore": True,  # TODO: Should we remove this; isn't it equivalent to the endpoint responding?
-            "version": self.settings['bookstore']["version"],
+            "release": self.settings['bookstore']["release"],
             "validation": self.settings['bookstore']["validation"],
         }
 
 
 def build_settings_dict(validation):
     """Helper for building the settings info that will be assigned to the web_app."""
-    return {"version": version, "validation": validation}
+    return {"release": version, "validation": validation}
 
 
 def load_jupyter_server_extension(nb_app):
@@ -103,7 +102,7 @@ def collect_handlers(log, base_url, validation):
     else:
         log.info("[bookstore] Publishing disabled. s3_bucket or endpoint are not configured.")
 
-    if validation['cloning_valid']:
+    if validation['clone_valid']:
         log.info(f"[bookstore] Enabling bookstore cloning, version: {version}")
         handlers.append(
             (url_path_join(base_bookstore_api_pattern, r"/clone(?:/?)*"), BookstoreCloneAPIHandler)

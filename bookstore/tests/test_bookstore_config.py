@@ -10,7 +10,7 @@ def test_validate_bookstore_defaults():
         "bookstore_valid": False,
         "publish_valid": False,
         "archive_valid": False,
-        "cloning_valid": True,
+        "clone_valid": True,
     }
     settings = BookstoreSettings()
     assert validate_bookstore(settings) == expected
@@ -22,7 +22,7 @@ def test_validate_bookstore_published():
         "bookstore_valid": True,
         "publish_valid": False,
         "archive_valid": True,
-        "cloning_valid": True,
+        "clone_valid": True,
     }
     settings = BookstoreSettings(s3_bucket="A_bucket", published_prefix="")
     assert validate_bookstore(settings) == expected
@@ -34,7 +34,7 @@ def test_validate_bookstore_workspace():
         "bookstore_valid": True,
         "publish_valid": True,
         "archive_valid": False,
-        "cloning_valid": True,
+        "clone_valid": True,
     }
     settings = BookstoreSettings(s3_bucket="A_bucket", workspace_prefix="")
     assert validate_bookstore(settings) == expected
@@ -46,7 +46,7 @@ def test_validate_bookstore_endpoint():
         "bookstore_valid": False,
         "publish_valid": False,
         "archive_valid": False,
-        "cloning_valid": True,
+        "clone_valid": True,
     }
     settings = BookstoreSettings(s3_endpoint_url="")
     assert validate_bookstore(settings) == expected
@@ -58,7 +58,7 @@ def test_validate_bookstore_bucket():
         "bookstore_valid": True,
         "publish_valid": True,
         "archive_valid": True,
-        "cloning_valid": True,
+        "clone_valid": True,
     }
     settings = BookstoreSettings(s3_bucket="A_bucket")
     assert validate_bookstore(settings) == expected
@@ -70,7 +70,7 @@ def test_disable_cloning():
         "bookstore_valid": True,
         "publish_valid": True,
         "archive_valid": True,
-        "cloning_valid": False,
+        "clone_valid": False,
     }
     settings = BookstoreSettings(s3_bucket="A_bucket", enable_cloning=False)
     assert validate_bookstore(settings) == expected

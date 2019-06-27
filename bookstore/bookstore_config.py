@@ -74,7 +74,7 @@ def validate_bookstore(settings: BookstoreSettings):
     Returns
     -------
     validation_checks : dict
-        Existence of settings by category (general, archive, publish)
+        Statements about whether features are validly configured and available
     """
     general_settings = [settings.s3_bucket != "", settings.s3_endpoint_url != ""]
     archive_settings = [*general_settings, settings.workspace_prefix != ""]
@@ -85,6 +85,6 @@ def validate_bookstore(settings: BookstoreSettings):
         "bookstore_valid": all(general_settings),
         "archive_valid": all(archive_settings),
         "publish_valid": all(published_settings),
-        "cloning_valid": all(cloning_settings),
+        "clone_valid": all(cloning_settings),
     }
     return validation_checks

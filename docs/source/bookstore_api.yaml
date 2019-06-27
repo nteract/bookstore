@@ -200,7 +200,7 @@ components:
         - bookstore_valid
         - archive_valid
         - publish_valid
-        - cloning_valid
+        - clone_valid
       properties:
         bookstore_valid:
           type: boolean
@@ -208,16 +208,12 @@ components:
           type: boolean
         publish_valid: 
           type: boolean
-        cloning_valid: 
+        clone_valid: 
           type: boolean
     VersionInfo:
       type: object
-      required:
-        - s3path
       properties:
-        bookstore:
-          type: boolean
-        version:
+        release:
           type: string
         validation: 
           $ref: '#/components/schemas/ValidationInfo'

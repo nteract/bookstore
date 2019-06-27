@@ -96,9 +96,9 @@ def test_build_settings_dict(bookstore_settings):
             'archive_valid': True,
             'bookstore_valid': True,
             'publish_valid': True,
-            'cloning_valid': True,
+            'clone_valid': True,
         },
-        'version': version,
+        'release': version,
     }
     validation = validate_bookstore(bookstore_settings)
     assert expected == build_settings_dict(validation)
@@ -153,13 +153,12 @@ class TestCloneAPIHandler(AsyncTestCase):
     def test_build_response(self):
         empty_handler = self.get_handler('/api/bookstore/')
         expected = {
-            'bookstore': True,
             'validation': {
                 'archive_valid': True,
                 'bookstore_valid': True,
                 'publish_valid': True,
-                'cloning_valid': True,
+                'clone_valid': True,
             },
-            'version': version,
+            'release': version,
         }
         assert empty_handler.build_response_dict() == expected
