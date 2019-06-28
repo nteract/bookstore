@@ -120,11 +120,9 @@ class BookstoreCloneAPIHandler(APIHandler):
         self.session = aiobotocore.get_session()
 
     async def _clone(self, s3_bucket, s3_object_key):
-        path = s3_object_key
 
         self.log.info(f"bucket: {s3_bucket}")
         self.log.info(f"key: {s3_object_key}")
-        full_s3_path = s3_path(s3_bucket, path)
 
         async with self.session.create_client(
             's3',
@@ -133,28 +131,17 @@ class BookstoreCloneAPIHandler(APIHandler):
             endpoint_url=self.bookstore_settings.s3_endpoint_url,
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
-            self.log.info("Processing published write of %s", path)
+            self.log.info("Processing published write of %s", s3_object_key)
             try:
                 obj = await client.get_object(Bucket=s3_bucket, Key=s3_object_key)
             except ClientError as e:
                 status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
                 raise web.HTTPError(status_code, e.args[0])
 
-            content = await obj['Body'].read()
-            self.log.info("Done with published write of %s", path)
+            self.log.info("Done with published write of %s", s3_object_key)
 
-        resp_content = {"s3_path": full_s3_path}
-        model = {
-            "type": "file",
-            "format": "text",
-            "mimetype": "text/plain",
-            "content": content.decode('utf-8'),
-        }
         self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
-
-        if 'VersionId' in obj:
-            resp_content["versionID"] = obj['VersionId']
-        return model
+        return obj
 
     @web.authenticated
     async def post(self):
@@ -190,7 +177,17 @@ class BookstoreCloneAPIHandler(APIHandler):
 
         if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
-        model = await self._clone(s3_bucket, s3_object_key)
+        obj = await self._clone(s3_bucket, s3_object_key)
+        content = await obj['Body'].read()
+        resp_content = {"s3_path": s3_path(s3_bucket, path)}
+        model = {
+            "type": "file",
+            "format": "text",
+            "mimetype": "text/plain",
+            "content": content.decode('utf-8'),
+        }
+        if 'VersionId' in obj:
+            resp_content["versionID"] = obj['VersionId']
         model, path = self.build_post_model_response(model, target_path)
         self.contents_manager.save(model, path)
         self.set_header('Content-Type', 'application/json')
