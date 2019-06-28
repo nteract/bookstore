@@ -9,7 +9,7 @@ from tornado import web
 from ._version import __version__
 from .bookstore_config import BookstoreSettings
 from .bookstore_config import validate_bookstore
-from .publish import BookstorePublishHandler
+from .publish import BookstorePublishAPIHandler
 from .clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
 
 
@@ -86,7 +86,7 @@ def collect_handlers(log, base_url, validation):
         handlers.append(
             (
                 url_path_join(base_bookstore_api_pattern, r"/publish%s" % path_regex),
-                BookstorePublishHandler,
+                BookstorePublishAPIHandler,
             )
         )
     else:

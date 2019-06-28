@@ -6,7 +6,7 @@ from unittest.mock import Mock
 from bookstore.handlers import collect_handlers, BookstoreVersionHandler
 from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
 from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
-from bookstore.publish import BookstorePublishHandler
+from bookstore.publish import BookstorePublishAPIHandler
 from notebook.base.handlers import path_regex
 from tornado.web import Application
 from traitlets.config import Config
@@ -21,7 +21,7 @@ def test_handlers():
 def test_collect_handlers_all():
     expected = [
         ('/api/bookstore', BookstoreVersionHandler),
-        ('/api/bookstore/publish%s' % path_regex, BookstorePublishHandler),
+        ('/api/bookstore/publish%s' % path_regex, BookstorePublishAPIHandler),
         ('/api/bookstore/clone(?:/?)*', BookstoreCloneAPIHandler),
         ('/bookstore/clone(?:/?)*', BookstoreCloneHandler),
     ]
@@ -36,7 +36,7 @@ def test_collect_handlers_all():
 def test_collect_handlers_no_clone():
     expected = [
         ('/api/bookstore', BookstoreVersionHandler),
-        ('/api/bookstore/publish%s' % path_regex, BookstorePublishHandler),
+        ('/api/bookstore/publish%s' % path_regex, BookstorePublishAPIHandler),
     ]
     web_app = Application()
     mock_settings = {"BookstoreSettings": {"s3_bucket": "mock_bucket", "enable_cloning": False}}

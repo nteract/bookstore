@@ -67,7 +67,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/S3CloneFile'
+              $ref: '#/components/schemas/S3CloneFileRequest'
         required: true
       responses:
         200:
@@ -96,7 +96,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Contents'
+              $ref: '#/components/schemas/PublishableContents'
         required: true
       
       responses:
@@ -105,11 +105,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/S3PublishFile'
+                $ref: '#/components/schemas/S3PublishFileResponse'
 
 components:
   schemas:
-    S3CloneFile:
+    S3CloneFileRequest:
       type: object
       required: 
         - s3_bucket
@@ -121,7 +121,7 @@ components:
           type: string
         target_path:
           type: string
-    S3PublishFile:
+    S3PublishFileResponse:
       type: object
       required:
         - s3path
@@ -130,6 +130,20 @@ components:
           type: string
         versionID:
           type: string
+    PublishableContents: 
+      description: "A object representing contents that can be published. This is currently a subset of the fields required for the Contents API."
+      type: object
+      required:
+        - type
+        - content
+      properties:
+        type:
+          type: string
+          description: Type of content
+          enum:
+            - notebook
+        content:
+          $ref: https://raw.githubusercontent.com/jupyter/nbformat/master/nbformat/v4/nbformat.v4.schema.json
     Contents:
       description: "A contents object.  The content and format keys may be null if content is not contained.  If type is 'file', then the mimetype will be null."
       type: object
