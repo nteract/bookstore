@@ -19,6 +19,56 @@ from .utils import url_path_join
 BOOKSTORE_FILE_LOADER = FileSystemLoader(PACKAGE_DIR)
 
 
+def build_notebook_model(content, path):
+    """Helper that builds a Contents API compatible model for notebooks.
+
+    Parameters
+    ----------
+    model : str
+        The content we wish to clone. 
+    path : str
+        The the path we wish to clone to.
+
+    Returns
+    --------
+    dict
+        Jupyter Contents API compatible model for notebooks
+    """
+    model = {
+        "type": "notebook",
+        "format": "json",
+        "content": json.loads(content),
+        "name": os.path.basename(os.path.relpath(path)),
+        "path": os.path.relpath(path),
+    }
+    return model
+
+
+def build_file_model(content, path):
+    """Helper that builds a Contents API compatible model for files.
+
+    Parameters
+    ----------
+    model : str
+        The content we wish to clone. 
+    path : str
+        The the path we wish to clone to.
+
+    Returns
+    --------
+    dict
+        Jupyter Contents API compatible model for files
+    """
+    model = {
+        "type": "file",
+        "format": "text",
+        "content": content,
+        "name": os.path.basename(os.path.relpath(path)),
+        "path": os.path.relpath(path),
+    }
+    return model
+
+
 class BookstoreCloneHandler(IPythonHandler):
     """Prepares and provides clone options page, populating UI with clone option parameters.
 
@@ -216,57 +266,9 @@ class BookstoreCloneAPIHandler(APIHandler):
         content = await obj['Body'].read()
         content = content.decode('utf-8')
         if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
-            model = self.build_notebook_model(content, path)
+            model = build_notebook_model(content, path)
         else:
-            model = self.build_file_model(content, path)
-        return model
-
-    def build_notebook_model(self, content, path):
-        """Helper that builds a Contents API compatible model for notebooks.
-
-        Parameters
-        ----------
-        model : str
-            The content we wish to clone. 
-        path : str
-            The the path we wish to clone to.
-
-        Returns
-        --------
-        dict
-            Jupyter Contents API compatible model for notebooks
-        """
-        model = {
-            "type": "notebook",
-            "format": "json",
-            "content": json.loads(content),
-            "name": os.path.basename(os.path.relpath(path)),
-            "path": os.path.relpath(path),
-        }
-        return model
-
-    def build_file_model(self, content, path):
-        """Helper that builds a Contents API compatible model for files.
-
-        Parameters
-        ----------
-        model : str
-            The content we wish to clone. 
-        path : str
-            The the path we wish to clone to.
-
-        Returns
-        --------
-        dict
-            Jupyter Contents API compatible model for files
-        """
-        model = {
-            "type": "file",
-            "format": "text",
-            "content": content,
-            "name": os.path.basename(os.path.relpath(path)),
-            "path": os.path.relpath(path),
-        }
+            model = build_file_model(content, path)
         return model
 
     def build_post_response_model(self, model, obj, s3_bucket):
