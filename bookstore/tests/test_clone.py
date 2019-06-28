@@ -6,6 +6,7 @@ import pytest
 import nbformat
 
 from jinja2 import Environment
+from notebook.services.contents.filemanager import FileContentsManager
 from tornado.testing import AsyncTestCase, gen_test
 from tornado.web import Application, HTTPError
 from tornado.httpserver import HTTPRequest
@@ -144,7 +145,11 @@ class TestCloneAPIHandler(AsyncTestCase):
             spec=Application,
             ui_methods={},
             ui_modules={},
-            settings={'jinja2_env': Environment(), "config": config},
+            settings={
+                'jinja2_env': Environment(),
+                "config": config,
+                "contents_manager": FileContentsManager(),
+            },
         )
 
     def post_handler(self, body_dict, app=None):
@@ -218,3 +223,27 @@ class TestCloneAPIHandler(AsyncTestCase):
         handler = self.post_handler({})
         actual = handler.build_post_response_model(model, obj, s3_bucket, s3_object_key)
         assert actual == expected
+
+    @gen_test
+    async def test_build_content_model(self):
+        content = "some content"
+        expected = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": "file_name.txt",
+            "path": "test_directory/file_name.txt",
+        }
+
+        class MyFakeClass:
+            def __init__(self):
+                pass
+
+            async def read(self):
+                return content.encode('utf-8')
+
+        obj = {'Body': MyFakeClass()}
+        path = "test_directory/file_name.txt"
+        success_handler = self.post_handler({})
+        model = await success_handler.build_content_model(obj, path)
+        assert model == expected
