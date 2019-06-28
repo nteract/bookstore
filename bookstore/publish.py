@@ -31,6 +31,11 @@ class BookstorePublishAPIHandler(APIHandler):
         PUT /api/bookstore/publish
 
         The payload directly matches the contents API for PUT.
+
+        Parameters
+        ----------
+        path: str
+            Path describing where contents should be published to, postfixed to the published_prefix .
         """
         self.log.info("Attempt publishing to %s", path)
 
@@ -47,6 +52,11 @@ class BookstorePublishAPIHandler(APIHandler):
 
         Pattern for surfacing nbformat validation errors originally written in
         https://github.com/jupyter/notebook/blob/a44a367c219b60a19bee003877d32c3ff1ce2412/notebook/services/contents/manager.py#L353-L355
+
+        Parameters
+        ----------
+        model: dict
+            Request model for publishing describing the type and content of the object.
 
         Raises
         ------
@@ -106,6 +116,20 @@ class BookstorePublishAPIHandler(APIHandler):
         return json.dumps(resp_content)
 
     def prepare_response(self, path, obj):
+        """Prepares repsonse to publish PUT request.
+
+        Parameters
+        ----------
+        path: 
+            path to place after the published prefix in the designated bucket
+        obj: dict
+            Validation dictionary for determining which endpoints to enable.
+
+        Returns
+        --------
+        dict
+            Model for responding to put request. 
+        """
 
         full_s3_path = s3_path(
             self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
