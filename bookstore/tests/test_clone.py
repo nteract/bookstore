@@ -192,3 +192,29 @@ class TestCloneAPIHandler(AsyncTestCase):
         success_handler = self.post_handler(post_body_dict)
         with pytest.raises(HTTPError):
             await success_handler._clone(s3_bucket, s3_object_key)
+
+    def test_build_post_response_model(self):
+        content = "some arbitrary content"
+        expected = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": "file_name.txt",
+            "path": "test_directory/file_name.txt",
+            "s3_path": "s3://my_bucket/original_key/may_be_different_than_storage.txt",
+            'versionID': "eeee222eee",
+        }
+
+        s3_bucket = "my_bucket"
+        s3_object_key = "original_key/may_be_different_than_storage.txt"
+        obj = {'VersionId': "eeee222eee"}
+        model = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": "file_name.txt",
+            "path": "test_directory/file_name.txt",
+        }
+        handler = self.post_handler({})
+        actual = handler.build_post_response_model(model, obj, s3_bucket, s3_object_key)
+        assert actual == expected
