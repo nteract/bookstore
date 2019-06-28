@@ -56,16 +56,16 @@ class BookstorePublishAPIHandler(APIHandler):
         if not model:
             raise web.HTTPError(400, "Bookstore cannot publish an empty model")
         if model.get('type', "") != 'notebook':
-            raise web.HTTPError(400, "Bookstore only publishes notebooks")
+            raise web.HTTPError(415, "Bookstore only publishes notebooks")
 
         content = model.get('content', {})
         if content == {}:
-            raise web.HTTPError(400, "Bookstore cannot publish empty contents")
+            raise web.HTTPError(422, "Bookstore cannot publish empty contents")
         try:
             validate_nb(content)
         except ValidationError as e:
             raise web.HTTPError(
-                400,
+                422,
                 "Bookstore cannot publish invalid notebook. "
                 "Validation errors are as follows: "
                 f"{e.message} {json.dumps(e.instance, indent=1, default=lambda obj: '<UNKNOWN>')}",
