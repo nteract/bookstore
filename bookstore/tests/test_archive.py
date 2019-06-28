@@ -44,3 +44,11 @@ def test_pre_save_hook():
     target_path = "my_notebook_path.ipynb"
 
     archiver.run_pre_save_hook(model, target_path)
+
+
+def test_pre_save_hook_bad_model():
+    archiver = BookstoreContentsArchiver()
+    model = {"type": "file", "content": new_notebook()}
+    target_path = "my_notebook_path.ipynb"
+
+    archiver.run_pre_save_hook(model, target_path)
