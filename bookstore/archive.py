@@ -145,7 +145,10 @@ class BookstoreContentsArchiver(FileContentsManager):
             The storage location
         """
         if model["type"] != "notebook":
-            self.log.info("Bookstore only archives notebooks.")
+            self.log.debug(
+                "Bookstore only archives notebooks, "
+                f"request does not state that {path} is a notebook."
+            )
             return
 
         content = json.dumps(model["content"])
