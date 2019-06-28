@@ -3,6 +3,7 @@ import json
 from unittest.mock import Mock
 
 import pytest
+import nbformat
 
 from jinja2 import Environment
 from tornado.testing import AsyncTestCase, gen_test
@@ -11,7 +12,39 @@ from tornado.httpserver import HTTPRequest
 from traitlets.config import Config
 
 
-from ..clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
+from bookstore.clone import (
+    build_notebook_model,
+    build_file_model,
+    BookstoreCloneHandler,
+    BookstoreCloneAPIHandler,
+)
+
+
+def test_build_notebook_model():
+    content = nbformat.v4.new_notebook()
+    expected = {
+        "type": "notebook",
+        "format": "json",
+        "content": content,
+        "name": "my_notebook_name.ipynb",
+        "path": "test_directory/my_notebook_name.ipynb",
+    }
+    path = "./test_directory/my_notebook_name.ipynb"
+    nb_content = nbformat.writes(content)
+    assert build_notebook_model(nb_content, path) == expected
+
+
+def test_build_file_model():
+    content = "my fancy file"
+    expected = {
+        "type": "file",
+        "format": "text",
+        "content": content,
+        "name": "file_name.txt",
+        "path": "test_directory/file_name.txt",
+    }
+    path = "./test_directory/file_name.txt"
+    assert build_file_model(content, path) == expected
 
 
 class TestCloneHandler(AsyncTestCase):
