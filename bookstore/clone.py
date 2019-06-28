@@ -64,7 +64,7 @@ class BookstoreCloneHandler(IPythonHandler):
         if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Requires an S3 object key in order to clone")
 
-        self.log.info("Setting up cloning landing page from %s", s3_object_key)
+        self.log.info(f"Setting up cloning landing page for {s3_object_key}")
 
         template_params = self.construct_template_params(s3_bucket, s3_object_key)
         self.set_header('Content-Type', 'text/html')
@@ -140,14 +140,14 @@ class BookstoreCloneAPIHandler(APIHandler):
             endpoint_url=self.bookstore_settings.s3_endpoint_url,
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
-            self.log.info("Processing published write of %s", s3_object_key)
+            self.log.info(f"Processing clone of {s3_object_key}")
             try:
                 obj = await client.get_object(Bucket=s3_bucket, Key=s3_object_key)
             except ClientError as e:
                 status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
                 raise web.HTTPError(status_code, e.args[0])
 
-            self.log.info("Done with published write of %s", s3_object_key)
+            self.log.info(f"Obtained contents for {s3_object_key}")
 
         self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
         return obj
@@ -183,11 +183,14 @@ class BookstoreCloneAPIHandler(APIHandler):
             os.path.relpath(s3_object_key)
         )
 
-        self.log.info("About to clone from %s", s3_object_key)
+        self.log.info(f"About to clone from {s3_object_key}")
         obj = await self._clone(s3_bucket, s3_object_key)
 
         content_model = await self.build_content_model(obj, target_path)
+
+        self.log.info(f"Completing clone for {s3_object_key}")
         self.contents_manager.save(content_model, content_model['path'])
+
         resp_model = self.build_post_response_model(content_model, obj, s3_bucket)
         self.set_header('Content-Type', 'application/json')
         self.finish(model)
