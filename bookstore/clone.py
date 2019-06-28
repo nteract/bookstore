@@ -13,7 +13,7 @@ from tornado import web
 
 from . import PACKAGE_DIR
 from .bookstore_config import BookstoreSettings
-from .s3_paths import s3_path
+from .s3_paths import s3_path, s3_display_path
 from .utils import url_path_join
 
 BOOKSTORE_FILE_LOADER = FileSystemLoader(PACKAGE_DIR)
@@ -199,7 +199,6 @@ class BookstoreCloneAPIHandler(APIHandler):
 
             self.log.info(f"Obtained contents for {s3_object_key}")
 
-        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
         return obj
 
     @web.authenticated
@@ -241,9 +240,11 @@ class BookstoreCloneAPIHandler(APIHandler):
         self.log.info(f"Completing clone for {s3_object_key}")
         self.contents_manager.save(content_model, content_model['path'])
 
-        resp_model = self.build_post_response_model(content_model, obj, s3_bucket)
+        resp_model = self.build_post_response_model(content_model, obj, s3_bucket, s3_object_key)
+
+        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
         self.set_header('Content-Type', 'application/json')
-        self.finish(model)
+        self.finish(resp_model)
 
     async def build_content_model(self, obj, target_path):
         """Helper that takes a response from S3 and creates a ContentsAPI compatible model.
@@ -271,7 +272,7 @@ class BookstoreCloneAPIHandler(APIHandler):
             model = build_file_model(content, path)
         return model
 
-    def build_post_response_model(self, model, obj, s3_bucket):
+    def build_post_response_model(self, model, obj, s3_bucket, s3_object_key):
         """Helper that takes a Jupyter Contents API compliant model and adds cloning specific information.
 
         Parameters
@@ -282,6 +283,8 @@ class BookstoreCloneAPIHandler(APIHandler):
             Log (usually from the NotebookApp) for logging endpoint changes.
         s3_bucket : str
             The S3 bucket we are cloning from
+        s3_object_key: str
+            The S3 key we are cloning
 
         Returns
         --------
@@ -289,7 +292,7 @@ class BookstoreCloneAPIHandler(APIHandler):
             Model with additional info about the S3 cloning
         """
         model = deepcopy(model)
-        model["s3_path"] = s3_path(s3_bucket, model['path'])
+        model["s3_path"] = s3_display_path(s3_bucket, s3_object_key)
         if 'VersionId' in obj:
             model["versionID"] = obj['VersionId']
         return model
