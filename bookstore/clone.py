@@ -120,6 +120,15 @@ class BookstoreCloneAPIHandler(APIHandler):
         self.session = aiobotocore.get_session()
 
     async def _clone(self, s3_bucket, s3_object_key):
+        """Main function that handles communicating with S3 to initiate the clone.
+
+        Parameters
+        ----------
+        s3_bucket: str
+            Log (usually from the NotebookApp) for logging endpoint changes.
+        s3_object_key: str
+            The the path we wish to clone to.
+        """
 
         self.log.info(f"bucket: {s3_bucket}")
         self.log.info(f"key: {s3_object_key}")
@@ -184,6 +193,22 @@ class BookstoreCloneAPIHandler(APIHandler):
         self.finish(model)
 
     async def build_content_model(self, obj, target_path):
+        """Helper that takes a response from S3 and creates a ContentsAPI compatible model.
+        
+        If the file at target_path already exists, this increments the file name.
+        
+        Parameters
+        ----------
+        obj : dict
+            Response object from S3
+        target_path : str
+            The the path we wish to clone to, may be incremented if already present.
+
+        Returns
+        --------
+        dict
+            Jupyter Contents API compatible model
+        """
         path = self.contents_manager.increment_filename(target_path)
         content = await obj['Body'].read()
         content = content.decode('utf-8')
@@ -194,6 +219,20 @@ class BookstoreCloneAPIHandler(APIHandler):
         return model
 
     def build_notebook_model(self, content, path):
+        """Helper that builds a Contents API compatible model for notebooks.
+
+        Parameters
+        ----------
+        model : str
+            The content we wish to clone. 
+        path : str
+            The the path we wish to clone to.
+
+        Returns
+        --------
+        dict
+            Jupyter Contents API compatible model for notebooks
+        """
         model = {
             "type": "notebook",
             "format": "json",
@@ -204,6 +243,20 @@ class BookstoreCloneAPIHandler(APIHandler):
         return model
 
     def build_file_model(self, content, path):
+        """Helper that builds a Contents API compatible model for files.
+
+        Parameters
+        ----------
+        model : str
+            The content we wish to clone. 
+        path : str
+            The the path we wish to clone to.
+
+        Returns
+        --------
+        dict
+            Jupyter Contents API compatible model for files
+        """
         model = {
             "type": "file",
             "format": "text",
@@ -213,10 +266,22 @@ class BookstoreCloneAPIHandler(APIHandler):
         }
         return model
 
-    def build_post_model_response(self, model, obj, s3_bucket):
-        """Helper that takes constructs a Jupyter Contents API compliant model.
+    def build_post_response_model(self, model, obj, s3_bucket):
+        """Helper that takes a Jupyter Contents API compliant model and adds cloning specific information.
 
-        If the file at target_path already exists, this increments the file name.
+        Parameters
+        ----------
+        model : dict
+            Jupyter Contents API model
+        obj : dict
+            Log (usually from the NotebookApp) for logging endpoint changes.
+        s3_bucket : str
+            The S3 bucket we are cloning from
+
+        Returns
+        --------
+        dict
+            Model with additional info about the S3 cloning
         """
         model = deepcopy(model)
         model["s3_path"] = s3_path(s3_bucket, model['path'])
