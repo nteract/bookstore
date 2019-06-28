@@ -139,8 +139,8 @@ class BookstoreContentsArchiver(FileContentsManager):
         Parameters
         ----------
 
-        model : str
-            The type of file
+        model : dict
+            The type of file and its contents
         path : str
             The storage location
         """

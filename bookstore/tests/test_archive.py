@@ -3,6 +3,7 @@ import asyncio
 import pytest
 
 from bookstore.archive import ArchiveRecord, BookstoreContentsArchiver
+from nbformat.v4 import new_notebook
 
 
 def test_create_contentsarchiver():
@@ -23,3 +24,11 @@ async def test_archive_failure_on_no_lock():
     assert record
 
     await archiver.archive(record)
+
+
+def test_pre_save_hook():
+    archiver = BookstoreContentsArchiver()
+    model = {"type": "notebook", "content": new_notebook()}
+    target_path = "my_notebook_path.ipynb"
+
+    archiver.run_pre_save_hook(model, target_path)
