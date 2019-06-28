@@ -225,7 +225,7 @@ class TestCloneAPIHandler(AsyncTestCase):
         assert actual == expected
 
     @gen_test
-    async def test_build_content_model(self):
+    async def test_build_text_content_model(self):
         content = "some content"
         expected = {
             "type": "file",
@@ -244,6 +244,30 @@ class TestCloneAPIHandler(AsyncTestCase):
 
         obj = {'Body': MyFakeClass()}
         path = "test_directory/file_name.txt"
+        success_handler = self.post_handler({})
+        model = await success_handler.build_content_model(obj, path)
+        assert model == expected
+
+    @gen_test
+    async def test_build_notebook_content_model(self):
+        content = nbformat.v4.new_notebook()
+        expected = {
+            "type": "notebook",
+            "format": "json",
+            "content": content,
+            "name": "file_name.ipynb",
+            "path": "test_directory/file_name.ipynb",
+        }
+
+        class MyFakeClass:
+            def __init__(self):
+                pass
+
+            async def read(self):
+                return nbformat.writes(content).encode('utf-8')
+
+        obj = {'Body': MyFakeClass()}
+        path = "test_directory/file_name.ipynb"
         success_handler = self.post_handler({})
         model = await success_handler.build_content_model(obj, path)
         assert model == expected
