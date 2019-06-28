@@ -169,37 +169,57 @@ class BookstoreCloneAPIHandler(APIHandler):
         s3_object_key = model.get("s3_key", "")
         if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
+
         target_path = model.get("target_path", "") or os.path.basename(
             os.path.relpath(s3_object_key)
         )
 
         self.log.info("About to clone from %s", s3_object_key)
-
-        if s3_object_key == '' or s3_object_key == '/':
-            raise web.HTTPError(400, "Must have a key to clone from")
         obj = await self._clone(s3_bucket, s3_object_key)
-        content = await obj['Body'].read()
-        resp_content = {"s3_path": s3_path(s3_bucket, path)}
-        model = {
-            "type": "file",
-            "format": "text",
-            "mimetype": "text/plain",
-            "content": content.decode('utf-8'),
-        }
-        if 'VersionId' in obj:
-            resp_content["versionID"] = obj['VersionId']
-        model, path = self.build_post_model_response(model, target_path)
-        self.contents_manager.save(model, path)
+
+        content_model = await self.build_content_model(obj, target_path)
+        self.contents_manager.save(content_model, content_model['path'])
+        resp_model = self.build_post_response_model(content_model, obj, s3_bucket)
         self.set_header('Content-Type', 'application/json')
         self.finish(model)
 
-    def build_post_model_response(self, model, target_path):
+    async def build_content_model(self, obj, target_path):
+        path = self.contents_manager.increment_filename(target_path)
+        content = await obj['Body'].read()
+        content = content.decode('utf-8')
+        if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
+            model = self.build_notebook_model(content, path)
+        else:
+            model = self.build_file_model(content, path)
+        return model
+
+    def build_notebook_model(self, content, path):
+        model = {
+            "type": "notebook",
+            "format": "json",
+            "content": json.loads(content),
+            "name": os.path.basename(os.path.relpath(path)),
+            "path": os.path.relpath(path),
+        }
+        return model
+
+    def build_file_model(self, content, path):
+        model = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": os.path.basename(os.path.relpath(path)),
+            "path": os.path.relpath(path),
+        }
+        return model
+
+    def build_post_model_response(self, model, obj, s3_bucket):
         """Helper that takes constructs a Jupyter Contents API compliant model.
 
         If the file at target_path already exists, this increments the file name.
         """
         model = deepcopy(model)
-        path = self.contents_manager.increment_filename(target_path)
-        model['name'] = os.path.basename(os.path.relpath(path))
-        model['path'] = os.path.relpath(path)
-        return model, path
+        model["s3_path"] = s3_path(s3_bucket, model['path'])
+        if 'VersionId' in obj:
+            model["versionID"] = obj['VersionId']
+        return model
