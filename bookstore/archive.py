@@ -139,12 +139,16 @@ class BookstoreContentsArchiver(FileContentsManager):
         Parameters
         ----------
 
-        model : str
-            The type of file
+        model : dict
+            The type of file and its contents
         path : str
             The storage location
         """
         if model["type"] != "notebook":
+            self.log.debug(
+                "Bookstore only archives notebooks, "
+                f"request does not state that {path} is a notebook."
+            )
             return
 
         content = json.dumps(model["content"])
