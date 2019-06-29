@@ -148,7 +148,8 @@ class TestCloneAPIHandler(AsyncTestCase):
         """
         get_handler = self.get_handler('/api/bookstore/')
         setattr(get_handler, '_transforms', [])
-        get_handler.get()
+        return_val = get_handler.get()
+        assert return_val is None
 
     def test_build_response(self):
         empty_handler = self.get_handler('/api/bookstore/')
