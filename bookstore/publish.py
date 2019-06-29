@@ -37,15 +37,25 @@ class BookstorePublishAPIHandler(APIHandler):
         path: str
             Path describing where contents should be published to, postfixed to the published_prefix .
         """
-        self.log.info("Attempt publishing to %s", path)
-
         if path == '' or path == '/':
             raise web.HTTPError(400, "Must provide a path for publishing")
+        path = path.lstrip('/')
+
+        s3_object_key = s3_key(self.bookstore_settings.published_prefix, path)
 
         model = self.get_json_body()
         self.validate_model(model)
-        resp = await self._publish(model['content'], path.lstrip('/'))
-        self.finish(resp)
+
+        full_s3_path = s3_display_path(
+            self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
+        )
+        self.log.info(f"Publishing to {full_s3_path}")
+
+        obj = await self._publish(model['content'], s3_object_key)
+        resp_content = self.prepare_response(obj, full_s3_path)
+
+        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
+        self.finish(json.dumps(resp_content))
 
     def validate_model(self, model):
         """Checks that the model given to the API handler meets bookstore's expected structure for a notebook.
@@ -81,16 +91,14 @@ class BookstorePublishAPIHandler(APIHandler):
                 f"{e.message} {json.dumps(e.instance, indent=1, default=lambda obj: '<UNKNOWN>')}",
             )
 
-    async def _publish(self, content, path):
-        """Publish notebook model to the path"""
-        s3_object_key = s3_key(self.bookstore_settings.published_prefix, path)
-
-        self.log.info(
-            "Publishing to %s",
-            s3_display_path(
-                self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
-            ),
-        )
+    async def _publish(self, content, s3_object_key):
+        """Publish notebook model to the path
+        
+        Returns
+        --------
+        dict
+            S3 PutObject response object
+        """
 
         async with self.session.create_client(
             's3',
@@ -99,7 +107,7 @@ class BookstorePublishAPIHandler(APIHandler):
             endpoint_url=self.bookstore_settings.s3_endpoint_url,
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
-            self.log.info("Processing published write of %s", path)
+            self.log.info(f"Processing published write to {s3_object_key}")
             try:
                 obj = await client.put_object(
                     Bucket=self.bookstore_settings.s3_bucket,
@@ -109,13 +117,11 @@ class BookstorePublishAPIHandler(APIHandler):
             except ClientError as e:
                 status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
                 raise web.HTTPError(status_code, e.args[0])
-            self.log.info("Done with published write of %s", path)
+            self.log.info(f"Done with published write to {s3_object_key}")
 
-        resp_content = self.prepare_response(obj, path)
-        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
-        return json.dumps(resp_content)
+        return obj
 
-    def prepare_response(self, obj, path):
+    def prepare_response(self, obj, full_s3_path):
         """Prepares repsonse to publish PUT request.
 
         Parameters
@@ -131,11 +137,7 @@ class BookstorePublishAPIHandler(APIHandler):
             Model for responding to put request. 
         """
 
-        full_s3_path = s3_path(
-            self.bookstore_settings.s3_bucket, self.bookstore_settings.published_prefix, path
-        )
-
-        resp_content = {"s3path": full_s3_path}
+        resp_content = {"s3_path": full_s3_path}
 
         if 'VersionId' in obj:
             resp_content["versionID"] = obj['VersionId']
