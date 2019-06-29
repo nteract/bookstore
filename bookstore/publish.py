@@ -111,19 +111,19 @@ class BookstorePublishAPIHandler(APIHandler):
                 raise web.HTTPError(status_code, e.args[0])
             self.log.info("Done with published write of %s", path)
 
-        resp_content = self.prepare_response(path, obj)
+        resp_content = self.prepare_response(obj, path)
         self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
         return json.dumps(resp_content)
 
-    def prepare_response(self, path, obj):
+    def prepare_response(self, obj, path):
         """Prepares repsonse to publish PUT request.
 
         Parameters
         ----------
-        path: 
-            path to place after the published prefix in the designated bucket
         obj: dict
             Validation dictionary for determining which endpoints to enable.
+        path: 
+            path to place after the published prefix in the designated bucket
 
         Returns
         --------

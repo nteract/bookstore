@@ -74,7 +74,7 @@ class TestPublishAPIHandler(AsyncTestCase):
     def test_prepare_response(self):
         expected = {"s3path": "my_bucket/custom_prefix/mylocal/path", "versionID": "eeeeAB"}
         empty_handler = self.put_handler('/bookstore/publish/hi')
-        actual = empty_handler.prepare_response("mylocal/path", {"VersionId": "eeeeAB"})
+        actual = empty_handler.prepare_response({"VersionId": "eeeeAB"}, "mylocal/path")
         assert actual == expected
 
     def test_validate_model_no_type(self):
