@@ -13,10 +13,60 @@ from tornado import web
 
 from . import PACKAGE_DIR
 from .bookstore_config import BookstoreSettings
-from .s3_paths import s3_path
+from .s3_paths import s3_path, s3_display_path
 from .utils import url_path_join
 
 BOOKSTORE_FILE_LOADER = FileSystemLoader(PACKAGE_DIR)
+
+
+def build_notebook_model(content, path):
+    """Helper that builds a Contents API compatible model for notebooks.
+
+    Parameters
+    ----------
+    content : str
+        The content of the model.
+    path : str
+        The path to be targeted.
+
+    Returns
+    --------
+    dict
+        Jupyter Contents API compatible model for notebooks
+    """
+    model = {
+        "type": "notebook",
+        "format": "json",
+        "content": json.loads(content),
+        "name": os.path.basename(os.path.relpath(path)),
+        "path": os.path.relpath(path),
+    }
+    return model
+
+
+def build_file_model(content, path):
+    """Helper that builds a Contents API compatible model for files.
+
+    Parameters
+    ----------
+    content: str
+        The content of the model
+    path : str
+        The path to be targeted.
+
+    Returns
+    --------
+    dict
+        Jupyter Contents API compatible model for files
+    """
+    model = {
+        "type": "file",
+        "format": "text",
+        "content": content,
+        "name": os.path.basename(os.path.relpath(path)),
+        "path": os.path.relpath(path),
+    }
+    return model
 
 
 class BookstoreCloneHandler(IPythonHandler):
@@ -64,7 +114,7 @@ class BookstoreCloneHandler(IPythonHandler):
         if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Requires an S3 object key in order to clone")
 
-        self.log.info("Setting up cloning landing page from %s", s3_object_key)
+        self.log.info(f"Setting up cloning landing page for {s3_object_key}")
 
         template_params = self.construct_template_params(s3_bucket, s3_object_key)
         self.set_header('Content-Type', 'text/html')
@@ -107,6 +157,10 @@ class BookstoreCloneAPIHandler(APIHandler):
         Helper to access bookstore settings.
     post(self)
         Clone a notebook from the location specified by the payload.
+    build_content_model(self, obj, path)
+        Helper that takes a response from S3 and creates a ContentsAPI compatible model.
+    build_post_response_model(self, model, obj, s3_bucket, s3_object_key)
+        Helper that takes a Jupyter Contents API compliant model and adds cloning specific information.
 
     See also
     --------
@@ -120,11 +174,18 @@ class BookstoreCloneAPIHandler(APIHandler):
         self.session = aiobotocore.get_session()
 
     async def _clone(self, s3_bucket, s3_object_key):
-        path = s3_object_key
+        """Main function that handles communicating with S3 to initiate the clone.
+
+        Parameters
+        ----------
+        s3_bucket: str
+            Log (usually from the NotebookApp) for logging endpoint changes.
+        s3_object_key: str
+            The the path we wish to clone to.
+        """
 
         self.log.info(f"bucket: {s3_bucket}")
         self.log.info(f"key: {s3_object_key}")
-        full_s3_path = s3_path(s3_bucket, path)
 
         async with self.session.create_client(
             's3',
@@ -133,28 +194,16 @@ class BookstoreCloneAPIHandler(APIHandler):
             endpoint_url=self.bookstore_settings.s3_endpoint_url,
             region_name=self.bookstore_settings.s3_region_name,
         ) as client:
-            self.log.info("Processing published write of %s", path)
+            self.log.info(f"Processing clone of {s3_object_key}")
             try:
                 obj = await client.get_object(Bucket=s3_bucket, Key=s3_object_key)
             except ClientError as e:
                 status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
                 raise web.HTTPError(status_code, e.args[0])
 
-            content = await obj['Body'].read()
-            self.log.info("Done with published write of %s", path)
+            self.log.info(f"Obtained contents for {s3_object_key}")
 
-        resp_content = {"s3_path": full_s3_path}
-        model = {
-            "type": "file",
-            "format": "text",
-            "mimetype": "text/plain",
-            "content": content.decode('utf-8'),
-        }
-        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
-
-        if 'VersionId' in obj:
-            resp_content["versionID"] = obj['VersionId']
-        return model
+        return obj
 
     @web.authenticated
     async def post(self):
@@ -182,27 +231,72 @@ class BookstoreCloneAPIHandler(APIHandler):
         s3_object_key = model.get("s3_key", "")
         if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Must have a key to clone from")
+
         target_path = model.get("target_path", "") or os.path.basename(
             os.path.relpath(s3_object_key)
         )
 
-        self.log.info("About to clone from %s", s3_object_key)
+        self.log.info(f"About to clone from {s3_object_key}")
+        obj = await self._clone(s3_bucket, s3_object_key)
 
-        if s3_object_key == '' or s3_object_key == '/':
-            raise web.HTTPError(400, "Must have a key to clone from")
-        model = await self._clone(s3_bucket, s3_object_key)
-        model, path = self.build_post_model_response(model, target_path)
-        self.contents_manager.save(model, path)
+        content_model = await self.build_content_model(obj, target_path)
+
+        self.log.info(f"Completing clone for {s3_object_key}")
+        self.contents_manager.save(content_model, content_model['path'])
+
+        resp_model = self.build_post_response_model(content_model, obj, s3_bucket, s3_object_key)
+
+        self.set_status(obj['ResponseMetadata']['HTTPStatusCode'])
         self.set_header('Content-Type', 'application/json')
-        self.finish(model)
+        self.finish(resp_model)
 
-    def build_post_model_response(self, model, target_path):
-        """Helper that takes constructs a Jupyter Contents API compliant model.
-
+    async def build_content_model(self, obj, target_path):
+        """Helper that takes a response from S3 and creates a ContentsAPI compatible model.
+        
         If the file at target_path already exists, this increments the file name.
+        
+        Parameters
+        ----------
+        obj : dict
+            Response object from S3
+        target_path : str
+            The the path we wish to clone to, may be incremented if already present.
+
+        Returns
+        --------
+        dict
+            Jupyter Contents API compatible model
+        """
+        path = self.contents_manager.increment_filename(target_path)
+        content = await obj['Body'].read()
+        content = content.decode('utf-8')
+        if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
+            model = build_notebook_model(content, path)
+        else:
+            model = build_file_model(content, path)
+        return model
+
+    def build_post_response_model(self, model, obj, s3_bucket, s3_object_key):
+        """Helper that takes a Jupyter Contents API compliant model and adds cloning specific information.
+
+        Parameters
+        ----------
+        model : dict
+            Jupyter Contents API model
+        obj : dict
+            Log (usually from the NotebookApp) for logging endpoint changes.
+        s3_bucket : str
+            The S3 bucket we are cloning from
+        s3_object_key: str
+            The S3 key we are cloning
+
+        Returns
+        --------
+        dict
+            Model with additional info about the S3 cloning
         """
         model = deepcopy(model)
-        path = self.contents_manager.increment_filename(target_path)
-        model['name'] = os.path.basename(os.path.relpath(path))
-        model['path'] = os.path.relpath(path)
-        return model, path
+        model["s3_path"] = s3_display_path(s3_bucket, s3_object_key)
+        if 'VersionId' in obj:
+            model["versionID"] = obj['VersionId']
+        return model

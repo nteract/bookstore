@@ -6,6 +6,10 @@ The ``clone`` module
 
 .. module:: bookstore.clone
 
+.. autofunction:: build_notebook_model
+
+.. autofunction:: build_file_model
+
 ``BookstoreCloneHandler``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -34,4 +38,6 @@ Methods
 
 .. automethod:: BookstoreCloneAPIHandler.post
 
-.. automethod:: BookstoreCloneAPIHandler.build_post_model_response
+.. automethod:: BookstoreCloneAPIHandler.build_content_model
+
+.. automethod:: BookstoreCloneAPIHandler.build_post_response_model

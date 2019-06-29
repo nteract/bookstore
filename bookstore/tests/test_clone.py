@@ -3,15 +3,49 @@ import json
 from unittest.mock import Mock
 
 import pytest
+import nbformat
 
 from jinja2 import Environment
+from notebook.services.contents.filemanager import FileContentsManager
 from tornado.testing import AsyncTestCase, gen_test
 from tornado.web import Application, HTTPError
 from tornado.httpserver import HTTPRequest
 from traitlets.config import Config
 
 
-from ..clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
+from bookstore.clone import (
+    build_notebook_model,
+    build_file_model,
+    BookstoreCloneHandler,
+    BookstoreCloneAPIHandler,
+)
+
+
+def test_build_notebook_model():
+    content = nbformat.v4.new_notebook()
+    expected = {
+        "type": "notebook",
+        "format": "json",
+        "content": content,
+        "name": "my_notebook_name.ipynb",
+        "path": "test_directory/my_notebook_name.ipynb",
+    }
+    path = "./test_directory/my_notebook_name.ipynb"
+    nb_content = nbformat.writes(content)
+    assert build_notebook_model(nb_content, path) == expected
+
+
+def test_build_file_model():
+    content = "my fancy file"
+    expected = {
+        "type": "file",
+        "format": "text",
+        "content": content,
+        "name": "file_name.txt",
+        "path": "test_directory/file_name.txt",
+    }
+    path = "./test_directory/file_name.txt"
+    assert build_file_model(content, path) == expected
 
 
 class TestCloneHandler(AsyncTestCase):
@@ -111,7 +145,11 @@ class TestCloneAPIHandler(AsyncTestCase):
             spec=Application,
             ui_methods={},
             ui_modules={},
-            settings={'jinja2_env': Environment(), "config": config},
+            settings={
+                'jinja2_env': Environment(),
+                "config": config,
+                "contents_manager": FileContentsManager(),
+            },
         )
 
     def post_handler(self, body_dict, app=None):
@@ -159,3 +197,77 @@ class TestCloneAPIHandler(AsyncTestCase):
         success_handler = self.post_handler(post_body_dict)
         with pytest.raises(HTTPError):
             await success_handler._clone(s3_bucket, s3_object_key)
+
+    def test_build_post_response_model(self):
+        content = "some arbitrary content"
+        expected = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": "file_name.txt",
+            "path": "test_directory/file_name.txt",
+            "s3_path": "s3://my_bucket/original_key/may_be_different_than_storage.txt",
+            'versionID': "eeee222eee",
+        }
+
+        s3_bucket = "my_bucket"
+        s3_object_key = "original_key/may_be_different_than_storage.txt"
+        obj = {'VersionId': "eeee222eee"}
+        model = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": "file_name.txt",
+            "path": "test_directory/file_name.txt",
+        }
+        handler = self.post_handler({})
+        actual = handler.build_post_response_model(model, obj, s3_bucket, s3_object_key)
+        assert actual == expected
+
+    @gen_test
+    async def test_build_text_content_model(self):
+        content = "some content"
+        expected = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": "file_name.txt",
+            "path": "test_directory/file_name.txt",
+        }
+
+        class MyFakeClass:
+            def __init__(self):
+                pass
+
+            async def read(self):
+                return content.encode('utf-8')
+
+        obj = {'Body': MyFakeClass()}
+        path = "test_directory/file_name.txt"
+        success_handler = self.post_handler({})
+        model = await success_handler.build_content_model(obj, path)
+        assert model == expected
+
+    @gen_test
+    async def test_build_notebook_content_model(self):
+        content = nbformat.v4.new_notebook()
+        expected = {
+            "type": "notebook",
+            "format": "json",
+            "content": content,
+            "name": "file_name.ipynb",
+            "path": "test_directory/file_name.ipynb",
+        }
+
+        class MyFakeClass:
+            def __init__(self):
+                pass
+
+            async def read(self):
+                return nbformat.writes(content).encode('utf-8')
+
+        obj = {'Body': MyFakeClass()}
+        path = "test_directory/file_name.ipynb"
+        success_handler = self.post_handler({})
+        model = await success_handler.build_content_model(obj, path)
+        assert model == expected
