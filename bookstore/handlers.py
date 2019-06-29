@@ -41,13 +41,13 @@ class BookstoreVersionHandler(APIHandler):
         """Helper for building the version handler's response before serialization."""
         return {
             "release": self.settings['bookstore']["release"],
-            "validation": self.settings['bookstore']["validation"],
+            "features": self.settings['bookstore']["features"],
         }
 
 
 def build_settings_dict(validation):
     """Helper for building the settings info that will be assigned to the web_app."""
-    return {"release": version, "validation": validation}
+    return {"release": version, "features": validation}
 
 
 def load_jupyter_server_extension(nb_app):

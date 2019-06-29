@@ -194,7 +194,7 @@ components:
         format:
           type: string
           description: Format of content (one of null, 'text', 'base64', 'json')
-    ValidationInfo:
+    FeatureValidationInfo:
       type: object
       required:
         - bookstore_valid
@@ -215,5 +215,5 @@ components:
       properties:
         release:
           type: string
-        validation: 
-          $ref: '#/components/schemas/ValidationInfo'
+        features: 
+          $ref: '#/components/schemas/FeatureValidationInfo'

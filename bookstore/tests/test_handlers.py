@@ -92,7 +92,7 @@ def bookstore_settings(request):
 
 def test_build_settings_dict(bookstore_settings):
     expected = {
-        'validation': {
+        'features': {
             'archive_valid': True,
             'bookstore_valid': True,
             'publish_valid': True,
@@ -154,7 +154,7 @@ class TestCloneAPIHandler(AsyncTestCase):
     def test_build_response(self):
         empty_handler = self.get_handler('/api/bookstore/')
         expected = {
-            'validation': {
+            'features': {
                 'archive_valid': True,
                 'bookstore_valid': True,
                 'publish_valid': True,
