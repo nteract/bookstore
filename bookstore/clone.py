@@ -24,10 +24,10 @@ def build_notebook_model(content, path):
 
     Parameters
     ----------
-    model : str
-        The content we wish to clone. 
+    content : str
+        The content of the model.
     path : str
-        The the path we wish to clone to.
+        The path to be targeted.
 
     Returns
     --------
@@ -49,10 +49,10 @@ def build_file_model(content, path):
 
     Parameters
     ----------
-    model : str
-        The content we wish to clone. 
+    content: str
+        The content of the model
     path : str
-        The the path we wish to clone to.
+        The path to be targeted.
 
     Returns
     --------
@@ -157,6 +157,10 @@ class BookstoreCloneAPIHandler(APIHandler):
         Helper to access bookstore settings.
     post(self)
         Clone a notebook from the location specified by the payload.
+    build_content_model(self, obj, path)
+        Helper that takes a response from S3 and creates a ContentsAPI compatible model.
+    build_post_response_model(self, model, obj, s3_bucket, s3_object_key)
+        Helper that takes a Jupyter Contents API compliant model and adds cloning specific information.
 
     See also
     --------
