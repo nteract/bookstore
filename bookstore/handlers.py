@@ -20,24 +20,34 @@ class BookstoreVersionHandler(APIHandler):
     """Handler responsible for Bookstore version information
 
     Used to lay foundations for the bookstore package. Though, frontends can use this endpoint for feature detection.
+
+    Methods
+    -------
+    get(self)
+        Provides version info and feature availability based on serverside settings.
+    build_response_dict(self)
+        Helper to populate response.
     """
 
     @web.authenticated
     def get(self):
-        self.finish(
-            json.dumps(
-                {
-                    "bookstore": True,
-                    "version": self.settings['bookstore']["version"],
-                    "validation": self.settings['bookstore']["validation"],
-                }
-            )
-        )
+        """GET /api/bookstore/
+
+        Returns version info and validation info for various bookstore features.
+        """
+        self.finish(json.dumps(self.build_response_dict()))
+
+    def build_response_dict(self):
+        """Helper for building the version handler's response before serialization."""
+        return {
+            "release": self.settings['bookstore']["release"],
+            "features": self.settings['bookstore']["features"],
+        }
 
 
-# TODO: Add a check. Note: We need to ensure that publishing is not configured if bookstore settings are not
-#       set. Because of how the APIHandlers cannot be configurable, all we can do is reach into settings
-#       For applications this will mean checking the config and then applying it in
+def build_settings_dict(validation):
+    """Helper for building the settings info that will be assigned to the web_app."""
+    return {"release": version, "features": validation}
 
 
 def load_jupyter_server_extension(nb_app):
@@ -48,7 +58,7 @@ def load_jupyter_server_extension(nb_app):
 
     bookstore_settings = BookstoreSettings(parent=nb_app)
     validation = validate_bookstore(bookstore_settings)
-    web_app.settings['bookstore'] = {"version": version, "validation": validation}
+    web_app.settings['bookstore'] = build_settings_dict(validation)
     handlers = collect_handlers(nb_app.log, base_url, validation)
     web_app.add_handlers(host_pattern, handlers)
 
@@ -92,7 +102,7 @@ def collect_handlers(log, base_url, validation):
     else:
         log.info("[bookstore] Publishing disabled. s3_bucket or endpoint are not configured.")
 
-    if validation['cloning_valid']:
+    if validation['clone_valid']:
         log.info(f"[bookstore] Enabling bookstore cloning, version: {version}")
         handlers.append(
             (url_path_join(base_bookstore_api_pattern, r"/clone(?:/?)*"), BookstoreCloneAPIHandler)

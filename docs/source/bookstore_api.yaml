@@ -194,27 +194,26 @@ components:
         format:
           type: string
           description: Format of content (one of null, 'text', 'base64', 'json')
-    ValidationInfo:
+    FeatureValidationInfo:
       type: object
       required:
-        - bookstore_validation
-        - archive_validation
-        - published_validation
+        - bookstore_valid
+        - archive_valid
+        - publish_valid
+        - clone_valid
       properties:
-        bookstore_validation:
+        bookstore_valid:
           type: boolean
-        archive_validation:
+        archive_valid:
           type: boolean
-        published_validation: 
+        publish_valid: 
+          type: boolean
+        clone_valid: 
           type: boolean
     VersionInfo:
       type: object
-      required:
-        - s3path
       properties:
-        bookstore:
-          type: boolean
-        version:
+        release:
           type: string
-        validation: 
-          $ref: '#/components/schemas/ValidationInfo'
+        features: 
+          $ref: '#/components/schemas/FeatureValidationInfo'
