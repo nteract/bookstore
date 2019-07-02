@@ -124,9 +124,9 @@ components:
     S3PublishFileResponse:
       type: object
       required:
-        - s3path
+        - s3_path
       properties:
-        s3path:
+        s3_path:
           type: string
         versionID:
           type: string
