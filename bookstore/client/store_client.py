@@ -14,7 +14,7 @@ class BookstoreClient(CurrentNotebookClient):
 
     @property
     def publish_endpoint(self):
-        api_endpoint = "/api/bookstore/published/"
+        api_endpoint = "/api/bookstore/publish/"
         return f"{self.url}{api_endpoint}"
 
     def publish(self, path=None):
@@ -31,7 +31,7 @@ class BookstoreClient(CurrentNotebookClient):
 
     @property
     def clone_endpoint(self):
-        api_endpoint = "/api/bookstore/cloned/"
+        api_endpoint = "/api/bookstore/clone/"
         return f"{self.url}{api_endpoint}"
 
     def clone(self, s3_bucket="", s3_key="", target_path=""):
