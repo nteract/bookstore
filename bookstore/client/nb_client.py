@@ -1,22 +1,4 @@
-"""Client to test bookstore endpoints from within a notebook.
-
-
-TODO: (Clarify) We want to test our bookstore endpoints, but it's no fun having
-to do this in an insecure fashion. Better would be to have some security in
-place.
-
-Example
--------
-
-[{'base_url': '/',
-  'hostname': 'localhost',
-  'notebook_dir': '/Users/mpacer/jupyter/eg_notebooks',
-  'password': False,
-  'pid': 96033,
-  'port': 8888,
-  'secure': False,
-  'token': '',
-  'url': 'http://localhost:8888/'}]
+"""Client for accessing notebook server endpoints from within a notebook.
 """
 import json
 import os
@@ -42,6 +24,21 @@ class LiveNotebookRecord(NamedTuple):
 
     This is a record of an object returned by
     `notebook.notebookapp.list_running_servers()`.
+
+    Example
+    -------
+    :: 
+
+        [{'base_url': '/',
+        'hostname': 'localhost',
+        'notebook_dir': '/Users/mpacer/jupyter/eg_notebooks',
+        'password': False,
+        'pid': 96033,
+        'port': 8888,
+        'secure': False,
+        'token': '',
+        'url': 'http://localhost:8888/'}]
+
     """
 
     base_url: str
@@ -56,11 +53,27 @@ class LiveNotebookRecord(NamedTuple):
 
 
 class KernelInfo:
-    #     id: str # 'f92b7c8b-0858-4d10-903c-b0631540fb36',
-    #     name: str # 'dev',
-    #     last_activity: str #'2019-03-14T23:38:08.137987Z',
-    #     execution_state: str #'idle',
-    #     connections: int # 0
+    """Representation of kernel info returned by the notebook's /api/kernel endpoint.
+
+    Attributes
+    ----------
+    id: str
+    name: str
+    last_activity: str
+    execution_state: str 
+    connections: int
+
+    Example
+    -------
+    ::
+
+        {id: 'f92b7c8b-0858-4d10-903c-b0631540fb36',
+        name: 'dev',
+        last_activity: '2019-03-14T23:38:08.137987Z',
+        execution_state: 'idle',
+        connections: 0}
+    """
+
     def __init__(self, *args, id, name, last_activity, execution_state, connections):
         self.model = {
             "id": id,
@@ -92,13 +105,35 @@ class KernelInfo:
             return False
 
 
-class NotebookSession:  # (NamedTuple):
-    #     id: str #'68d9c58f-c57d-4133-8b41-5ec2731b268d',
-    #     path: str #'Untitled38.ipynb',
-    #     name: str #'',
-    #     type: str #'notebook',
-    #     kernel: KernelInfo
-    #     notebook: dict # deprecated API {'path': 'Untitled38.ipynb', 'name': ''}
+class NotebookSession:
+    """Representation of session info returned by the notebook's /api/sessions/ endpoint.
+    
+    Attributes
+    ----------
+    id: str
+    path: str 
+    name: str 
+    type: str 
+    kernel: KernelInfo
+    notebook: dict 
+    model: dict
+        Record of the raw response (without converting the KernelInfo).
+
+    Example
+    -------
+    ::
+    
+        {id: '68d9c58f-c57d-4133-8b41-5ec2731b268d',
+         path: 'Untitled38.ipynb',
+         name: '',
+         type: 'notebook',
+         kernel: KernelInfo(id='f92b7c8b-0858-4d10-903c-b0631540fb36', 
+                            name='dev', 
+                            last_activity='2019-03-14T23:38:08.137987Z', 
+                            execution_state='idle', 
+                            connections=0),
+        notebook: {'path': 'Untitled38.ipynb', 'name': ''}}
+    """
 
     def __init__(self, *args, path, name, type, kernel, notebook={}, **kwargs):
         self.model = {
@@ -133,7 +168,28 @@ class NotebookSession:  # (NamedTuple):
 
 
 class NotebookClient:
-    """Client used to interact with bookstore from within a running notebook UI"""
+    """EXPERIMENTAL SUPPORT: Client used to interact with a notebook server from within a notebook.
+
+    Parameters
+    ----------
+    nb_config: dict
+        Dictionary of info compatible with creating a LiveNotebookRecord.
+
+    Attributes
+    ----------
+    nb_config: dict
+       Dictionary of info compatible with creating a LiveNotebookRecord. 
+    nb_record: LiveNotebookRecord
+        LiveNotebookRecord of info for this notebook
+    url: str
+        url from nb_record minus final /
+    token: str
+        token used for authenticating requests serverside
+    xsrf_token: str
+        xsrf_token used in cookie for authenticating requests
+    req_session: requests.Session
+        Session to be reused across methods
+    """
 
     def __init__(self, nb_config):
         self.nb_config = nb_config
@@ -154,23 +210,20 @@ class NotebookClient:
         self.xsrf_token = first.cookies.get("_xsrf", "")
 
     def setup_request_sessions(self):
-        """ Sets up a requests.Session object for sharing headers across API requests.
-        """
+        """ Sets up a requests.Session object for sharing headers across API requests. """
         self.req_session = requests.Session()
         self.req_session.headers.update(self.headers)
 
     @property
     def sessions(self):
-        """Current notebook sessions. Reissues request on each call.
-        """
+        """Current notebook sessions. Reissues request on each call. """
         return {
             session['kernel']['id']: NotebookSession(**session) for session in self.get_sessions()
         }
 
     @property
     def headers(self):
-        """Default headers to be shared across requests.
-        """
+        """Default headers to be shared across requests. """
         headers = {
             'Authorization': f'token {self.token}',
             'X-XSRFToken': self.xsrf_token,
@@ -180,41 +233,48 @@ class NotebookClient:
 
     @property
     def sessions_endpoint(self):
+        """Current server's kernels API endpoint."""
         api_endpoint = "/api/sessions/"
         return f"{self.url}{api_endpoint}"
 
     def get_sessions(self):
+        """Requests info about current sessions from notebook server."""
         target_url = f"{self.sessions_endpoint}"
         resp = self.req_session.get(target_url)
         return resp.json()
 
     @property
     def kernels_endpoint(self):
+        """Current server's kernels API endpoint."""
         api_endpoint = "/api/kernels/"
         return f"{self.url}{api_endpoint}"
 
     def get_kernels(self):
+        """Requests info about current kernels from notebook server."""
         target_url = f"{self.kernels_endpoint}"
         resp = self.req_session.get(target_url)
         return resp.json()
 
     @property
     def kernels(self):
+        """Current notebook kernels. Reissues request on each call."""
         return self.get_kernels()
 
     @property
     def contents_endpoint(self):
+        """Current server's contents API endpoint."""
         api_endpoint = "/api/contents/"
         return f"{self.url}{api_endpoint}"
 
     def get_contents(self, path):
+        """Requests info about current contents from notebook server."""
         target_url = f"{self.contents_endpoint}{path}"
         resp = self.req_session.get(target_url)
         return resp.json()
 
 
 class NotebookClientCollection:
-    """Representation of a collection of notebook clients"""
+    """EXPERIMENTAL SUPPORT: Representation of a collection of notebook clients"""
 
     # TODO: refactor from lambda to a def
     nb_client_gen = lambda: (NotebookClient(x) for x in list_running_servers())
@@ -234,7 +294,7 @@ class NotebookClientCollection:
 
 
 class CurrentNotebookClient(NotebookClient):
-    """Represents the currently active notebook client"""
+    """EXPERIMENTAL SUPPORT: Represents the currently active notebook client."""
 
     def __init__(self):
         self.nb_client = NotebookClientCollection.current_server()
@@ -243,8 +303,10 @@ class CurrentNotebookClient(NotebookClient):
 
     @property
     def connection_file(self):
+        """Connection file for connecting to current notebook's kernel."""
         return get_ipython().parent.parent.connection_file
 
     @property
     def kernel_id(self):
+        """Kernel id for identifying which notebook is currently being used by this session."""
         return extract_kernel_id(self.connection_file)
