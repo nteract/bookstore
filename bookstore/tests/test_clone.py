@@ -235,17 +235,9 @@ class TestCloneAPIHandler(AsyncTestCase):
             "path": "test_directory/file_name.txt",
         }
 
-        class MyFakeClass:
-            def __init__(self):
-                pass
-
-            async def read(self):
-                return content.encode('utf-8')
-
-        obj = {'Body': MyFakeClass()}
         path = "test_directory/file_name.txt"
         success_handler = self.post_handler({})
-        model = await success_handler.build_content_model(obj, path)
+        model = success_handler.build_content_model(content, path)
         assert model == expected
 
     @gen_test
@@ -259,15 +251,9 @@ class TestCloneAPIHandler(AsyncTestCase):
             "path": "test_directory/file_name.ipynb",
         }
 
-        class MyFakeClass:
-            def __init__(self):
-                pass
+        str_content = nbformat.writes(content)
 
-            async def read(self):
-                return nbformat.writes(content).encode('utf-8')
-
-        obj = {'Body': MyFakeClass()}
         path = "test_directory/file_name.ipynb"
         success_handler = self.post_handler({})
-        model = await success_handler.build_content_model(obj, path)
+        model = success_handler.build_content_model(str_content, path)
         assert model == expected

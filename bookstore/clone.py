@@ -197,13 +197,14 @@ class BookstoreCloneAPIHandler(APIHandler):
             self.log.info(f"Processing clone of {s3_object_key}")
             try:
                 obj = await client.get_object(Bucket=s3_bucket, Key=s3_object_key)
+                content = (await obj['Body'].read()).decode('utf-8')
             except ClientError as e:
                 status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
                 raise web.HTTPError(status_code, e.args[0])
 
             self.log.info(f"Obtained contents for {s3_object_key}")
 
-        return obj
+        return obj, content
 
     @web.authenticated
     async def post(self):
@@ -237,9 +238,9 @@ class BookstoreCloneAPIHandler(APIHandler):
         )
 
         self.log.info(f"About to clone from {s3_object_key}")
-        obj = await self._clone(s3_bucket, s3_object_key)
+        obj, content = await self._clone(s3_bucket, s3_object_key)
 
-        content_model = await self.build_content_model(obj, target_path)
+        content_model = self.build_content_model(content, target_path)
 
         self.log.info(f"Completing clone for {s3_object_key}")
         self.contents_manager.save(content_model, content_model['path'])
@@ -250,15 +251,15 @@ class BookstoreCloneAPIHandler(APIHandler):
         self.set_header('Content-Type', 'application/json')
         self.finish(resp_model)
 
-    async def build_content_model(self, obj, target_path):
+    def build_content_model(self, content, target_path):
         """Helper that takes a response from S3 and creates a ContentsAPI compatible model.
         
         If the file at target_path already exists, this increments the file name.
         
         Parameters
         ----------
-        obj : dict
-            Response object from S3
+        content : str
+            string encoded file content
         target_path : str
             The the path we wish to clone to, may be incremented if already present.
 
@@ -268,8 +269,6 @@ class BookstoreCloneAPIHandler(APIHandler):
             Jupyter Contents API compatible model
         """
         path = self.contents_manager.increment_filename(target_path)
-        content = await obj['Body'].read()
-        content = content.decode('utf-8')
         if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
             model = build_notebook_model(content, path)
         else:
