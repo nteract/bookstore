@@ -30,7 +30,7 @@ Distributed under the terms of the Modified BSD License.
           xhr.responseType = "json";
           xhr.onload = function(e) {
             if (xhr.readyState === 4) {
-              if (xhr.status === 201) {
+              if (xhr.status === 200) {
                 window.location.href = `{{ redirect_contents_url }}/${
                   xhr.response.path
                 }`;
