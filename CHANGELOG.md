@@ -1,6 +1,12 @@
 # Change Log
 
-## 2.3.0 [Unreleased](https://github.com/nteract/bookstore/compare/2.2.1...HEAD)
+## 2.3.2 [Unreleased](https://github.com/nteract/bookstore/compare/2.3.1...HEAD)
+
+## [2.3.1](https://github.com/nteract/bookstore/releases/tag/2.3.1) 2019-07-16
+
+### Fixing problems
+
+This fixes an issue that arose where in certain cases cloning would hang indefinitely when trying to read content [#145](https://github.com/nteract/bookstore/issues/145).
 
 ## [2.3.0](https://github.com/nteract/bookstore/releases/tag/2.3.0) 2019-07-02
 
