@@ -71,7 +71,6 @@ setup(
         'futures ; python_version < "3.0"',
         'ipython >= 5.0',
         'notebook',
-        's3fs',
         'tornado >= 5.1.1',
         'aiobotocore',
         'aioboto3',
