@@ -200,7 +200,8 @@ components:
         - bookstore_valid
         - archive_valid
         - publish_valid
-        - clone_valid
+        - s3_clone_valid
+        - fs_clone_valid
       properties:
         bookstore_valid:
           type: boolean
@@ -208,7 +209,9 @@ components:
           type: boolean
         publish_valid: 
           type: boolean
-        clone_valid: 
+        s3_clone_valid: 
+          type: boolean
+        fs_clone_valid: 
           type: boolean
     VersionInfo:
       type: object
