@@ -94,10 +94,10 @@ class TestCloneHandler(AsyncTestCase):
     def test_gen_template_params(self):
         success_handler = self.get_handler('/bookstore/clone?s3_bucket=hello&s3_key=my_key')
         expected = {
-            's3_bucket': 'hello',
-            's3_key': 'my_key',
+            'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key'},
             'clone_api_url': 'https://localhost:8888/api/bookstore/clone',
             'redirect_contents_url': 'https://localhost:8888',
+            'source_description': 'my_key from hello',
         }
         success_handler = self.get_handler('/bookstore/clone?s3_bucket=hello&s3_key=my_key')
         output = success_handler.construct_template_params(
@@ -108,10 +108,10 @@ class TestCloneHandler(AsyncTestCase):
     def test_gen_template_params_base_url(self):
         base_url_list = ['/my_base_url', '/my_base_url/', 'my_base_url/', 'my_base_url']
         expected = {
-            's3_bucket': 'hello',
-            's3_key': 'my_key',
+            'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key'},
             'clone_api_url': 'https://localhost:8888/my_base_url/api/bookstore/clone',
             'redirect_contents_url': 'https://localhost:8888',
+            'source_description': 'my_key from hello',
         }
         for base_url in base_url_list:
             mock_app = Mock(
