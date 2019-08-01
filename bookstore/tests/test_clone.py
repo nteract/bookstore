@@ -1,6 +1,7 @@
 import json
 
 from unittest.mock import Mock
+from pathlib import Path
 
 import pytest
 import nbformat
@@ -12,12 +13,13 @@ from tornado.web import Application, HTTPError
 from tornado.httpserver import HTTPRequest
 from traitlets.config import Config
 
-
+from bookstore.bookstore_config import BookstoreSettings
 from bookstore.clone import (
     build_notebook_model,
     build_file_model,
     BookstoreCloneHandler,
     BookstoreCloneAPIHandler,
+    validate_relpath,
 )
 
 
@@ -257,3 +259,31 @@ class TestCloneAPIHandler(AsyncTestCase):
         success_handler = self.post_handler({})
         model = success_handler.build_content_model(str_content, path)
         assert model == expected
+
+
+def test_validate_relpath():
+    relpath = 'hi'
+    settings = BookstoreSettings(fs_cloning_basedir="/anything")
+    fs_clonepath = validate_relpath(relpath, settings)
+    assert fs_clonepath == Path("/anything/hi")
+
+
+def test_validate_relpath_nonabsolute_basedir():
+    relpath = 'hi'
+    settings = BookstoreSettings(fs_cloning_basedir="anything")
+    with pytest.raises(HTTPError):
+        fs_clonepath = validate_relpath(relpath, settings)
+
+
+def test_validate_relpath_empty_relpath():
+    relpath = ''
+    settings = BookstoreSettings(fs_cloning_basedir="/anything")
+    with pytest.raises(HTTPError):
+        fs_clonepath = validate_relpath(relpath, settings)
+
+
+def test_validate_relpath_escape_basedir():
+    relpath = '../hi'
+    settings = BookstoreSettings(fs_cloning_basedir="/anything")
+    with pytest.raises(HTTPError):
+        fs_clonepath = validate_relpath(relpath, settings)
