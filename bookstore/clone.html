@@ -21,10 +21,7 @@ Distributed under the terms of the Modified BSD License.
 
         var button = document.getElementById("mybutton");
         button.onclick = function(event) {
-          var post_json = {
-            s3_bucket: "{{ s3_bucket }}",
-            s3_key: "{{ s3_key }}"
-          };
+          var post_json = {{ post_model | tojson(indent=2)}}
           var xsrf_token = getCookieByName("_xsrf");
           var xhr = new XMLHttpRequest();
           xhr.responseType = "json";
@@ -58,8 +55,8 @@ Distributed under the terms of the Modified BSD License.
 
   <body>
     <p>
-      This is a placeholder for the cloning landing page for the file
-      {{ s3_key }} at {{ s3_bucket }}.
+      This is the landing page where you should confirm that you wish to clone
+      {{ source_description }}.
     </p>
     <button id="mybutton" onclick="alert('did not get replaced')">
       confirm clone
