@@ -96,7 +96,8 @@ def test_build_settings_dict(bookstore_settings):
             'archive_valid': True,
             'bookstore_valid': True,
             'publish_valid': True,
-            'clone_valid': True,
+            's3_clone_valid': True,
+            'fs_clone_valid': False,
         },
         'release': version,
     }
@@ -158,7 +159,8 @@ class TestCloneAPIHandler(AsyncTestCase):
                 'archive_valid': True,
                 'bookstore_valid': True,
                 'publish_valid': True,
-                'clone_valid': True,
+                's3_clone_valid': True,
+                'fs_clone_valid': False,
             },
             'release': version,
         }

@@ -102,7 +102,7 @@ def collect_handlers(log, base_url, validation):
     else:
         log.info("[bookstore] Publishing disabled. s3_bucket or endpoint are not configured.")
 
-    if validation['clone_valid']:
+    if validation['s3_clone_valid']:
         log.info(f"[bookstore] Enabling bookstore cloning, version: {version}")
         handlers.append(
             (url_path_join(base_bookstore_api_pattern, r"/clone(?:/?)*"), BookstoreCloneAPIHandler)

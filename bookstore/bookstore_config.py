@@ -83,12 +83,14 @@ def validate_bookstore(settings: BookstoreSettings):
     general_settings = [settings.s3_bucket != "", settings.s3_endpoint_url != ""]
     archive_settings = [*general_settings, settings.workspace_prefix != ""]
     published_settings = [*general_settings, settings.published_prefix != ""]
-    cloning_settings = [settings.enable_cloning]
+    s3_cloning_settings = [settings.enable_cloning]
+    fs_cloning_settings = [settings.fs_cloning_basedir != ""]
 
     validation_checks = {
         "bookstore_valid": all(general_settings),
         "archive_valid": all(archive_settings),
         "publish_valid": all(published_settings),
-        "clone_valid": all(cloning_settings),
+        "s3_clone_valid": all(s3_cloning_settings),
+        "fs_clone_valid": all(fs_cloning_settings),
     }
     return validation_checks
