@@ -21,6 +21,7 @@ from bookstore.clone import (
     BookstoreCloneHandler,
     BookstoreCloneAPIHandler,
     validate_relpath,
+    BookstoreFSCloneHandler,
 )
 
 
@@ -301,3 +302,89 @@ def test_validate_relpath_escape_basedir(caplog):
         with caplog.at_level(logging.INFO):
             fs_clonepath = validate_relpath(relpath, settings, log)
     assert f"Request to clone from a path outside of base directory" in caplog.text
+
+
+class TestFSCloneHandler(AsyncTestCase):
+    def setUp(self):
+        super().setUp()
+        mock_settings = {"BookstoreSettings": {"fs_cloning_basedir": "/Users/jupyter"}}
+        self.config = Config(mock_settings)
+        self.mock_application = Mock(
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            settings={'jinja2_env': Environment(), 'config': self.config},
+        )
+
+    def get_handler(self, uri, app=None):
+        if app is None:
+            app = self.mock_application
+        connection = Mock(context=Mock(protocol="https"))
+        payload_request = HTTPRequest(
+            method='GET',
+            uri=uri,
+            headers={"Host": "localhost:8888"},
+            body=None,
+            connection=connection,
+        )
+        return BookstoreFSCloneHandler(app, payload_request)
+
+    @gen_test
+    async def test_get_no_param(self):
+        empty_handler = self.get_handler('/bookstore/fs-clone')
+        with pytest.raises(HTTPError):
+            await empty_handler.get()
+
+    @gen_test
+    async def test_get_empty_relpath(self):
+        empty_relpath_handler = self.get_handler('/bookstore/fs-clone?relpath=')
+        with pytest.raises(HTTPError):
+            await empty_relpath_handler.get()
+
+    @gen_test
+    async def test_get_escape_basedir(self):
+        escape_basedir_handler = self.get_handler('/bookstore/fs-clone?relpath=../hi')
+        with pytest.raises(HTTPError):
+            await escape_basedir_handler.get()
+
+    @gen_test
+    async def test_get_success(self):
+        success_handler = self.get_handler('/bookstore/fs-clone?relpath=my/test/path.ipynb')
+        await success_handler.get()
+
+    def test_gen_template_params(self):
+        expected = {
+            'post_model': {'relpath': 'my/test/path.ipynb'},
+            'clone_api_url': 'https://localhost:8888/api/bookstore/fs-clone',
+            'redirect_contents_url': 'https://localhost:8888',
+            'source_description': '/Users/jupyter/my/test/path.ipynb',
+        }
+        success_handler = self.get_handler('/bookstore/fs-clone?relpath=my/test/path.ipynb')
+        output = success_handler.construct_template_params(
+            relpath='my/test/path.ipynb', fs_clonepath='/Users/jupyter/my/test/path.ipynb'
+        )
+        assert expected == output
+
+    def test_gen_template_params_base_url(self):
+        base_url_list = ['/my_base_url', '/my_base_url/', 'my_base_url/', 'my_base_url']
+        expected = {
+            'post_model': {'relpath': 'my/test/path.ipynb'},
+            'clone_api_url': 'https://localhost:8888/my_base_url/api/bookstore/fs-clone',
+            'redirect_contents_url': 'https://localhost:8888',
+            'source_description': '/Users/jupyter/my/test/path.ipynb',
+        }
+        for base_url in base_url_list:
+            mock_app = Mock(
+                spec=Application,
+                ui_methods={},
+                ui_modules={},
+                settings={'jinja2_env': Environment(), "base_url": base_url, "config": self.config},
+            )
+
+            success_handler = self.get_handler(
+                '/bookstore/fs-clone?relpath=my/test/path.ipynb', app=mock_app
+            )
+            output = success_handler.construct_template_params(
+                relpath='my/test/path.ipynb', fs_clonepath='/Users/jupyter/my/test/path.ipynb'
+            )
+            assert expected == output
