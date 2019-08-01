@@ -43,7 +43,7 @@ def test_collect_handlers_no_clone():
         ('/api/bookstore/publish%s' % path_regex, BookstorePublishAPIHandler),
     ]
     web_app = Application()
-    mock_settings = {"BookstoreSettings": {"s3_bucket": "mock_bucket", "enable_cloning": False}}
+    mock_settings = {"BookstoreSettings": {"s3_bucket": "mock_bucket", "enable_s3_cloning": False}}
     bookstore_settings = BookstoreSettings(config=Config(mock_settings))
     validation = validate_bookstore(bookstore_settings)
     handlers = collect_handlers(log, '/', validation)
@@ -67,7 +67,7 @@ def test_collect_handlers_no_publish():
 def test_collect_handlers_only_version():
     expected = [('/api/bookstore', BookstoreVersionHandler)]
     web_app = Application()
-    mock_settings = {"BookstoreSettings": {"enable_cloning": False}}
+    mock_settings = {"BookstoreSettings": {"enable_s3_cloning": False}}
     bookstore_settings = BookstoreSettings(config=Config(mock_settings))
     validation = validate_bookstore(bookstore_settings)
     handlers = collect_handlers(log, '/', validation)

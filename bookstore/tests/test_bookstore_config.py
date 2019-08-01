@@ -76,7 +76,7 @@ def test_disable_cloning():
         "publish_valid": True,
         "archive_valid": True,
         "s3_clone_valid": False,
-        "fs_clone_valid": False
+        "fs_clone_valid": False,
     }
-    settings = BookstoreSettings(s3_bucket="A_bucket", enable_cloning=False)
+    settings = BookstoreSettings(s3_bucket="A_bucket", enable_s3_cloning=False)
     assert validate_bookstore(settings) == expected
