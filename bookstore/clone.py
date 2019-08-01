@@ -3,6 +3,7 @@ import json
 import os
 
 from copy import deepcopy
+from pathlib import Path
 
 import aiobotocore
 
@@ -300,3 +301,21 @@ class BookstoreCloneAPIHandler(APIHandler):
         if 'VersionId' in obj:
             model["versionID"] = obj['VersionId']
         return model
+
+
+def validate_relpath(relpath, settings):
+    """Validates that a relative path appropriately resolves given bookstore settings.
+    """
+    if relpath == '':
+        raise web.HTTPError(400, "Requires a path to clone")
+
+    fs_basedir = Path(settings.fs_cloning_basedir)
+    if not fs_basedir.is_absolute():
+        raise web.HTTPError(400, "File system cloning base directory must be an absolute path")
+
+    fs_clonepath = Path(os.path.realpath(os.path.join(fs_basedir, relpath)))
+
+    if fs_basedir not in fs_clonepath.parents:
+        raise web.HTTPError(400, "Cannot clone from a path outside of the base directory")
+
+    return fs_clonepath
