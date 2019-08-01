@@ -63,7 +63,7 @@ class BookstoreSettings(LoggingConfigurable):
     ).tag(config=True)
 
     fs_cloning_basedir = Unicode(
-        "", help=("Base directory used for relative paths when cloning from the file system")
+        "", help=("Base directory used for relative paths when cloning from the local file system")
     ).tag(config=True)
 
 

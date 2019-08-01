@@ -82,7 +82,7 @@ def test_disable_cloning():
     assert validate_bookstore(settings) == expected
 
 
-def test_enable_fscloning():
+def test_enable_fs_cloning():
     """Tests that file system cloning works even if s3 cloning is disabled."""
     expected = {
         "bookstore_valid": False,
