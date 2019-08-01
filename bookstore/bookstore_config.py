@@ -33,13 +33,18 @@ class BookstoreSettings(LoggingConfigurable):
                 Bucket name, environment variable ``JPYNB_S3_BUCKET``
     max_threads : int(``16``)
                   Maximum threads from the threadpool available for S3 read/writes
+    enable_s3_cloning : bool(``True``)
+                        Enable cloning from s3.
+    fs_cloning_basedir : str(``"/Users/jupyter"``)
+                        Base directory used for relative paths when cloning from the local file system.
+                  
     """
 
     workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(
         config=True
     )
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
-    enable_s3_cloning = Bool(True, help="Enable cloning.").tag(config=True)
+    enable_s3_cloning = Bool(True, help="Enable cloning from s3.").tag(config=True)
 
     s3_access_key_id = Unicode(
         help="S3/AWS access key ID", allow_none=True, default_value=None

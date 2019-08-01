@@ -70,7 +70,7 @@ def test_validate_bookstore_bucket():
 
 
 def test_disable_cloning():
-    """Tests that cloning can be disabled when s3_bucket is provided."""
+    """Tests that cloning from s3_bucket can be disabled."""
     expected = {
         "bookstore_valid": True,
         "publish_valid": True,
