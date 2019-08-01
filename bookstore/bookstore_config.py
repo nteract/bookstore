@@ -33,13 +33,18 @@ class BookstoreSettings(LoggingConfigurable):
                 Bucket name, environment variable ``JPYNB_S3_BUCKET``
     max_threads : int(``16``)
                   Maximum threads from the threadpool available for S3 read/writes
+    enable_s3_cloning : bool(``True``)
+                        Enable cloning from s3.
+    fs_cloning_basedir : str(``"/Users/jupyter"``)
+                        Base directory used for relative paths when cloning from the local file system.
+                  
     """
 
     workspace_prefix = Unicode("workspace", help="Prefix for the live workspace notebooks").tag(
         config=True
     )
     published_prefix = Unicode("published", help="Prefix for published notebooks").tag(config=True)
-    enable_cloning = Bool(True, help="Enable cloning.").tag(config=True)
+    enable_s3_cloning = Bool(True, help="Enable cloning from s3.").tag(config=True)
 
     s3_access_key_id = Unicode(
         help="S3/AWS access key ID", allow_none=True, default_value=None
@@ -62,6 +67,10 @@ class BookstoreSettings(LoggingConfigurable):
         16, help="Maximum number of threads for the threadpool allocated for S3 read/writes"
     ).tag(config=True)
 
+    fs_cloning_basedir = Unicode(
+        "", help=("Base directory used for relative paths when cloning from the local file system")
+    ).tag(config=True)
+
 
 def validate_bookstore(settings: BookstoreSettings):
     """Check that settings exist.
@@ -79,12 +88,14 @@ def validate_bookstore(settings: BookstoreSettings):
     general_settings = [settings.s3_bucket != "", settings.s3_endpoint_url != ""]
     archive_settings = [*general_settings, settings.workspace_prefix != ""]
     published_settings = [*general_settings, settings.published_prefix != ""]
-    cloning_settings = [settings.enable_cloning]
+    s3_cloning_settings = [settings.enable_s3_cloning]
+    fs_cloning_settings = [settings.fs_cloning_basedir != ""]
 
     validation_checks = {
         "bookstore_valid": all(general_settings),
         "archive_valid": all(archive_settings),
         "publish_valid": all(published_settings),
-        "clone_valid": all(cloning_settings),
+        "s3_clone_valid": all(s3_cloning_settings),
+        "fs_clone_valid": all(fs_cloning_settings),
     }
     return validation_checks
