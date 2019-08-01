@@ -62,6 +62,10 @@ class BookstoreSettings(LoggingConfigurable):
         16, help="Maximum number of threads for the threadpool allocated for S3 read/writes"
     ).tag(config=True)
 
+    fs_cloning_basedir = Unicode(
+        "", help=("Base directory used for relative paths when cloning from the file system")
+    ).tag(config=True)
+
 
 def validate_bookstore(settings: BookstoreSettings):
     """Check that settings exist.
