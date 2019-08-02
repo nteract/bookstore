@@ -8,7 +8,7 @@ from unittest.mock import Mock
 from bookstore._version import __version__
 from bookstore.handlers import collect_handlers, build_settings_dict, BookstoreVersionHandler
 from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
-from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler
+from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler, BookstoreFSCloneHandler
 from bookstore.publish import BookstorePublishAPIHandler
 from notebook.base.handlers import path_regex
 from tornado.testing import AsyncTestCase
@@ -28,9 +28,12 @@ def test_collect_handlers_all():
         ('/api/bookstore/publish%s' % path_regex, BookstorePublishAPIHandler),
         ('/api/bookstore/clone(?:/?)*', BookstoreCloneAPIHandler),
         ('/bookstore/clone(?:/?)*', BookstoreCloneHandler),
+        ('/bookstore/fs-clone(?:/?)*', BookstoreFSCloneHandler),
     ]
     web_app = Application()
-    mock_settings = {"BookstoreSettings": {"s3_bucket": "mock_bucket"}}
+    mock_settings = {
+        "BookstoreSettings": {"s3_bucket": "mock_bucket", "fs_cloning_basedir": "/Users/jupyter"}
+    }
     bookstore_settings = BookstoreSettings(config=Config(mock_settings))
     validation = validate_bookstore(bookstore_settings)
     handlers = collect_handlers(log, '/', validation)
@@ -55,9 +58,35 @@ def test_collect_handlers_no_publish():
         ('/api/bookstore', BookstoreVersionHandler),
         ('/api/bookstore/clone(?:/?)*', BookstoreCloneAPIHandler),
         ('/bookstore/clone(?:/?)*', BookstoreCloneHandler),
+        ('/bookstore/fs-clone(?:/?)*', BookstoreFSCloneHandler),
     ]
     web_app = Application()
-    mock_settings = {"BookstoreSettings": {"s3_bucket": "mock_bucket", "published_prefix": ""}}
+    mock_settings = {
+        "BookstoreSettings": {
+            "s3_bucket": "mock_bucket",
+            "published_prefix": "",
+            "fs_cloning_basedir": "/Users/jupyter",
+        }
+    }
+    bookstore_settings = BookstoreSettings(config=Config(mock_settings))
+    validation = validate_bookstore(bookstore_settings)
+    handlers = collect_handlers(log, '/', validation)
+    assert expected == handlers
+
+
+def test_collect_only_fs_clone():
+    expected = [
+        ('/api/bookstore', BookstoreVersionHandler),
+        ('/bookstore/fs-clone(?:/?)*', BookstoreFSCloneHandler),
+    ]
+    web_app = Application()
+    mock_settings = {
+        "BookstoreSettings": {
+            "published_prefix": "",
+            "fs_cloning_basedir": "/Users/jupyter",
+            "enable_s3_cloning": False,
+        }
+    }
     bookstore_settings = BookstoreSettings(config=Config(mock_settings))
     validation = validate_bookstore(bookstore_settings)
     handlers = collect_handlers(log, '/', validation)
@@ -81,6 +110,7 @@ def bookstore_settings(request):
             "s3_access_key_id": "mock_id",
             "s3_secret_access_key": "mock_access",
             "s3_bucket": "my_bucket",
+            "fs_cloning_basedir": "/Users/jupyter",
         }
     }
     config = Config(mock_settings)
@@ -97,7 +127,7 @@ def test_build_settings_dict(bookstore_settings):
             'bookstore_valid': True,
             'publish_valid': True,
             's3_clone_valid': True,
-            'fs_clone_valid': False,
+            'fs_clone_valid': True,
         },
         'release': version,
     }
@@ -160,7 +190,7 @@ class TestCloneAPIHandler(AsyncTestCase):
                 'bookstore_valid': True,
                 'publish_valid': True,
                 's3_clone_valid': True,
-                'fs_clone_valid': False,
+                'fs_clone_valid': True,
             },
             'release': version,
         }
