@@ -3,6 +3,7 @@ import json
 import os
 
 from copy import deepcopy
+from pathlib import Path
 
 import aiobotocore
 
@@ -300,3 +301,41 @@ class BookstoreCloneAPIHandler(APIHandler):
         if 'VersionId' in obj:
             model["versionID"] = obj['VersionId']
         return model
+
+
+def validate_relpath(relpath, settings, log):
+    """Validates that a relative path appropriately resolves given bookstore settings.
+
+    Parameters
+    ----------
+    relpath : string
+        Relative path to a notebook to be cloned.
+    settings : BookstoreSettings
+        Bookstore configuration.
+    log : logging.Logger
+        Log (usually from the NotebookApp) for logging endpoint changes.
+
+    Returns
+    --------
+    Path
+        Absolute path to file to be cloned.
+    """
+    if relpath == '':
+        log.info("Request received with empty relpath.")
+        raise web.HTTPError(400, "Request malformed, must provide a non-empty relative path.")
+
+    fs_basedir = Path(settings.fs_cloning_basedir)
+    if not fs_basedir.is_absolute():
+        log.info(
+            f"Bookstore's cloning root directory is set to {settings.fs_cloning_basedir}, \n"
+            "which is a relative path, when it must be an absolute path."
+        )
+        raise web.HTTPError(501, "Server is not configured for this.")
+
+    fs_clonepath = Path(os.path.realpath(os.path.join(fs_basedir, relpath)))
+
+    if fs_basedir not in fs_clonepath.parents:
+        log.info(f"Request to clone from a path outside of base directory: {fs_clonepath}.")
+        raise web.HTTPError(404, f"{fs_clonepath} is outside root cloning directory.")
+
+    return fs_clonepath

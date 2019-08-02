@@ -36,7 +36,7 @@ class BookstoreSettings(LoggingConfigurable):
     enable_s3_cloning : bool(``True``)
                         Enable cloning from s3.
     fs_cloning_basedir : str(``"/Users/jupyter"``)
-                        Base directory used for relative paths when cloning from the local file system.
+                        Absolute path to base directory used to clone from the local file system
                   
     """
 
@@ -68,7 +68,7 @@ class BookstoreSettings(LoggingConfigurable):
     ).tag(config=True)
 
     fs_cloning_basedir = Unicode(
-        "", help=("Base directory used for relative paths when cloning from the local file system")
+        "", help=("Absolute path to base directory used to clone from the local file system")
     ).tag(config=True)
 
 
