@@ -1,4 +1,5 @@
 import json
+import logging
 
 from unittest.mock import Mock
 from pathlib import Path
@@ -21,6 +22,9 @@ from bookstore.clone import (
     BookstoreCloneAPIHandler,
     validate_relpath,
 )
+
+
+log = logging.getLogger('test_clone')
 
 
 def test_build_notebook_model():
@@ -264,7 +268,7 @@ class TestCloneAPIHandler(AsyncTestCase):
 def test_validate_relpath():
     relpath = 'hi'
     settings = BookstoreSettings(fs_cloning_basedir="/anything")
-    fs_clonepath = validate_relpath(relpath, settings)
+    fs_clonepath = validate_relpath(relpath, settings, log)
     assert fs_clonepath == Path("/anything/hi")
 
 
@@ -272,18 +276,18 @@ def test_validate_relpath_nonabsolute_basedir():
     relpath = 'hi'
     settings = BookstoreSettings(fs_cloning_basedir="anything")
     with pytest.raises(HTTPError):
-        fs_clonepath = validate_relpath(relpath, settings)
+        fs_clonepath = validate_relpath(relpath, settings, log)
 
 
 def test_validate_relpath_empty_relpath():
     relpath = ''
     settings = BookstoreSettings(fs_cloning_basedir="/anything")
     with pytest.raises(HTTPError):
-        fs_clonepath = validate_relpath(relpath, settings)
+        fs_clonepath = validate_relpath(relpath, settings, log)
 
 
 def test_validate_relpath_escape_basedir():
     relpath = '../hi'
     settings = BookstoreSettings(fs_cloning_basedir="/anything")
     with pytest.raises(HTTPError):
-        fs_clonepath = validate_relpath(relpath, settings)
+        fs_clonepath = validate_relpath(relpath, settings, log)
