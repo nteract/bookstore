@@ -43,3 +43,17 @@ Methods
 .. automethod:: BookstoreCloneAPIHandler.build_content_model
 
 .. automethod:: BookstoreCloneAPIHandler.build_post_response_model
+
+``BookstoreFSCloneHandler``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Methods
+^^^^^^^
+
+.. automethod:: BookstoreFSCloneHandler.initialize
+
+.. automethod:: BookstoreFSCloneHandler.get
+
+.. automethod:: BookstoreFSCloneHandler.construct_template_params
+
+.. automethod:: BookstoreFSCloneHandler.get_template
