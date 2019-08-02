@@ -79,6 +79,33 @@ paths:
         400:
           description: Must have a key to clone from
           content: {}
+  /bookstore/fs-clone:
+    get:
+      tags:
+      - clone
+      summary: Landing page for initiating file-system cloning.
+      description: This serves a simple html page that allows avoiding xsrf issues on a jupyter server.
+      parameters:
+      - name: relpath
+        in: query
+        description: relative path being targeted
+        required: true
+        style: form
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            text/html:
+              schema:
+                type: string
+        400:
+          description: Request malformed, must provide a relative path.
+          content: {}
+        404:
+          description: Request to clone from a path outside of base directory
+          content: {}
   /api/bookstore/publish/{path}:
     put: 
       tags:
