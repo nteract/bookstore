@@ -325,12 +325,6 @@ def validate_relpath(relpath, settings, log):
         raise web.HTTPError(400, "Request malformed, must provide a non-empty relative path.")
 
     fs_basedir = Path(settings.fs_cloning_basedir)
-    if not fs_basedir.is_absolute():
-        log.info(
-            f"Bookstore's cloning root directory is set to {settings.fs_cloning_basedir}, \n"
-            "which is a relative path, when it must be an absolute path."
-        )
-        raise web.HTTPError(501, "Server is not configured for this.")
 
     fs_clonepath = Path(os.path.realpath(os.path.join(fs_basedir, relpath)))
 

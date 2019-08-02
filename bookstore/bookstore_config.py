@@ -1,6 +1,11 @@
 """Configuration settings for bookstore."""
+import logging
+from pathlib import Path
+
 from traitlets import Integer, Unicode, Bool
 from traitlets.config import LoggingConfigurable
+
+log = logging.getLogger('bookstore_config')
 
 
 class BookstoreSettings(LoggingConfigurable):
@@ -89,7 +94,7 @@ def validate_bookstore(settings: BookstoreSettings):
     archive_settings = [*general_settings, settings.workspace_prefix != ""]
     published_settings = [*general_settings, settings.published_prefix != ""]
     s3_cloning_settings = [settings.enable_s3_cloning]
-    fs_cloning_settings = [settings.fs_cloning_basedir != ""]
+    fs_cloning_settings = [Path(settings.fs_cloning_basedir).is_absolute()]
 
     validation_checks = {
         "bookstore_valid": all(general_settings),
@@ -98,4 +103,9 @@ def validate_bookstore(settings: BookstoreSettings):
         "s3_clone_valid": all(s3_cloning_settings),
         "fs_clone_valid": all(fs_cloning_settings),
     }
+    if not validation_checks["fs_clone_valid"] and settings.fs_cloning_basedir != "":
+        log.info(
+            f"{settings.fs_cloning_basedir} is not an absolute path, file system cloning will be disabled."
+        )
+
     return validation_checks

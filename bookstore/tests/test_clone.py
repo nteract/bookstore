@@ -273,19 +273,6 @@ def test_validate_relpath():
     assert fs_clonepath == Path("/anything/hi")
 
 
-def test_validate_relpath_nonabsolute_basedir(caplog):
-    relpath = 'hi'
-    settings = BookstoreSettings(fs_cloning_basedir="anything")
-    with pytest.raises(HTTPError):
-        with caplog.at_level(logging.INFO):
-            fs_clonepath = validate_relpath(relpath, settings, log)
-
-    assert (
-        f"Bookstore's cloning root directory is set to {settings.fs_cloning_basedir},"
-        in caplog.text
-    )
-
-
 def test_validate_relpath_empty_relpath(caplog):
     relpath = ''
     settings = BookstoreSettings(fs_cloning_basedir="/anything")
