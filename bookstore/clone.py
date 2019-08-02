@@ -308,14 +308,17 @@ def validate_relpath(relpath, settings, log):
 
     Parameters
     ----------
-    model : dict
-        Jupyter Contents API model
-    obj : dict
+    relpath : string
+        Relative path to a notebook to be cloned.
+    settings : BookstoreSettings
+        Bookstore configuration.
+    log : logging.Logger
         Log (usually from the NotebookApp) for logging endpoint changes.
-    s3_bucket : str
-        The S3 bucket we are cloning from
-    s3_object_key: str
-        The S3 key we are cloning
+
+    Returns
+    --------
+    Path
+        Absolute path to file to be cloned.
     """
     if relpath == '':
         log.info("Request received with empty relpath.")

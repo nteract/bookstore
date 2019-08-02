@@ -10,6 +10,8 @@ The ``clone`` module
 
 .. autofunction:: build_file_model
 
+.. autofunction:: validate_relpath
+
 ``BookstoreCloneHandler``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
