@@ -1,4 +1,6 @@
 """Tests for bookstore config"""
+import logging
+
 import pytest
 
 from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
@@ -93,3 +95,20 @@ def test_enable_fs_cloning():
     }
     settings = BookstoreSettings(enable_s3_cloning=False, fs_cloning_basedir="/Users/bookstore")
     assert validate_bookstore(settings) == expected
+
+
+def test_relative_basepath(caplog):
+    """Tests that file system cloning works even if s3 cloning is disabled."""
+    expected = {
+        "bookstore_valid": False,
+        "publish_valid": False,
+        "archive_valid": False,
+        "s3_clone_valid": False,
+        "fs_clone_valid": False,
+    }
+    fs_cloning_basedir = "Users/jupyter"
+    settings = BookstoreSettings(enable_s3_cloning=False, fs_cloning_basedir=fs_cloning_basedir)
+    with caplog.at_level(logging.INFO):
+        actual = validate_bookstore(settings)
+    assert actual == expected
+    assert f"{fs_cloning_basedir} is not an absolute path," in caplog.text
