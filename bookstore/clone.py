@@ -339,3 +339,76 @@ def validate_relpath(relpath, settings, log):
         raise web.HTTPError(404, f"{fs_clonepath} is outside root cloning directory.")
 
     return fs_clonepath
+
+
+class BookstoreFSCloneHandler(IPythonHandler):
+    """Prepares and provides file system clone options page, populating UI with clone option parameters.
+
+    Provides handling for ``GET`` requests when cloning a notebook
+    from a local file system. Launches a user interface with cloning options.
+
+    Methods
+    -------
+    initialize(self)
+        Helper to access bookstore settings.
+    get(self)
+        Checks for valid storage settings and render a UI for clone options.
+    construct_template_params(self, relpath)
+        Helper to populate Jinja template for cloning option page.
+    get_template(self, name)
+        Loads a Jinja template and its related settings.
+
+    See also
+    --------
+    `Jupyter Notebook reference on Custom Handlers <https://jupyter-notebook.readthedocs.io/en/stable/extending/handlers.html#registering-custom-handlers>`_
+    """
+
+    def initialize(self):
+        """Helper to retrieve bookstore setting for the session."""
+        self.bookstore_settings = BookstoreSettings(config=self.config)
+
+    @web.authenticated
+    async def get(self):
+        """GET /bookstore/fs-clone?relpath=<your_relpath>
+
+        Renders an options page that will allow you to clone a notebook
+        from a via the Bookstore file-system cloning API.
+
+        relpath is the relative path that you wish to clone from
+        """
+
+        relpath = self.get_argument("relpath")
+
+        fs_clonepath = validate_relpath(relpath, self.bookstore_settings, self.log)
+
+        self.log.info(f"Setting up cloning landing page for {fs_clonepath}")
+
+        template_params = self.construct_template_params(relpath, fs_clonepath)
+        self.set_header('Content-Type', 'text/html')
+        self.write(self.render_template('clone.html', **template_params))
+
+    def construct_template_params(self, relpath, fs_clonepath):
+        """Helper that takes a valid relpath and populates UI template
+        
+        Returns
+        --------
+        
+        dict
+            Template parameters in a dictionary
+        """
+        base_uri = f"{self.request.protocol}://{self.request.host}"
+        clone_api_url = url_path_join(base_uri, self.base_url, "/api/bookstore/fs-clone")
+        redirect_contents_url = url_path_join(base_uri, self.default_url)
+        model = {"relpath": relpath}
+
+        template_params = {
+            "post_model": model,
+            "clone_api_url": clone_api_url,
+            "redirect_contents_url": redirect_contents_url,
+            "source_description": fs_clonepath,
+        }
+        return template_params
+
+    def get_template(self, name):
+        """Loads a Jinja template by name."""
+        return BOOKSTORE_FILE_LOADER.load(self.settings['jinja2_env'], name)
