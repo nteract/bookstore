@@ -106,6 +106,31 @@ paths:
         404:
           description: Request to clone from a path outside of base directory
           content: {}
+  /api/bookstore/fs-clone:
+    post:
+      tags:
+      - clone
+      summary: Trigger clone from file system
+      requestBody:
+        description: Information about what to clone from the local file system
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FSCloneFileRequest'
+        required: true
+      responses:
+        200:
+          description: Successfully cloned
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Contents'
+        400:
+          description: Request malformed, must provide a relative path.
+          content: {}
+        404:
+          description: Request to clone from a path outside of base directory
+          content: {}
   /api/bookstore/publish/{path}:
     put: 
       tags:
@@ -145,6 +170,15 @@ components:
         s3_bucket: 
           type: string
         s3_key:
+          type: string
+        target_path:
+          type: string
+    FSCloneFileRequest:
+      type: object
+      required: 
+        - relpath
+      properties:
+        relpath:
           type: string
         target_path:
           type: string
