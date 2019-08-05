@@ -8,7 +8,12 @@ from unittest.mock import Mock
 from bookstore._version import __version__
 from bookstore.handlers import collect_handlers, build_settings_dict, BookstoreVersionHandler
 from bookstore.bookstore_config import BookstoreSettings, validate_bookstore
-from bookstore.clone import BookstoreCloneHandler, BookstoreCloneAPIHandler, BookstoreFSCloneHandler
+from bookstore.clone import (
+    BookstoreCloneHandler,
+    BookstoreCloneAPIHandler,
+    BookstoreFSCloneHandler,
+    BookstoreFSCloneAPIHandler,
+)
 from bookstore.publish import BookstorePublishAPIHandler
 from notebook.base.handlers import path_regex
 from tornado.testing import AsyncTestCase
@@ -29,6 +34,7 @@ def test_collect_handlers_all():
         ('/api/bookstore/clone(?:/?)*', BookstoreCloneAPIHandler),
         ('/bookstore/clone(?:/?)*', BookstoreCloneHandler),
         ('/bookstore/fs-clone(?:/?)*', BookstoreFSCloneHandler),
+        ('/api/bookstore/fs-clone(?:/?)*', BookstoreFSCloneAPIHandler),
     ]
     web_app = Application()
     mock_settings = {
@@ -59,6 +65,7 @@ def test_collect_handlers_no_publish():
         ('/api/bookstore/clone(?:/?)*', BookstoreCloneAPIHandler),
         ('/bookstore/clone(?:/?)*', BookstoreCloneHandler),
         ('/bookstore/fs-clone(?:/?)*', BookstoreFSCloneHandler),
+        ('/api/bookstore/fs-clone(?:/?)*', BookstoreFSCloneAPIHandler),
     ]
     web_app = Application()
     mock_settings = {
@@ -78,6 +85,7 @@ def test_collect_only_fs_clone():
     expected = [
         ('/api/bookstore', BookstoreVersionHandler),
         ('/bookstore/fs-clone(?:/?)*', BookstoreFSCloneHandler),
+        ('/api/bookstore/fs-clone(?:/?)*', BookstoreFSCloneAPIHandler),
     ]
     web_app = Application()
     mock_settings = {
