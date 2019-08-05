@@ -18,9 +18,9 @@ The full list of changes they made can be seen [on GitHub](https://github.com/nt
 
 As of 2.4.0 cloning from a local or network attached file system is now possible, but disabled by default.
 
-To enable this fs cloning, set `BookstoreSettings.fs_cloning_basedir` to the root directory from which you want people to be able to clone.
+To enable this filesystem (`fs`) cloning, set `BookstoreSettings.fs_cloning_basedir` to the root directory from which you want people to be able to clone.
 
-For more information about the motivation and design of this endpoint, please see [this issue](https://github.com/nteract/bookstore/issues/154). 
+Adding fs cloning offers users more flexibility to clone notebooks from attached filesystems, like EFS. For more information about the motivation and design of this endpoint, please see [this issue](https://github.com/nteract/bookstore/issues/154). 
 
 ## [2.3.1](https://github.com/nteract/bookstore/releases/tag/2.3.1) 2019-07-16
 
