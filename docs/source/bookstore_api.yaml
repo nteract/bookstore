@@ -112,7 +112,7 @@ paths:
       - clone
       summary: Trigger clone from file system
       requestBody:
-        description: Information about what to clone from the local file system
+        description: Information about what to clone from the accessible file system
         content:
           application/json:
             schema:
@@ -126,10 +126,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contents'
         400:
-          description: Request malformed, must provide a relative path.
+          description: Malformed request. Provide a valid relative path.
           content: {}
         404:
-          description: Request to clone from a path outside of base directory
+          description: Invalid request. Cloning from a path outside of the base directory is not allowed.
           content: {}
   /api/bookstore/publish/{path}:
     put: 
