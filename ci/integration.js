@@ -64,7 +64,7 @@ const main = async () => {
   await s3Client.makeBucket(bucketName);
   console.log(`Created bucket ${bucketName}`);
 
-  async function compareNotebooks(filepath, originalNotebook) {
+  async function compareS3Notebooks(filepath, originalNotebook) {
     /***** Check notebook from S3 *****/
     const rawNotebook = await s3Client.getObject(
       bucketName,
@@ -199,8 +199,8 @@ const main = async () => {
     await sleep(100);
   }
 
-  function cloneQueryCheck(s3Key, expectedQueryString) {
-    const populatedQueryString = jupyterServer.populateCloneQuery(
+  function s3CloneLandingQueryCheck(s3Key, expectedQueryString) {
+    const populatedQueryString = jupyterServer.populateS3CloneLandingQuery(
       bucketName,
       s3Key
     );
@@ -214,7 +214,7 @@ const main = async () => {
     console.log(`Query matched ${expectedQueryString}`);
   }
 
-  function checkCloneResponse(res, expected) {
+  function checkS3CloneLandingResponse(res, expected) {
     const content = res.response;
     if (!content.includes(expected)) {
       console.error("Response is ill-formed:");
@@ -227,24 +227,27 @@ const main = async () => {
   }
 
   const publishedPath = "ci-published/ci-published.ipynb";
-  cloneQueryCheck(
+  s3CloneLandingQueryCheck(
     publishedPath,
     url_path_join(
       jupyterServer.endpoint,
       `bookstore/clone?s3_bucket=${bucketName}&s3_key=${publishedPath}`
     )
   );
-  const cloneRes = await jupyterServer.cloneNotebook(bucketName, publishedPath);
-  checkCloneResponse(cloneRes, publishedPath);
+  const s3CloneLandingRes = await jupyterServer.cloneS3NotebookLanding(
+    bucketName,
+    publishedPath
+  );
+  checkS3CloneLandingResponse(s3CloneLandingRes, publishedPath);
 
+  await jupyterServer.cloneS3Notebook(bucketName, publishedPath);
   // Wait for minio to have the notebook
   // Future iterations of this script should poll to get the notebook
   await sleep(700);
 
-  jupyterServer.shutdown();
-
-  await compareNotebooks("ci-local-writeout.ipynb", originalNotebook);
-  await compareNotebooks("ci-local-writeout2.ipynb", {
+  await compareS3Notebooks("ci-published.ipynb", originalNotebook);
+  await compareS3Notebooks("ci-local-writeout.ipynb", originalNotebook);
+  await compareS3Notebooks("ci-local-writeout2.ipynb", {
     cells: [],
     nbformat: 4,
     nbformat_minor: 2,
@@ -252,6 +255,14 @@ const main = async () => {
       save: 3
     }
   });
+  await sleep(700);
+
+  await jupyterServer.deleteNotebook("ci-published.ipynb");
+  await jupyterServer.deleteNotebook("ci-local-writeout.ipynb");
+  await jupyterServer.deleteNotebook("ci-local-writeout2.ipynb");
+  await jupyterServer.deleteNotebook("ci-local-writeout3.ipynb");
+
+  jupyterServer.shutdown();
 
   console.log("📚 Bookstore Integration Complete 📚");
 };

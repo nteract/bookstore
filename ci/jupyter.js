@@ -121,20 +121,53 @@ class JupyterServer {
     return xhr;
   }
 
-  populateCloneQuery(s3Bucket, s3Key) {
+  populateS3CloneLandingQuery(s3Bucket, s3Key) {
     return url_path_join(
       this.endpoint,
       `/bookstore/clone?s3_bucket=${s3Bucket}&s3_key=${s3Key}`
     );
   }
-  async cloneNotebook(s3Bucket, s3Key) {
+  populateS3CloneQuery() {
+    return url_path_join(this.endpoint, `/api/bookstore/clone`);
+  }
+  async cloneS3NotebookLanding(s3Bucket, s3Key) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
     const xhr = await ajax({
-      url: this.populateCloneQuery(s3Bucket, s3Key),
+      url: this.populateS3CloneLandingQuery(s3Bucket, s3Key),
       responseType: "text",
       createXHR: () => new XMLHttpRequest(),
       method: "GET",
+      headers: {
+        Authorization: `token ${this.token}`
+      }
+    }).toPromise();
+
+    return xhr;
+  }
+  async cloneS3Notebook(s3Bucket, s3Key) {
+    const query = {
+      url: this.populateS3CloneQuery(),
+      responseType: "json",
+      createXHR: () => new XMLHttpRequest(),
+      body: { s3_bucket: s3Bucket, s3_key: s3Key },
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${this.token}`
+      }
+    };
+    const xhr = await ajax(query).toPromise();
+
+    return xhr;
+  }
+  async deleteNotebook(path) {
+    const apiPath = "/api/contents/";
+    const xhr = await ajax({
+      url: url_path_join(this.endpoint, apiPath, path),
+      responseType: "json",
+      createXHR: () => new XMLHttpRequest(),
+      method: "DELETE",
       headers: {
         Authorization: `token ${this.token}`
       }
