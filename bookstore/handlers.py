@@ -10,7 +10,12 @@ from ._version import __version__
 from .bookstore_config import BookstoreSettings
 from .bookstore_config import validate_bookstore
 from .publish import BookstorePublishAPIHandler
-from .clone import BookstoreCloneHandler, BookstoreCloneAPIHandler, BookstoreFSCloneHandler
+from .clone import (
+    BookstoreCloneHandler,
+    BookstoreCloneAPIHandler,
+    BookstoreFSCloneHandler,
+    BookstoreFSCloneAPIHandler,
+)
 
 
 version = __version__
@@ -118,6 +123,12 @@ def collect_handlers(log, base_url, validation):
         handlers.append(
             (url_path_join(base_bookstore_pattern, r"/fs-clone(?:/?)*"), BookstoreFSCloneHandler)
         )
+        handlers.append(
+            (
+                url_path_join(base_bookstore_api_pattern, r"/fs-clone(?:/?)*"),
+                BookstoreFSCloneAPIHandler,
+            )
+        ),
     else:
         log.info(f"[bookstore] bookstore cloning disabled, version: {version}")
     return handlers
