@@ -268,7 +268,7 @@ class BookstoreCloneAPIHandler(APIHandler):
         Returns
         --------
         dict
-            Jupyter Contents API compatible model
+            `Jupyter Contents API compatible model <https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html>`_
         """
         path = self.contents_manager.increment_filename(target_path, insert='-')
         if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
@@ -457,7 +457,7 @@ class BookstoreFSCloneAPIHandler(APIHandler):
 
             {
             "relpath": string,
-            "target_path": string
+            "target_path": string #optional
             }
 
         The response payload should match the standard Jupyter contents
@@ -495,7 +495,7 @@ class BookstoreFSCloneAPIHandler(APIHandler):
         Returns
         --------
         dict
-            Jupyter Contents API compatible model
+            `Jupyter Contents API compatible model <https://jupyter-notebook.readthedocs.io/en/stable/extending/contents.html>`_
         """
         path = self.contents_manager.increment_filename(target_path, insert='-')
         if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
