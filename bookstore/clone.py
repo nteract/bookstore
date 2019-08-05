@@ -457,7 +457,7 @@ class BookstoreFSCloneAPIHandler(APIHandler):
 
             {
             "relpath": string,
-            "target_path"?: string
+            "target_path": string
             }
 
         The response payload should match the standard Jupyter contents
