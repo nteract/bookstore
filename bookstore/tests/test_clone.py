@@ -28,9 +28,10 @@ from bookstore.clone import (
 )
 from bookstore.utils import TemporaryWorkingDirectory
 
+from . import test_dir
+
 
 log = logging.getLogger('test_clone')
-test_dir = os.path.realpath(os.path.dirname(__file__))
 
 
 def test_build_notebook_model():

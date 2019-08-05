@@ -163,6 +163,39 @@ const main = async () => {
     nbformat_minor: 2
   };
 
+  const EmptyNotebook = {
+    cells: [
+      {
+        cell_type: "code",
+        execution_count: null,
+        metadata: {},
+        outputs: [],
+        source: []
+      }
+    ],
+    metadata: {
+      kernelspec: {
+        display_name: "dev",
+        language: "python",
+        name: "dev"
+      },
+      language_info: {
+        codemirror_mode: {
+          name: "ipython",
+          version: 3
+        },
+        file_extension: ".py",
+        mimetype: "text/x-python",
+        name: "python",
+        nbconvert_exporter: "python",
+        pygments_lexer: "ipython3",
+        version: "3.6.8"
+      }
+    },
+    nbformat: 4,
+    nbformat_minor: 2
+  };
+
   await jupyterServer.writeNotebook(
     "ci-local-writeout.ipynb",
     originalNotebook
@@ -241,9 +274,10 @@ const main = async () => {
   checkS3CloneLandingResponse(s3CloneLandingRes, publishedPath);
 
   await jupyterServer.cloneS3Notebook(bucketName, publishedPath);
+  await jupyterServer.cloneFSNotebook("test_files/EmptyNotebook.ipynb");
   // Wait for minio to have the notebook
   // Future iterations of this script should poll to get the notebook
-  await sleep(700);
+  await sleep(2000);
 
   await compareS3Notebooks("ci-published.ipynb", originalNotebook);
   await compareS3Notebooks("ci-local-writeout.ipynb", originalNotebook);
@@ -255,12 +289,15 @@ const main = async () => {
       save: 3
     }
   });
+  await compareS3Notebooks("EmptyNotebook.ipynb", EmptyNotebook);
+
   await sleep(700);
 
   await jupyterServer.deleteNotebook("ci-published.ipynb");
   await jupyterServer.deleteNotebook("ci-local-writeout.ipynb");
   await jupyterServer.deleteNotebook("ci-local-writeout2.ipynb");
   await jupyterServer.deleteNotebook("ci-local-writeout3.ipynb");
+  await jupyterServer.deleteNotebook("EmptyNotebook.ipynb");
 
   jupyterServer.shutdown();
 

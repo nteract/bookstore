@@ -4,6 +4,8 @@
 print("using CI config")
 
 from bookstore import BookstoreContentsArchiver, BookstoreSettings
+from bookstore.tests import test_dir
+
 
 # jupyter config
 # At ~/.jupyter/jupyter_notebook_config.py for user installs
@@ -22,3 +24,6 @@ c.BookstoreSettings.s3_bucket = "bookstore"
 # Straight out of `circleci/config.yml`
 c.BookstoreSettings.s3_access_key_id = "ONLY_ON_CIRCLE"
 c.BookstoreSettings.s3_secret_access_key = "CAN_WE_DO_THIS"
+
+# Local filesystem cloning
+c.BookstoreSettings.fs_cloning_basedir = test_dir

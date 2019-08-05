@@ -161,6 +161,45 @@ class JupyterServer {
 
     return xhr;
   }
+  populateFSCloneLandingQuery(relpath) {
+    return url_path_join(
+      this.endpoint,
+      `/bookstore/fs-clone?relpath=${relpath}`
+    );
+  }
+  populateFSCloneQuery() {
+    return url_path_join(this.endpoint, `/api/bookstore/fs-clone`);
+  }
+  async cloneFSNotebookLanding(relpath) {
+    const xhr = await ajax({
+      url: this.populateFSCloneLandingQuery(relpath),
+      responseType: "text",
+      createXHR: () => new XMLHttpRequest(),
+      method: "GET",
+      headers: {
+        Authorization: `token ${this.token}`
+      }
+    }).toPromise();
+
+    return xhr;
+  }
+  async cloneFSNotebook(relpath) {
+    const query = {
+      url: this.populateFSCloneQuery(),
+      responseType: "json",
+      createXHR: () => new XMLHttpRequest(),
+      body: { relpath },
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${this.token}`
+      }
+    };
+    const xhr = await ajax(query).toPromise();
+
+    return xhr;
+  }
+
   async deleteNotebook(path) {
     const apiPath = "/api/contents/";
     const xhr = await ajax({
