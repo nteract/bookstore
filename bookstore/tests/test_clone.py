@@ -1,5 +1,7 @@
 import json
 import logging
+import uuid
+import os
 
 from unittest.mock import Mock
 from pathlib import Path
@@ -22,10 +24,13 @@ from bookstore.clone import (
     BookstoreCloneAPIHandler,
     validate_relpath,
     BookstoreFSCloneHandler,
+    BookstoreFSCloneAPIHandler,
 )
+from bookstore.utils import TemporaryWorkingDirectory
 
 
 log = logging.getLogger('test_clone')
+test_dir = os.path.realpath(os.path.dirname(__file__))
 
 
 def test_build_notebook_model():
@@ -164,7 +169,7 @@ class TestCloneAPIHandler(AsyncTestCase):
             app = self.mock_application
         body = json.dumps(body_dict).encode('utf-8')
         payload_request = HTTPRequest(
-            method='POST', uri="/api/bookstore/cloned", headers=None, body=body, connection=Mock()
+            method='POST', uri="/api/bookstore/clone", headers=None, body=body, connection=Mock()
         )
         return BookstoreCloneAPIHandler(app, payload_request)
 
@@ -294,7 +299,7 @@ def test_validate_relpath_escape_basedir(caplog):
 class TestFSCloneHandler(AsyncTestCase):
     def setUp(self):
         super().setUp()
-        mock_settings = {"BookstoreSettings": {"fs_cloning_basedir": "/Users/jupyter"}}
+        mock_settings = {"BookstoreSettings": {"fs_cloning_basedir": test_dir}}
         self.config = Config(mock_settings)
         self.mock_application = Mock(
             spec=Application,
@@ -375,3 +380,108 @@ class TestFSCloneHandler(AsyncTestCase):
                 relpath='my/test/path.ipynb', fs_clonepath='/Users/jupyter/my/test/path.ipynb'
             )
             assert expected == output
+
+
+class TestFSCloneAPIHandler(AsyncTestCase):
+    def setUp(self):
+        super().setUp()
+        mock_settings = {
+            "BookstoreSettings": {"fs_cloning_basedir": os.path.join(test_dir, 'test_files')}
+        }
+        config = Config(mock_settings)
+
+        self.mock_application = Mock(
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            settings={
+                'jinja2_env': Environment(),
+                "config": config,
+                "contents_manager": FileContentsManager(),
+            },
+        )
+
+    def post_handler(self, body_dict, app=None):
+        if app is None:
+            app = self.mock_application
+        body = json.dumps(body_dict).encode('utf-8')
+        payload_request = HTTPRequest(
+            method='POST', uri="/api/bookstore/fs-clone", headers=None, body=body, connection=Mock()
+        )
+        return BookstoreFSCloneAPIHandler(app, payload_request)
+
+    @gen_test
+    async def test_post_no_body(self):
+        post_body_dict = {}
+        empty_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_handler.post()
+
+    @gen_test
+    async def test_post_empty_relpath(self):
+        post_body_dict = {"relpath": ""}
+        empty_relpath_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_relpath_handler.post()
+
+    @gen_test
+    async def test_post_basedir_escape(self):
+        post_body_dict = {"relpath": "../myfile.txt"}
+        empty_relpath_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await empty_relpath_handler.post()
+
+    @gen_test
+    async def test_post_nonsense_params(self):
+        post_body_dict = {"relpath": str(uuid.uuid4())}
+        success_handler = self.post_handler(post_body_dict)
+        with pytest.raises(HTTPError):
+            await success_handler.post()
+
+    @gen_test
+    async def test_post_success_notebook(self):
+        post_body_dict = {"relpath": 'EmptyNotebook.ipynb'}
+        with open(os.path.join(test_dir, 'test_files/EmptyNotebook.ipynb'), 'r') as f:
+            expected = json.load(f)
+        success_handler = self.post_handler(post_body_dict)
+        setattr(success_handler, '_transforms', [])
+
+        with TemporaryWorkingDirectory() as tmp:
+            await success_handler.post()
+            with open('EmptyNotebook.ipynb') as f:
+                actual = json.load(f)
+        assert actual == expected
+
+    @gen_test
+    async def test_build_text_content_model(self):
+        content = "some content"
+        expected = {
+            "type": "file",
+            "format": "text",
+            "content": content,
+            "name": "file_name.txt",
+            "path": "test_directory/file_name.txt",
+        }
+
+        path = "test_directory/file_name.txt"
+        post_handler = self.post_handler({})
+        model = post_handler.build_content_model(content, path)
+        assert model == expected
+
+    @gen_test
+    async def test_build_notebook_content_model(self):
+        content = nbformat.v4.new_notebook()
+        expected = {
+            "type": "notebook",
+            "format": "json",
+            "content": content,
+            "name": "file_name.ipynb",
+            "path": "test_directory/file_name.ipynb",
+        }
+
+        str_content = nbformat.writes(content)
+
+        path = "test_directory/file_name.ipynb"
+        post_handler = self.post_handler({})
+        model = post_handler.build_content_model(str_content, path)
+        assert model == expected

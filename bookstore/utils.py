@@ -1,4 +1,7 @@
 """Utility and helper functions."""
+import os
+
+from tempfile import TemporaryDirectory
 
 
 def url_path_join(*pieces):
@@ -20,3 +23,17 @@ def url_path_join(*pieces):
     if result == '//':
         result = '/'
     return result
+
+
+class TemporaryWorkingDirectory(TemporaryDirectory):
+    """Utility for creating a temporary working directory.
+    """
+
+    def __enter__(self):
+        self.cwd = os.getcwd()
+        os.chdir(self.name)
+        return super().__enter__()
+
+    def __exit__(self, exc, value, tb):
+        os.chdir(self.cwd)
+        return super().__exit__(exc, value, tb)
