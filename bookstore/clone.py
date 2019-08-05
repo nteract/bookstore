@@ -406,3 +406,101 @@ class BookstoreFSCloneHandler(IPythonHandler):
     def get_template(self, name):
         """Loads a Jinja template by name."""
         return BOOKSTORE_FILE_LOADER.load(self.settings['jinja2_env'], name)
+
+
+class BookstoreFSCloneAPIHandler(APIHandler):
+    """Handle notebook clone from a local file system.
+
+    Provides API handling for ``POST`` and clones a notebook
+    from the local file system.
+
+    Methods
+    -------
+    initialize(self)
+        Helper to access bookstore settings.
+    post(self)
+        Clone a notebook from the location specified by the payload.
+    build_content_model(self, content, path)
+        Helper for creating a Jupyter ContentsAPI compatible model.
+
+    See also
+    --------
+    `Jupyter Notebook reference on Custom Handlers <https://jupyter-notebook.readthedocs.io/en/stable/extending/handlers.html#registering-custom-handlers>`_
+    """
+
+    def initialize(self):
+        """Helper to retrieve bookstore setting for the session."""
+        self.bookstore_settings = BookstoreSettings(config=self.config)
+
+    def _get_content(self, path):
+        """Helper for getting content from a local filepath.
+        
+        Parameters
+        ----------
+        path : str
+            Source path from which to get a notebook
+        """
+        self.log.info(f"Reading content from {path}")
+        if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
+            content = self.contents_manager._read_notebook(path)
+        else:
+            content = self.contents_manager._read_file(path, format=None)
+        return content
+
+    @web.authenticated
+    async def post(self):
+        """POST /api/bookstore/fs-clone
+
+        Clone a notebook to the path specified in the payload.
+
+        The payload type for the request should be::
+
+            {
+            "relpath": string,
+            "target_path"?: string
+            }
+
+        The response payload should match the standard Jupyter contents
+        API POST response.
+        """
+        model = self.get_json_body()
+
+        relpath = model.get("relpath", "")
+        fs_clonepath = validate_relpath(relpath, self.bookstore_settings, self.log)
+
+        target_path = model.get("target_path", "") or os.path.basename(os.path.relpath(relpath))
+
+        nb = self._get_content(str(fs_clonepath))
+        content_model = self.build_content_model(json.dumps(nb), target_path)
+
+        self.log.info(f"Completing clone from {fs_clonepath} to {target_path}")
+        self.contents_manager.save(content_model, content_model['path'])
+
+        self.set_status(200)
+        self.set_header('Content-Type', 'application/json')
+        self.finish(content_model)
+
+    def build_content_model(self, content, target_path):
+        """Helper that takes a content and creates a ContentsAPI compatible model.
+        
+        If the file at target_path already exists, this increments the file name.
+        
+        Parameters
+        ----------
+        content : dict or string
+            dict or string encoded file content
+        target_path : str
+            The the path we wish to clone to, may be incremented if already present.
+
+        Returns
+        --------
+        dict
+            Jupyter Contents API compatible model
+        """
+        path = self.contents_manager.increment_filename(target_path, insert='-')
+        if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
+            model = build_notebook_model(content, path)
+            self.contents_manager.validate_notebook_model(model)
+        else:
+            model = build_file_model(content, path)
+        return model
