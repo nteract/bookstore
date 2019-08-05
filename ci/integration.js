@@ -255,6 +255,13 @@ const main = async () => {
       save: 3
     }
   });
+  await sleep(700);
+
+  await jupyterServer.deleteNotebook("ci-published.ipynb");
+  await jupyterServer.deleteNotebook("ci-local-writeout.ipynb");
+  await jupyterServer.deleteNotebook("ci-local-writeout2.ipynb");
+  await jupyterServer.deleteNotebook("ci-local-writeout3.ipynb");
+
   jupyterServer.shutdown();
 
   console.log("📚 Bookstore Integration Complete 📚");
