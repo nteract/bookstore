@@ -161,6 +161,20 @@ class JupyterServer {
 
     return xhr;
   }
+  async deleteNotebook(path) {
+    const apiPath = "/api/contents/";
+    const xhr = await ajax({
+      url: url_path_join(this.endpoint, apiPath, path),
+      responseType: "json",
+      createXHR: () => new XMLHttpRequest(),
+      method: "DELETE",
+      headers: {
+        Authorization: `token ${this.token}`
+      }
+    }).toPromise();
+
+    return xhr;
+  }
   shutdown() {
     this.process.kill();
   }
