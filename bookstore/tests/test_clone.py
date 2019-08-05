@@ -26,6 +26,7 @@ from bookstore.clone import (
     BookstoreFSCloneHandler,
     BookstoreFSCloneAPIHandler,
 )
+from bookstore.utils import TemporaryWorkingDirectory
 
 
 log = logging.getLogger('test_clone')
@@ -168,7 +169,7 @@ class TestCloneAPIHandler(AsyncTestCase):
             app = self.mock_application
         body = json.dumps(body_dict).encode('utf-8')
         payload_request = HTTPRequest(
-            method='POST', uri="/api/bookstore/cloned", headers=None, body=body, connection=Mock()
+            method='POST', uri="/api/bookstore/clone", headers=None, body=body, connection=Mock()
         )
         return BookstoreCloneAPIHandler(app, payload_request)
 
@@ -385,9 +386,7 @@ class TestFSCloneAPIHandler(AsyncTestCase):
     def setUp(self):
         super().setUp()
         mock_settings = {
-            "BookstoreSettings": {
-                "fs_cloning_basedir": os.path.join(test_dir, 'test_files')
-            }
+            "BookstoreSettings": {"fs_cloning_basedir": os.path.join(test_dir, 'test_files')}
         }
         config = Config(mock_settings)
 
@@ -400,7 +399,6 @@ class TestFSCloneAPIHandler(AsyncTestCase):
                 "config": config,
                 "contents_manager": FileContentsManager(),
             },
-            transforms=[],
         )
 
     def post_handler(self, body_dict, app=None):
@@ -439,6 +437,20 @@ class TestFSCloneAPIHandler(AsyncTestCase):
         success_handler = self.post_handler(post_body_dict)
         with pytest.raises(HTTPError):
             await success_handler.post()
+
+    @gen_test
+    async def test_post_success_notebook(self):
+        post_body_dict = {"relpath": 'EmptyNotebook.ipynb'}
+        with open(os.path.join(test_dir, 'test_files/EmptyNotebook.ipynb'), 'r') as f:
+            expected = json.load(f)
+        success_handler = self.post_handler(post_body_dict)
+        setattr(success_handler, '_transforms', [])
+
+        with TemporaryWorkingDirectory() as tmp:
+            await success_handler.post()
+            with open('EmptyNotebook.ipynb') as f:
+                actual = json.load(f)
+        assert actual == expected
 
     @gen_test
     async def test_build_text_content_model(self):
