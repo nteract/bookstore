@@ -121,17 +121,17 @@ class JupyterServer {
     return xhr;
   }
 
-  populateCloneQuery(s3Bucket, s3Key) {
+  populateS3CloneLandingQuery(s3Bucket, s3Key) {
     return url_path_join(
       this.endpoint,
       `/bookstore/clone?s3_bucket=${s3Bucket}&s3_key=${s3Key}`
     );
   }
-  async cloneNotebook(s3Bucket, s3Key) {
+  async cloneS3NotebookLanding(s3Bucket, s3Key) {
     // Once https://github.com/nteract/nteract/pull/3651 is merged, we can use
     // rx-jupyter for writing a notebook to the contents API
     const xhr = await ajax({
-      url: this.populateCloneQuery(s3Bucket, s3Key),
+      url: this.populateS3CloneLandingQuery(s3Bucket, s3Key),
       responseType: "text",
       createXHR: () => new XMLHttpRequest(),
       method: "GET",
