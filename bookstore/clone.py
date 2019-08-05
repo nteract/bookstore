@@ -409,17 +409,17 @@ class BookstoreFSCloneHandler(IPythonHandler):
 
 
 class BookstoreFSCloneAPIHandler(APIHandler):
-    """Handle notebook clone from a local file system.
+    """Handle notebook clone from an accessible file system (local or cloud).
 
     Provides API handling for ``POST`` and clones a notebook
-    from the local file system.
+    from the specified file system (local or cloud).
 
     Methods
     -------
     initialize(self)
         Helper to access bookstore settings.
     post(self)
-        Clone a notebook from the location specified by the payload.
+        Clone a notebook from the filesystem location specified by the payload.
     build_content_model(self, content, path)
         Helper for creating a Jupyter ContentsAPI compatible model.
 
@@ -433,12 +433,12 @@ class BookstoreFSCloneAPIHandler(APIHandler):
         self.bookstore_settings = BookstoreSettings(config=self.config)
 
     def _get_content(self, path):
-        """Helper for getting content from a local filepath.
+        """Helper for getting content from a specified filepath.
         
         Parameters
         ----------
         path : str
-            Source path from which to get a notebook
+           File system path to a notebook
         """
         self.log.info(f"Reading content from {path}")
         if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
