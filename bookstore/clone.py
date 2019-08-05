@@ -270,7 +270,7 @@ class BookstoreCloneAPIHandler(APIHandler):
         dict
             Jupyter Contents API compatible model
         """
-        path = self.contents_manager.increment_filename(target_path)
+        path = self.contents_manager.increment_filename(target_path, insert='-')
         if os.path.splitext(path)[1] in [".ipynb", ".jpynb"]:
             model = build_notebook_model(content, path)
         else:
