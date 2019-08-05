@@ -6,6 +6,7 @@ from typing import Dict
 from typing import NamedTuple
 
 import aiobotocore
+import nbformat
 from notebook.services.contents.filemanager import FileContentsManager
 from tornado import ioloop
 
@@ -151,7 +152,7 @@ class BookstoreContentsArchiver(FileContentsManager):
             )
             return
 
-        content = json.dumps(model["content"])
+        content = nbformat.writes(nbformat.from_dict(model["content"]))
 
         loop = ioloop.IOLoop.current()
 
