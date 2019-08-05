@@ -240,11 +240,12 @@ const main = async () => {
   );
   checkS3CloneLandingResponse(s3CloneLandingRes, publishedPath);
 
+  await jupyterServer.cloneS3Notebook(bucketName, publishedPath);
   // Wait for minio to have the notebook
   // Future iterations of this script should poll to get the notebook
   await sleep(700);
 
-  jupyterServer.shutdown();
+  await compareS3Notebooks("ci-published.ipynb", originalNotebook);
   await compareS3Notebooks("ci-local-writeout.ipynb", originalNotebook);
   await compareS3Notebooks("ci-local-writeout2.ipynb", {
     cells: [],
@@ -254,6 +255,7 @@ const main = async () => {
       save: 3
     }
   });
+  jupyterServer.shutdown();
 
   console.log("📚 Bookstore Integration Complete 📚");
 };
