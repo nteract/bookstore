@@ -138,7 +138,7 @@ class BookstoreCloneHandler(IPythonHandler):
             "post_model": model,
             "clone_api_url": clone_api_url,
             "redirect_contents_url": redirect_contents_url,
-            "source_description": f"{s3_object_key} from {s3_bucket}",
+            "source_description": f"'{s3_object_key}' from the s3 bucket '{s3_bucket}'",
         }
         return template_params
 
