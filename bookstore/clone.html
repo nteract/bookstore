@@ -10,6 +10,50 @@ Distributed under the terms of the Modified BSD License.
     <meta http-equiv="Content-Language" content="en" />
 
     <title>Clone Landing page</title>
+    <style type="text/css" media="screen">
+      body {
+        background-color: #f1f1f1;
+        margin: 0;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      .container { margin: 50px auto 40px auto; width: 600px; text-align: center; }
+
+      h1 { letter-spacing: -1px; line-height: 60px; font-size: 60px; font-weight: 100; margin: 0px; text-shadow: 0 1px 0 #fff; }
+      p { color: rgba(0, 0, 0, 0.5); margin: 10px 0 10px; font-size: 18px; font-weight: 200; line-height: 1.6em;}
+
+      @media
+      only screen and (-webkit-min-device-pixel-ratio: 2),
+      only screen and (   min--moz-device-pixel-ratio: 2),
+      only screen and (     -o-min-device-pixel-ratio: 2/1),
+      only screen and (        min-device-pixel-ratio: 2),
+      only screen and (                min-resolution: 192dpi),
+      only screen and (                min-resolution: 2dppx) {
+      }
+
+      p {
+        text-align: left;
+      }
+
+      pre {
+        text-align: left;
+        white-space: pre-wrap;       /* css-3 */
+        white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+        white-space: -pre-wrap;      /* Opera 4-6 */
+        white-space: -o-pre-wrap;    /* Opera 7 */
+        word-wrap: break-word;
+      }
+
+      h1 {
+        margin-bottom: 1em;
+      }
+
+      button {
+        font-size: 25px;
+      }
+
+    </style>
+  </head>
     <script>
       window.onload = function() {
         var getCookieByName = function(name) {
@@ -54,12 +98,15 @@ Distributed under the terms of the Modified BSD License.
   </head>
 
   <body>
-    <p>
-      This is the landing page where you should confirm that you wish to clone
-      {{ source_description }}.
-    </p>
-    <button id="mybutton" onclick="alert('did not get replaced')">
-      confirm clone
-    </button>
+    <div class="container">
+        <h1>Clone Confirmation</h1>
+        <p>Preparing to copy the following file to your notebook's working directory:</p>
+        <pre>{{ source_description }}</pre>
+        <p>Only copy code from locations that you recognize and trust.</p>
+
+        <button id="mybutton" onclick="alert('did not get replaced')">
+          Clone
+        </button>
+    </div>
   </body>
 </html>
