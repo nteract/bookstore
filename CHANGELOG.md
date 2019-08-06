@@ -1,6 +1,10 @@
 # Change Log
 
-## 2.4.1 [Unreleased](https://github.com/nteract/bookstore/compare/2.4.0...HEAD)
+## 2.4.2 [Unreleased](https://github.com/nteract/bookstore/compare/2.4.1...HEAD)
+
+## [2.4.1](https://github.com/nteract/bookstore/releases/tag/2.4.1) 2019-08-6
+
+This improves the landing page experience with a cleaner and clearer landing page design.
 
 ## [2.4.0](https://github.com/nteract/bookstore/releases/tag/2.4.0) 2019-08-5
 
