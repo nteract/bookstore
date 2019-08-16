@@ -65,7 +65,8 @@ Distributed under the terms of the Modified BSD License.
 
         var button = document.getElementById("mybutton");
         button.onclick = function(event) {
-          var post_json = {{ post_model | tojson(indent=2)}}
+          button.disabled=true;
+          var post_json = {{ post_model | tojson(indent=2) }}
           var xsrf_token = getCookieByName("_xsrf");
           var xhr = new XMLHttpRequest();
           xhr.responseType = "json";
