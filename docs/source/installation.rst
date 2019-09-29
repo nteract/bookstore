@@ -11,6 +11,13 @@ Install from PyPI (recommended)
 .. code-block:: bash
 
     python3 -m pip install bookstore
+    
+Install from conda-forge
+------------------------
+
+.. code-block:: bash
+
+    conda install -c conda-forge bookstore
 
 Install from Source
 -------------------
