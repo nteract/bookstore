@@ -108,8 +108,8 @@ class TestCloneHandler(AsyncTestCase):
         success_handler = self.get_handler('/bookstore/clone?s3_bucket=hello&s3_key=my_key')
         expected = {
             'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key'},
-            'clone_api_url': 'https://localhost:8888/api/bookstore/clone',
-            'redirect_contents_url': 'https://localhost:8888',
+            'clone_api_url': '/api/bookstore/clone',
+            'redirect_contents_url': '/',
             'source_description': "'my_key' from the s3 bucket 'hello'",
         }
         success_handler = self.get_handler('/bookstore/clone?s3_bucket=hello&s3_key=my_key')
@@ -122,8 +122,8 @@ class TestCloneHandler(AsyncTestCase):
         base_url_list = ['/my_base_url', '/my_base_url/', 'my_base_url/', 'my_base_url']
         expected = {
             'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key'},
-            'clone_api_url': 'https://localhost:8888/my_base_url/api/bookstore/clone',
-            'redirect_contents_url': 'https://localhost:8888',
+            'clone_api_url': '/my_base_url/api/bookstore/clone',
+            'redirect_contents_url': '/my_base_url',
             'source_description': "'my_key' from the s3 bucket 'hello'",
         }
         for base_url in base_url_list:
@@ -348,8 +348,8 @@ class TestFSCloneHandler(AsyncTestCase):
     def test_gen_template_params(self):
         expected = {
             'post_model': {'relpath': 'my/test/path.ipynb'},
-            'clone_api_url': 'https://localhost:8888/api/bookstore/fs-clone',
-            'redirect_contents_url': 'https://localhost:8888',
+            'clone_api_url': '/api/bookstore/fs-clone',
+            'redirect_contents_url': '/',
             'source_description': '/Users/jupyter/my/test/path.ipynb',
         }
         success_handler = self.get_handler('/bookstore/fs-clone?relpath=my/test/path.ipynb')
@@ -362,8 +362,8 @@ class TestFSCloneHandler(AsyncTestCase):
         base_url_list = ['/my_base_url', '/my_base_url/', 'my_base_url/', 'my_base_url']
         expected = {
             'post_model': {'relpath': 'my/test/path.ipynb'},
-            'clone_api_url': 'https://localhost:8888/my_base_url/api/bookstore/fs-clone',
-            'redirect_contents_url': 'https://localhost:8888',
+            'clone_api_url': '/my_base_url/api/bookstore/fs-clone',
+            'redirect_contents_url': '/my_base_url',
             'source_description': '/Users/jupyter/my/test/path.ipynb',
         }
         for base_url in base_url_list:
