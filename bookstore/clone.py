@@ -130,13 +130,13 @@ class BookstoreCloneHandler(IPythonHandler):
         dict
             Template parameters in a dictionary
         """
-        clone_api_url = url_path_join('/', self.base_url, "/api/bookstore/clone")
-        # here we match the logic in how default_url is defined in
+        # here we closely match the logic in how default_url is defined in
         # https://github.com/jupyter/notebook/blob/55e93b9ffef0df9158586e65a34164f7a903e1e0/notebook/notebookapp.py#L1415-L1417
         if self.default_url.startswith(self.base_url):
-            redirect_contents_url = url_path_join('/', self.default_url)
+            redirect_contents_url = self.default_url
         else:
-            redirect_contents_url = url_path_join('/', self.base_url, self.default_url)
+            redirect_contents_url = url_path_join(self.base_url, self.default_url)
+        clone_api_url = url_path_join(self.base_url, "/api/bookstore/clone")
         model = {"s3_bucket": s3_bucket, "s3_key": s3_object_key}
         template_params = {
             "post_model": model,
@@ -394,13 +394,13 @@ class BookstoreFSCloneHandler(IPythonHandler):
         dict
             Template parameters in a dictionary
         """
-        clone_api_url = url_path_join('/', self.base_url, "/api/bookstore/fs-clone")
-        # here we match the logic in how default_url is defined in
+        # here we closely match the logic in how default_url is defined in
         # https://github.com/jupyter/notebook/blob/55e93b9ffef0df9158586e65a34164f7a903e1e0/notebook/notebookapp.py#L1415-L1417
         if self.default_url.startswith(self.base_url):
-            redirect_contents_url = url_path_join('/', self.default_url)
+            redirect_contents_url = self.default_url
         else:
-            redirect_contents_url = url_path_join('/', self.base_url, self.default_url)
+            redirect_contents_url = url_path_join(self.base_url, self.default_url)
+        clone_api_url = url_path_join(self.base_url, "/api/bookstore/fs-clone")
         model = {"relpath": relpath}
 
         template_params = {

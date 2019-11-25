@@ -65,7 +65,11 @@ class TestCloneHandler(AsyncTestCase):
     def setUp(self):
         super().setUp()
         self.mock_application = Mock(
-            spec=Application, ui_methods={}, ui_modules={}, settings={'jinja2_env': Environment()}
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            # base_url in Tornado settings must begin and end with '/'
+            settings={'jinja2_env': Environment(), "base_url": "/"},
         )
 
     def get_handler(self, uri, app=None):
@@ -119,28 +123,26 @@ class TestCloneHandler(AsyncTestCase):
         assert expected == output
 
     def test_gen_template_params_base_url(self):
-        base_url_list = ['/my_base_url', '/my_base_url/', 'my_base_url/', 'my_base_url']
         expected = {
             'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key'},
             'clone_api_url': '/my_base_url/api/bookstore/clone',
             'redirect_contents_url': '/my_base_url',
             'source_description': "'my_key' from the s3 bucket 'hello'",
         }
-        for base_url in base_url_list:
-            mock_app = Mock(
-                spec=Application,
-                ui_methods={},
-                ui_modules={},
-                settings={'jinja2_env': Environment(), "base_url": base_url},
-            )
+        mock_app = Mock(
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            settings={'jinja2_env': Environment(), "base_url": "/my_base_url/"},
+        )
 
-            success_handler = self.get_handler(
-                '/bookstore/clone?s3_bucket=hello&s3_key=my_key', app=mock_app
-            )
-            output = success_handler.construct_template_params(
-                s3_bucket="hello", s3_object_key="my_key"
-            )
-            assert expected == output
+        success_handler = self.get_handler(
+            '/bookstore/clone?s3_bucket=hello&s3_key=my_key', app=mock_app
+        )
+        output = success_handler.construct_template_params(
+            s3_bucket="hello", s3_object_key="my_key"
+        )
+        assert expected == output
 
 
 class TestCloneAPIHandler(AsyncTestCase):
@@ -306,7 +308,7 @@ class TestFSCloneHandler(AsyncTestCase):
             spec=Application,
             ui_methods={},
             ui_modules={},
-            settings={'jinja2_env': Environment(), 'config': self.config},
+            settings={'jinja2_env': Environment(), 'config': self.config, "base_url": "/"},
         )
 
     def get_handler(self, uri, app=None):
@@ -359,28 +361,32 @@ class TestFSCloneHandler(AsyncTestCase):
         assert expected == output
 
     def test_gen_template_params_base_url(self):
-        base_url_list = ['/my_base_url', '/my_base_url/', 'my_base_url/', 'my_base_url']
+        # We can only test `base_url`s that begin and end with `/`
+        mock_app = Mock(
+            spec=Application,
+            ui_methods={},
+            ui_modules={},
+            settings={
+                'jinja2_env': Environment(),
+                "base_url": '/my_base_url/',
+                "config": self.config,
+            },
+        )
+
         expected = {
             'post_model': {'relpath': 'my/test/path.ipynb'},
             'clone_api_url': '/my_base_url/api/bookstore/fs-clone',
             'redirect_contents_url': '/my_base_url',
             'source_description': '/Users/jupyter/my/test/path.ipynb',
         }
-        for base_url in base_url_list:
-            mock_app = Mock(
-                spec=Application,
-                ui_methods={},
-                ui_modules={},
-                settings={'jinja2_env': Environment(), "base_url": base_url, "config": self.config},
-            )
 
-            success_handler = self.get_handler(
-                '/bookstore/fs-clone?relpath=my/test/path.ipynb', app=mock_app
-            )
-            output = success_handler.construct_template_params(
-                relpath='my/test/path.ipynb', fs_clonepath='/Users/jupyter/my/test/path.ipynb'
-            )
-            assert expected == output
+        success_handler = self.get_handler(
+            '/bookstore/fs-clone?relpath=my/test/path.ipynb', app=mock_app
+        )
+        output = success_handler.construct_template_params(
+            relpath='my/test/path.ipynb', fs_clonepath='/Users/jupyter/my/test/path.ipynb'
+        )
+        assert expected == output
 
 
 class TestFSCloneAPIHandler(AsyncTestCase):
@@ -399,6 +405,7 @@ class TestFSCloneAPIHandler(AsyncTestCase):
                 'jinja2_env': Environment(),
                 "config": config,
                 "contents_manager": FileContentsManager(),
+                "base_url": "/",
             },
         )
 
