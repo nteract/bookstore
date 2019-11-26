@@ -78,7 +78,7 @@ Distributed under the terms of the Modified BSD License.
           xhr.onload = function(e) {
             if (xhr.readyState === 4) {
               if (xhr.status === 200) {
-                window.location.href = `{{ redirect_contents_url }}/${
+                window.location.pathname = `{{ redirect_contents_url }}/${
                   xhr.response.path
                 }`;
               } else {
