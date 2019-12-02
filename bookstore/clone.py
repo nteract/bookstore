@@ -82,7 +82,7 @@ class BookstoreCloneHandler(IPythonHandler):
         Helper to access bookstore settings.
     get(self)
         Checks for valid storage settings and render a UI for clone options.
-    construct_template_params(self, s3_bucket, s3_object_key)
+    construct_template_params(self, s3_bucket, s3_object_key, s3_version_id=None)
         Helper to populate Jinja template for cloning option page.
     get_template(self, name)
         Loads a Jinja template and its related settings.
@@ -115,13 +115,15 @@ class BookstoreCloneHandler(IPythonHandler):
         if s3_object_key == '' or s3_object_key == '/':
             raise web.HTTPError(400, "Requires an S3 object key in order to clone")
 
+        s3_version_id = self.get_argument("s3_version_id", default=None)
+
         self.log.info(f"Setting up cloning landing page for {s3_object_key}")
 
-        template_params = self.construct_template_params(s3_bucket, s3_object_key)
+        template_params = self.construct_template_params(s3_bucket, s3_object_key, s3_version_id)
         self.set_header('Content-Type', 'text/html')
         self.write(self.render_template('clone.html', **template_params))
 
-    def construct_template_params(self, s3_bucket, s3_object_key):
+    def construct_template_params(self, s3_bucket, s3_object_key, s3_version_id=None):
         """Helper that takes valid S3 parameters and populates UI template
         
         Returns
@@ -137,12 +139,12 @@ class BookstoreCloneHandler(IPythonHandler):
         else:
             redirect_contents_url = url_path_join(self.base_url, self.default_url)
         clone_api_url = url_path_join(self.base_url, "/api/bookstore/clone")
-        model = {"s3_bucket": s3_bucket, "s3_key": s3_object_key}
+        model = {"s3_bucket": s3_bucket, "s3_key": s3_object_key, "s3_version_id": s3_version_id}
         template_params = {
             "post_model": model,
             "clone_api_url": clone_api_url,
             "redirect_contents_url": redirect_contents_url,
-            "source_description": f"'{s3_object_key}' from the s3 bucket '{s3_bucket}'",
+            "source_description": f"'{s3_object_key}'{' version: '+s3_version_id if s3_version_id else ''} from the s3 bucket '{s3_bucket}'",
         }
         return template_params
 
@@ -179,7 +181,7 @@ class BookstoreCloneAPIHandler(APIHandler):
 
         self.session = aiobotocore.get_session()
 
-    async def _clone(self, s3_bucket, s3_object_key):
+    async def _clone(self, s3_bucket, s3_object_key, s3_version_id=None):
         """Main function that handles communicating with S3 to initiate the clone.
 
         Parameters
@@ -188,6 +190,8 @@ class BookstoreCloneAPIHandler(APIHandler):
             Log (usually from the NotebookApp) for logging endpoint changes.
         s3_object_key: str
             The the path we wish to clone to.
+        s3_version_id: str, optional
+            The version id provided. Default is None, which gets the latest version
         """
 
         self.log.info(f"bucket: {s3_bucket}")
@@ -202,7 +206,10 @@ class BookstoreCloneAPIHandler(APIHandler):
         ) as client:
             self.log.info(f"Processing clone of {s3_object_key}")
             try:
-                obj = await client.get_object(Bucket=s3_bucket, Key=s3_object_key)
+                s3_kwargs = {"Bucket": s3_bucket, "Key": s3_object_key}
+                if s3_version_id is not None:
+                    s3_kwargs['VersionId'] = s3_version_id
+                obj = await client.get_object(**s3_kwargs)
                 content = (await obj['Body'].read()).decode('utf-8')
             except ClientError as e:
                 status_code = e.response['ResponseMetadata'].get('HTTPStatusCode')
@@ -224,6 +231,7 @@ class BookstoreCloneAPIHandler(APIHandler):
             "s3_bucket": string,
             "s3_key": string,
             "target_path"?: string
+            "s3_version_id"?: string
             }
 
         The response payload should match the standard Jupyter contents
@@ -242,9 +250,10 @@ class BookstoreCloneAPIHandler(APIHandler):
         target_path = model.get("target_path", "") or os.path.basename(
             os.path.relpath(s3_object_key)
         )
+        s3_version_id = model.get("s3_version_id", None)
 
         self.log.info(f"About to clone from {s3_object_key}")
-        obj, content = await self._clone(s3_bucket, s3_object_key)
+        obj, content = await self._clone(s3_bucket, s3_object_key, s3_version_id=s3_version_id)
 
         content_model = self.build_content_model(content, target_path)
 

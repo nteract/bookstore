@@ -109,9 +109,8 @@ class TestCloneHandler(AsyncTestCase):
         await success_handler.get()
 
     def test_gen_template_params(self):
-        success_handler = self.get_handler('/bookstore/clone?s3_bucket=hello&s3_key=my_key')
         expected = {
-            'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key'},
+            'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key', 's3_version_id': None},
             'clone_api_url': '/api/bookstore/clone',
             'redirect_contents_url': '/',
             'source_description': "'my_key' from the s3 bucket 'hello'",
@@ -124,7 +123,7 @@ class TestCloneHandler(AsyncTestCase):
 
     def test_gen_template_params_base_url(self):
         expected = {
-            'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key'},
+            'post_model': {'s3_bucket': 'hello', 's3_key': 'my_key', 's3_version_id': None},
             'clone_api_url': '/my_base_url/api/bookstore/clone',
             'redirect_contents_url': '/my_base_url',
             'source_description': "'my_key' from the s3 bucket 'hello'",
