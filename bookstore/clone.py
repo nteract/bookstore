@@ -181,6 +181,23 @@ class BookstoreCloneAPIHandler(APIHandler):
 
         self.session = aiobotocore.get_session()
 
+    def _build_s3_request_object(self, s3_bucket, s3_object_key, s3_version_id=None):
+        """Helper to build object request with the appropriate keys for S3 APIs.
+
+        Parameters
+        ----------
+        s3_bucket: str
+            Log (usually from the NotebookApp) for logging endpoint changes.
+        s3_object_key: str
+            The the path we wish to clone to.
+        s3_version_id: str, optional
+            The version id provided. Default is None, which gets the latest version
+        """
+        s3_kwargs = {"Bucket": s3_bucket, "Key": s3_object_key}
+        if s3_version_id is not None:
+            s3_kwargs['VersionId'] = s3_version_id
+        return s3_kwargs
+
     async def _clone(self, s3_bucket, s3_object_key, s3_version_id=None):
         """Main function that handles communicating with S3 to initiate the clone.
 
@@ -206,9 +223,7 @@ class BookstoreCloneAPIHandler(APIHandler):
         ) as client:
             self.log.info(f"Processing clone of {s3_object_key}")
             try:
-                s3_kwargs = {"Bucket": s3_bucket, "Key": s3_object_key}
-                if s3_version_id is not None:
-                    s3_kwargs['VersionId'] = s3_version_id
+                s3_kwargs = self._build_s3_request_object(s3_bucket, s3_object_key, s3_version_id)
                 obj = await client.get_object(**s3_kwargs)
                 content = (await obj['Body'].read()).decode('utf-8')
             except ClientError as e:

@@ -128,7 +128,9 @@ class TestCloneHandler(AsyncTestCase):
             'redirect_contents_url': '/',
             'source_description': "'my_key' version: my_version from the s3 bucket 'hello'",
         }
-        success_handler = self.get_handler('/bookstore/clone?s3_bucket=hello&s3_key=my_key&s3_version_id=my_version')
+        success_handler = self.get_handler(
+            '/bookstore/clone?s3_bucket=hello&s3_key=my_key&s3_version_id=my_version'
+        )
         output = success_handler.construct_template_params(
             s3_bucket="hello", s3_object_key="my_key", s3_version_id="my_version"
         )
@@ -224,6 +226,33 @@ class TestCloneAPIHandler(AsyncTestCase):
         success_handler = self.post_handler(post_body_dict)
         with pytest.raises(HTTPError):
             await success_handler._clone(s3_bucket, s3_object_key)
+
+    def test_build_s3_request_object(self):
+        expected = {"Bucket": "my_bucket", "Key": "my_key"}
+        s3_bucket = "my_bucket"
+        s3_object_key = "my_key"
+        post_body_dict = {"s3_key": "my_key", "s3_bucket": "my_bucket"}
+        success_handler = self.post_handler(post_body_dict)
+        actual = success_handler._build_s3_request_object(s3_bucket, s3_object_key)
+        assert actual == expected
+
+    def test_build_s3_request_object_version_id(self):
+        expected = {"Bucket": "my_bucket", "Key": "my_key", "VersionId": "my_version"}
+
+        s3_bucket = "my_bucket"
+        s3_object_key = "my_key"
+        s3_version_id = "my_version"
+
+        post_body_dict = {
+            "s3_key": s3_object_key,
+            "s3_bucket": s3_bucket,
+            "s3_version_id": s3_version_id,
+        }
+        success_handler = self.post_handler(post_body_dict)
+        actual = success_handler._build_s3_request_object(
+            s3_bucket, s3_object_key, s3_version_id=s3_version_id
+        )
+        assert actual == expected
 
     def test_build_post_response_model(self):
         content = "some arbitrary content"
