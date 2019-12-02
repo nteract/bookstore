@@ -1,6 +1,10 @@
 # Change Log
 
-## 2.4.2 [Unreleased](https://github.com/nteract/bookstore/compare/2.4.1...HEAD)
+## [Unreleased](https://github.com/nteract/bookstore/compare/2.5.0...HEAD)
+
+## [2.5.0](https://github.com/nteract/bookstore/compare/2.5.0)
+
+This switches the bookstore serverextension and landing page from using absolute urls to relative paths.
 
 ## [2.4.1](https://github.com/nteract/bookstore/releases/tag/2.4.1) 2019-08-6
 
