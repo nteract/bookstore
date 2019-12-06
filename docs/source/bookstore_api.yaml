@@ -9,7 +9,7 @@ info:
   license:
     name: BSD 3-clause
     url: https://github.com/nteract/bookstore/blob/master/LICENSE 
-  version: 2.5.1
+  version: 2.5.1dev0
 externalDocs:
   description: Find out more about Bookstore
   url: https://bookstore.readthedocs.io/en/latest/ 

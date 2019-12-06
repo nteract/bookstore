@@ -14,7 +14,10 @@ version is used.
 
 ## Create the release
 
-- [ ] Update version number `bookstore/_version.py`
+- [ ] Update version numbers in 
+  - [ ] `bookstore/_version.py` (version_info)
+  - [ ] `docs/source/conf.py` (version and release)
+  - [ ] `docs/source/bookstore_api.yaml` (info.version)
 - [ ] Commit the updated version
 - [ ] Clean the repo of all non-tracked files: `git clean -xdfi`
 - [ ] Commit and tag the release
