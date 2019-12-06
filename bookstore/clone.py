@@ -140,11 +140,12 @@ class BookstoreCloneHandler(IPythonHandler):
             redirect_contents_url = url_path_join(self.base_url, self.default_url)
         clone_api_url = url_path_join(self.base_url, "/api/bookstore/clone")
         model = {"s3_bucket": s3_bucket, "s3_key": s3_object_key, "s3_version_id": s3_version_id}
+        version_text = ' version: ' + s3_version_id if s3_version_id else ''
         template_params = {
             "post_model": model,
             "clone_api_url": clone_api_url,
             "redirect_contents_url": redirect_contents_url,
-            "source_description": f"'{s3_object_key}'{' version: '+s3_version_id if s3_version_id else ''} from the s3 bucket '{s3_bucket}'",
+            "source_description": f"'{s3_object_key}'{version_text} from the s3 bucket '{s3_bucket}'",
         }
         return template_params
 
