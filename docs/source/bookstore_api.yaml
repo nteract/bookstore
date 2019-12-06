@@ -9,7 +9,7 @@ info:
   license:
     name: BSD 3-clause
     url: https://github.com/nteract/bookstore/blob/master/LICENSE 
-  version: 2.3.0.dev0
+  version: 2.5.1dev0
 externalDocs:
   description: Find out more about Bookstore
   url: https://bookstore.readthedocs.io/en/latest/ 
@@ -44,6 +44,13 @@ paths:
         in: query
         description: S3 object key being requested
         required: true
+        style: form
+        schema:
+          type: string
+      - name: s3_version_id
+        in: query
+        description: S3 object key being requested
+        required: false
         style: form
         schema:
           type: string
@@ -170,6 +177,8 @@ components:
         s3_bucket: 
           type: string
         s3_key:
+          type: string
+        s3_version_id:
           type: string
         target_path:
           type: string
