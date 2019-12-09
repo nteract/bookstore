@@ -2,6 +2,21 @@
 
 ## [Unreleased](https://github.com/nteract/bookstore/compare/2.5.0...HEAD)
 
+## [2.5.1](https://github.com/nteract/bookstore/compare/2.5.1)
+
+This enables adds a new feature to bookstore cloning from s3, cloning specific versions of notebooks from versioned s3 buckets.
+
+Specifically, it introduces the `s3_version_id` query parameter to the `/bookstore/clone/` GET handler.
+
+So if you wanted to clone a specific version `myVersion` of `/workspace/my_notebook.ipynb` from the `my_bucket` S3 bucket,
+you would change the route from something like
+
+http://localhost:8888/bookstore/clone?s3_bucket=my_bucket&s3_key=workspace/my_notebook.ipynb
+
+to
+
+http://localhost:8888/bookstore/clone?s3_bucket=my_bucket&s3_key=workspace/my_notebook.ipynb&s3_version_id=myVersion
+
 ## [2.5.0](https://github.com/nteract/bookstore/compare/2.5.0)
 
 This switches the bookstore serverextension and landing page from using absolute urls to relative paths.
