@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased](https://github.com/nteract/bookstore/compare/2.5.0...HEAD)
+## [Unreleased](https://github.com/nteract/bookstore/compare/2.5.1...HEAD)
 
 ## [2.5.1](https://github.com/nteract/bookstore/compare/2.5.1)
 

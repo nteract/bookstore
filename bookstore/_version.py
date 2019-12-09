@@ -18,7 +18,7 @@ No dot before alpha/beta/rc. Use dot before `.dev`. Examples::
 - suffix (dev or "" to designate a final version)
 """
 
-version_info = (2, 5, 1)
+version_info = (2, 5, 2, "", "dev")
 
 __version__ = ".".join(map(str, version_info[:3])) + ".".join(version_info[3:])
 
