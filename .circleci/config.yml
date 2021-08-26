@@ -41,7 +41,7 @@ jobs:
           name: check types
           command: |
             . venv/bin/activate
-            mypy bookstore --ignore-missing-imports
+            mypy -m bookstore --ignore-missing-imports
       - run:
           name: python tests
           command: |
