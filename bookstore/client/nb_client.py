@@ -50,6 +50,7 @@ class LiveNotebookRecord(NamedTuple):
     secure: bool
     token: str
     url: str
+    sock: str = None
 
 
 class KernelInfo:
